@@ -7,7 +7,7 @@
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9937136601785737"
      crossorigin="anonymous"></script>
      <meta name="google-adsense-account" content="ca-pub-9937136601785737">
-    <style> 
+    <style>
         body {
             font-family: sans-serif;
             margin: 0;
@@ -444,45 +444,4 @@ galleryImages.forEach(img => {
             qrisContainer.style.display = 'none';
             notificationDiv.style.display = 'none';
         }
-function showQRIS() {
-    document.getElementById('qrisNama').textContent = "";
-    document.getElementById('qrisNomor').textContent = "";
-
-    popupImage.classList.remove('blurred');
-    popupImage.style.display = 'none';
-    qrisImage.style.display = 'block';
-    qrisContainer.style.display = 'flex';
-    payButton.style.display = 'none';
-    notificationDiv.style.display = 'none';
-        }
-
-        function processPayment() {
-            notificationDiv.textContent = "Pembayaran sedang diproses oleh sistem...";
-            notificationDiv.style.display = 'block';
-            setTimeout(() => {
-                window.location.reload();
-            }, 2000);
-        }
-  var modal = document.getElementById("paymentModal");
-
-  // Function to open the modal
-  function openModal() {
-    modal.style.display = "block";
-  }
-
-  // Function to close the modal
-  function closeModal() {
-    modal.style.display = "none";
-
-  }
-
-  // Close modal if user clicks outside of it
-  window.onclick = function(event) {
-    if (event.target == modal) {
-      modal.style.display = "none";
-    }
-  }
-</script>
-</body>
-</html>
-    
+funct
