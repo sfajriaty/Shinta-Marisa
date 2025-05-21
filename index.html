@@ -243,7 +243,21 @@
     margin-left: 10px;
     cursor: pointer;
   }
-  
+          .download-button {
+            padding: 5px 3px;
+            font-size: .5em;
+            background-color: #007b; /* Warna biru untuk "download" */
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            text-decoration: none; /* Menghilangkan garis bawah pada link */
+            display: inline-block; /* Agar padding dan margin bekerja */
+        }
+        .download-button:hover {
+            background-color: #0056;
+        }
     </style>
 </head>
 <body>
@@ -375,6 +389,10 @@
     <div class="qris-image-container">
         <img id="qrisImage" class="qris-image" src="" alt="QRIS">
     </div>
+        <a href="https://jfhcwtsxchweaetsjryf.supabase.co/storage/v1/object/public/qris//1-.jpg" download="https://jfhcwtsxchweaetsjryf.supabase.co/storage/v1/object/public/qris//1-.jpg">
+        <button class="download-button">Download Qris!</button>
+    </a>
+    
     <button class="done-button" onclick="processPayment()">KONFIRMASI PEMBAYARAN</button>
     <div id="notification"></div>
     <span style="font-size: 0.8em; color: #555;"><strong>(konfirmasi jika sudah melakukan tranfer)<hr></strong></span>
@@ -429,7 +447,7 @@ galleryImages.forEach(img => {
         function openPopup(imageSrc) {
             currentImageSource = imageSrc;
             popupImage.src = currentImageSource;
-            payButton.style.display = 'block';
+            payButton.style.display ='block' ;
             qrisContainer.style.display = 'none';
             notificationDiv.style.display = 'none';
             qrisImage.src = defaultQrisUrl;
@@ -479,3 +497,4 @@ function showQRIS() {
 </script>
 </body>
 </html>
+            
