@@ -69,7 +69,7 @@
             width: 100%;
             height: 100%;
             border-radius: 10px;
-            filter: blur(5px);
+            filter: blur(1px);
             cursor: pointer;
         }
 
@@ -112,7 +112,7 @@
             max-width: 90%;
             max-height: 70vh;
             border-radius: 5px;
-            filter: blur(5px);
+            filter: blur(1px);
             display: block;
         }
 
@@ -194,8 +194,8 @@
         }
     #whatsapp-button {
     position: fixed;
-    bottom: 10px;
-    right: 10px;
+    bottom: -3px;
+    right: 15px;
     z-index: 999;
     cursor: pointer;
   }
@@ -213,11 +213,11 @@
     width: 100%;
     height: 100%;
     overflow: auto;
-    background-color: rgba(0,0,0,0.5); 
+    background-color: rgba(0,0,0,0.9); 
     }
 
   .modal-content {
-    background-color: ;
+    background-color: rgba(0,0,0,0.9);
     margin: 120% auto;
     padding: 5px;
     border-radius: 10px;
@@ -228,7 +228,7 @@
   }
   .close-button:hover,
   .close-button:focus {
-    color: red;
+    color: #fff;
     text-decoration: none;
     cursor: pointer;
   }
@@ -262,7 +262,34 @@
             color: red;
             font-weight: bold;
         }
-        
+                .slideshow-container {
+            position: relative;
+            max-width: 800px;
+            margin: auto;
+            overflow: hidden;
+            border: 0px solid #fff;
+        }
+        .mySlides {
+            display: none; 
+            width: 100%;
+            transition: transform 0.8s ease-in-out; 
+        }
+        .mySlides img {
+            width: 97%;
+            padding: 5px;
+            height: auto;
+            display: block;
+            border-radius: 10px;
+        }
+        .slide-from-right {
+            transform: translateX(100%);
+        }
+        .slide-to-center {
+            transform: translateX(0%);
+        }
+        .slide-to-left {
+            transform: translateX(100%);
+        }
     </style>
 </head>
 <body>
@@ -288,90 +315,25 @@
         <hr style="border: 1px solid #eee; margin: 10px 0;">
         <div class="gallery-wrapper" id="supabase-gallery">
             <div class="gallery-item">
-                <img src="https://jfhcwtsxchweaetsjryf.supabase.co/storage/v1/object/public/media//IMG_20250510_213445.jpg" alt="Foto 1" onclick="openPopup('https://jfhcwtsxchweaetsjryf.supabase.co/storage/v1/object/public/media//IMG_20250510_213445.jpg')">
+                <img src="https://jfhcwtsxchweaetsjryf.supabase.co/storage/v1/object/public/qris//IMG_20250521_123113.jpg" alt="Foto 1" onclick="openPopup('https://jfhcwtsxchweaetsjryf.supabase.co/storage/v1/object/public/qris//IMG_20250521_123113.jpg')">
             </div>
-            <div class="gallery-item">
-                <img src="https://jfhcwtsxchweaetsjryf.supabase.co/storage/v1/object/public/media//IMG_20250510_213457.jpg" alt="Foto 2" onclick="openPopup('https://jfhcwtsxchweaetsjryf.supabase.co/storage/v1/object/public/media//IMG_20250510_213457.jpg')">
-            </div>
-            <div class="gallery-item">
-                <img src="https://jfhcwtsxchweaetsjryf.supabase.co/storage/v1/object/public/media//IMG_20250510_213507.jpg" alt="Foto 3" onclick="openPopup('https://jfhcwtsxchweaetsjryf.supabase.co/storage/v1/object/public/media//IMG_20250510_213507.jpg')">
-            </div>
-            <div class="gallery-item">
-                <img src="https://jfhcwtsxchweaetsjryf.supabase.co/storage/v1/object/public/media//IMG_20250510_213517.jpg" alt="Foto 3" onclick="openPopup('https://jfhcwtsxchweaetsjryf.supabase.co/storage/v1/object/public/media//IMG_20250510_213517.jpg')">
-            </div>
-            <div class="gallery-item">
-                <img src="https://jfhcwtsxchweaetsjryf.supabase.co/storage/v1/object/public/media//IMG_20250510_213529.jpg" alt="Foto 3" onclick="openPopup('https://jfhcwtsxchweaetsjryf.supabase.co/storage/v1/object/public/media//IMG_20250510_213529.jpg')">
-            </div>
-            <div class="gallery-item">
-                <img src="https://jfhcwtsxchweaetsjryf.supabase.co/storage/v1/object/public/media//IMG_20250510_214842.jpg" alt="Foto 3" onclick="openPopup('https://jfhcwtsxchweaetsjryf.supabase.co/storage/v1/object/public/media//IMG_20250510_214842.jpg')">
-            </div>
-            <div class="gallery-item">
-                <img src="https://jfhcwtsxchweaetsjryf.supabase.co/storage/v1/object/public/media//IMG_20250510_214852.jpg" alt="Foto 3" onclick="openPopup('https://jfhcwtsxchweaetsjryf.supabase.co/storage/v1/object/public/media//IMG_20250510_214852.jpg')">
-            </div>
-            <div class="gallery-item">
-                <img src="https://jfhcwtsxchweaetsjryf.supabase.co/storage/v1/object/public/media//IMG_20250510_214908.jpg" alt="Foto 3" onclick="openPopup('https://jfhcwtsxchweaetsjryf.supabase.co/storage/v1/object/public/media//IMG_20250510_214908.jpg')">
-            </div>
-            <div class="gallery-item">
-                <img src="https://jfhcwtsxchweaetsjryf.supabase.co/storage/v1/object/public/media//IMG_20250510_214920.jpg" alt="Foto 3" onclick="openPopup('https://jfhcwtsxchweaetsjryf.supabase.co/storage/v1/object/public/media//IMG_20250510_214920.jpg')">
-            </div>
-            <div class="gallery-item">
-                <img src="https://jfhcwtsxchweaetsjryf.supabase.co/storage/v1/object/public/media//IMG_20250510_214944.jpg" alt="Foto 3" onclick="openPopup('https://jfhcwtsxchweaetsjryf.supabase.co/storage/v1/object/public/media//IMG_20250510_214944.jpg')">
-            </div>
-            <div class="gallery-item">
-                <img src="https://jfhcwtsxchweaetsjryf.supabase.co/storage/v1/object/public/media//IMG_20250510_214955.jpg" alt="Foto 3" onclick="openPopup('https://jfhcwtsxchweaetsjryf.supabase.co/storage/v1/object/public/media//IMG_20250510_214955.jpg')">
-            </div>
-            <div class="gallery-item">
-                <img src="https://jfhcwtsxchweaetsjryf.supabase.co/storage/v1/object/public/media//IMG_20250510_231432.jpg" alt="Foto 3" onclick="openPopup('https://jfhcwtsxchweaetsjryf.supabase.co/storage/v1/object/public/media//IMG_20250510_231432.jpg')">
-            </div>
-            <div class="gallery-item">
-                <img src="https://jfhcwtsxchweaetsjryf.supabase.co/storage/v1/object/public/media//IMG_20250510_231443.jpg" alt="Foto 3" onclick="openPopup('https://jfhcwtsxchweaetsjryf.supabase.co/storage/v1/object/public/media//IMG_20250510_231443.jpg')">
-            </div>
-            <div class="gallery-item">
-                <img src="https://jfhcwtsxchweaetsjryf.supabase.co/storage/v1/object/public/media//IMG_20250510_231456.jpg" alt="Foto 3" onclick="openPopup('https://jfhcwtsxchweaetsjryf.supabase.co/storage/v1/object/public/media//IMG_20250510_231456.jpg')">
-            </div>
-            <div class="gallery-item">
-                <img src="https://jfhcwtsxchweaetsjryf.supabase.co/storage/v1/object/public/media//IMG_20250510_231520.jpg" alt="Foto 3" onclick="openPopup('https://jfhcwtsxchweaetsjryf.supabase.co/storage/v1/object/public/media//IMG_20250510_231520.jpg')">
-            </div>
-            <div class="gallery-item">
-                <img src="https://jfhcwtsxchweaetsjryf.supabase.co/storage/v1/object/public/media//IMG_20250510_232447.jpg" alt="Foto 3" onclick="openPopup('https://jfhcwtsxchweaetsjryf.supabase.co/storage/v1/object/public/media//IMG_20250510_232447.jpg')">
-            </div>
-             <div class="gallery-item">
-                <img src="https://jfhcwtsxchweaetsjryf.supabase.co/storage/v1/object/public/media//IMG_20250510_232456.jpg" alt="Foto 3" onclick="openPopup('https://jfhcwtsxchweaetsjryf.supabase.co/storage/v1/object/public/media//IMG_20250510_232456.jpg')">
-            </div>
-            <div class="gallery-item">
-                <img src="https://jfhcwtsxchweaetsjryf.supabase.co/storage/v1/object/public/media//IMG_20250510_232522.jpg" alt="Foto 3" onclick="openPopup('https://jfhcwtsxchweaetsjryf.supabase.co/storage/v1/object/public/media//IMG_20250510_232522.jpg')">
-            </div>
-            <div class="gallery-item">
-                <img src="https://jfhcwtsxchweaetsjryf.supabase.co/storage/v1/object/public/media//IMG_20250510_232533.jpg" alt="Foto 3" onclick="openPopup('https://jfhcwtsxchweaetsjryf.supabase.co/storage/v1/object/public/media//IMG_20250510_232533.jpg')">
-            </div>
-            <div class="gallery-item">
-                <img src="https://jfhcwtsxchweaetsjryf.supabase.co/storage/v1/object/public/media//IMG_20250510_232545.jpg" alt="Foto 3" onclick="openPopup('https://jfhcwtsxchweaetsjryf.supabase.co/storage/v1/object/public/media//IMG_20250510_232545.jpg')">
-            </div>
-            <div class="gallery-item">
-                <img src="https://jfhcwtsxchweaetsjryf.supabase.co/storage/v1/object/public/media//IMG_20250510_232559.jpg" alt="Foto 3" onclick="openPopup('https://jfhcwtsxchweaetsjryf.supabase.co/storage/v1/object/public/media//IMG_20250510_232559.jpg')">
-            </div>
-             <div class="gallery-item">
-                <img src="https://jfhcwtsxchweaetsjryf.supabase.co/storage/v1/object/public/media//IMG_20250510_232610.jpg" alt="Foto 3" onclick="openPopup('https://jfhcwtsxchweaetsjryf.supabase.co/storage/v1/object/public/media//IMG_20250510_232610.jpg')">
-            </div>
- <div class="gallery-item">
-                <img src="https://jfhcwtsxchweaetsjryf.supabase.co/storage/v1/object/public/media//IMG_20250510_232622.jpg" alt="Foto 3" onclick="openPopup('https://jfhcwtsxchweaetsjryf.supabase.co/storage/v1/object/public/media//IMG_20250510_232622.jpg')">
-            </div>
- <div class="gallery-item">
-                <img src="https://jfhcwtsxchweaetsjryf.supabase.co/storage/v1/object/public/media//IMG_20250510_232636.jpg" alt="Foto 3" onclick="openPopup('https://jfhcwtsxchweaetsjryf.supabase.co/storage/v1/object/public/media//IMG_20250510_232636.jpg')">
-            </div>
- <div class="gallery-item">
-                <img src="https://jfhcwtsxchweaetsjryf.supabase.co/storage/v1/object/public/media//Sexi_13.jpg" alt="Foto 3" onclick="openPopup('https://jfhcwtsxchweaetsjryf.supabase.co/storage/v1/object/public/media//Sexi_13.jpg')">
-            </div>
- <div class="gallery-item">
-                <img src="https://jfhcwtsxchweaetsjryf.supabase.co/storage/v1/object/public/media//Sexi_14.jpg" alt="Foto 3" onclick="openPopup('https://jfhcwtsxchweaetsjryf.supabase.co/storage/v1/object/public/media//Sexi_14.jpg')">
-            </div>
- <div class="gallery-item">
-                <img src="https://jfhcwtsxchweaetsjryf.supabase.co/storage/v1/object/public/media//Sexi_15.jpg" alt="Foto 3" onclick="openPopup('https://jfhcwtsxchweaetsjryf.supabase.co/storage/v1/object/public/media//Sexi_15.jpg')">
-            </div>
- <div class="gallery-item">
-                <img src="https://jfhcwtsxchweaetsjryf.supabase.co/storage/v1/object/public/media//Sexi_19.jpg" alt="Foto 3" onclick="openPopup('https://jfhcwtsxchweaetsjryf.supabase.co/storage/v1/object/public/media//Sexi_19.jpg')">
-            </div>
-            </div>
+                <div class="slideshow-container">
+
+        <div class="mySlides fade">
+            <div class="numbertext"></div>
+            <img src="https://jfhcwtsxchweaetsjryf.supabase.co/storage/v1/object/public/qris//IMG_20250521_141226.jpg" alt="Gambar 1">
+        </div>
+
+        <div class="mySlides fade">
+            <div class="numbertext"></div>
+            <img src="https://jfhcwtsxchweaetsjryf.supabase.co/storage/v1/object/public/qris//IMG_20250521_144024.jpg" alt="Gambar 2">
+        </div>
+
+        <div class="mySlides fade">
+            <div class="numbertext"></div>
+            <img src="https://jfhcwtsxchweaetsjryf.supabase.co/storage/v1/object/public/qris//IMG_20250521_140707.jpg" alt="Gambar 3">
+        </div>
+    <br>
     </div>
     <div id="overlay" class="overlay" onclick="closePopup()">
         <div id="popupContent" class="popup" onclick="event.stopPropagation()">
@@ -379,7 +341,7 @@
                 <img id="popupImage" class="popup-image" src="" alt="Gambar Popup">
             </div>
             <button id="payButton" class="pay-button" onclick="showQRIS()">Bayar</button>
-            <span style="font-size: 0.8em; color: #555;"><strong>(Lanjutkan membayar poto dengan harga Rp.10.000)</strong></span>
+            <span style="font-size: 0.8em; color: #555;"><strong>(Lanjutkan membayar poto dengan harga Rp.25.000)</strong></span>
 
           <div id="qrisContainer" class="qris-container">
     <div class="qris-info">
@@ -403,7 +365,7 @@
     </div>
     <footer>
           </div>
-        <span style="font-size: 0.5em; color: #555;"><strong><center>HANYA DENGAN Rp.10.000,- KAMU ❤️ SUDAH BISA MELIHAT KOLEKSI POTO PREMIUM SHINTA</center></strong>
+        <span style="font-size: 0.5em; color: #555;"><strong><center>HANYA DENGAN Rp.25.000,- KAMU ❤️ SUDAH BISA MELIHAT KOLEKSI POTO PREMIUM SHINTA</center></strong>
         <p><center>&copy; 2025 GALLERY SHINTA. Hak Cipta Dilindungi.</p>
         <p><a href="/kebijakan-privasi">Kebijakan Privasi</a> | <a href="/syarat-dan-ketentuan">Syarat & Ketentuan</a></center></p>
     </footer>
@@ -532,6 +494,67 @@ function showQRIS() {
                     }
                 });
         });
+        let slideIndex = 1; 
+        let slideshowInterval;
+        function showSlides() {
+            let i;
+            let slides = document.getElementsByClassName("mySlides");
+            let dots = document.getElementsByClassName("dot");
+
+            
+            for (i = 0; i < slides.length; i++) {
+                slides[i].style.display = "none";
+                slides[i].classList.remove('slide-from-right', 'slide-to-center', 'slide-to-left');
+            }
+
+            
+            for (i = 0; i < dots.length; i++) {
+                dots[i].className = dots[i].className.replace(" active", "");
+            }
+
+            slideIndex++;
+            if (slideIndex > slides.length) {
+                slideIndex = 1; 
+            }
+
+            
+            slides[slideIndex - 1].style.display = "block";
+            slides[slideIndex - 1].classList.add('slide-from-right');
+            setTimeout(() => {
+                slides[slideIndex - 1].classList.remove('slide-from-right');
+                slides[slideIndex - 1].classList.add('slide-to-center');
+            }, 50);
+
+            dots[slideIndex - 1].className += " active";
+        }
+
+        
+        function plusSlides(n) {
+            
+            clearInterval(slideshowInterval);
+            slideIndex += n - 1; 
+            showSlides();
+            startSlideshow();
+        }
+
+        
+        function currentSlide(n) {
+
+            clearInterval(slideshowInterval);
+            slideIndex = n - 1;
+            showSlides();
+          
+            startSlideshow();
+        }
+
+        
+        function startSlideshow() {
+            
+            slideshowInterval = setInterval(showSlides, 3000);
+        }
+
+        
+        document.addEventListener("DOMContentLoaded", startSlideshow);
   </script>
- </body>
+ </body>    
 </html>
