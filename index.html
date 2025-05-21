@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Galeri Shinta</title>
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9937136601785737"
+     crossorigin="anonymous"></script>
+    <style>
+        body {
+            font-family: sans-serif;
+            margin: 0;
+            background: linear-gradient(to bottom, #F67a, #FFC0CB, #DDA);
+            background-size: cover;
+            background-repeat: no-repeat;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            padding-top: 6px;
+            padding-bottom: 0px;
+        }
+        .header {
+            color: #67a;
+            text-align: center;
+            position: fixed;
+            top: -15px;
+            left: 0;
+            width: 100%;
+            background-color: transparent;
+            padding: 0;
+            z-index: 1000;
+        }
+        .gallery-title {
+            color: #fff;
+            text-align: center;
+            position: fixed;
+            top: -2px;
+            left: 0;
+            width: 100%;
+            background-color: #f69;
+            padding: 5px 0px;
+            z-index: 1;
+        }
+        .container {
+            top: 0;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            max-width: 90%;
+            margin-top: 50px;
+            margin-bottom: 5px;
+        }
+
+        .gallery-wrapper {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1px;
+            margin-bottom: 0;
+        }
+        .gallery-item {
+            border-radius: 10px;
+            overflow: hidden;
+            text-align: center;
+            aspect-ratio: 1 / 1;
+        }
+
+        .gallery-item img {
+            width: 100%;
+            height: 100%;
+            border-radius: 10px;
+            filter: blur(5px);
+            cursor: pointer;
+        }
+
+        .overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(2px);
+            justify-content: center;
+            align-items: center;
+            z-index: 10;
+        }
+
+        .popup {
+            background-color: #dda;
+            padding: 20px;
+            border-radius: 5px;
+            text-align: center;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+            max-width: 100vw;
+            max-height: 100vh;
+            overflow: auto;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .popup-image-container {
+            margin-bottom: 0px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .popup-image {
+            max-width: 90%;
+            max-height: 70vh;
+            border-radius: 5px;
+            filter: blur(5px);
+            display: block;
+        }
+
+        .pay-button, .done-button {
+            background-color: #28a745;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 15px;
+            cursor: pointer;
+            font-size: 1em;
+            margin-top: 10px;
+        }
+
+        .pay-button:hover, .done-button:hover {
+            background-color: #1e7e34;
+        }
+
+        .qris-container {
+            display: none;
+            text-align: center;
+            margin-top: 20px;
+            flex-direction: column;
+            align-items: center;
+            width: 80%;
+            max-width: 300px;
+        }
+
+        .qris-info {
+            text-align: top;
+            font-size: 15px; bold;
+            margin-bottom: 10px;
+            background-color: rgba(0, 0, 0, 0.1); 
+            color: ;
+        }
+        .qris-image-container {
+            margin-bottom: 10px;
+        }
+        .qris-image {
+            max-width: 100%;
+            max-height: 300px;
+            filter: none;
+            border-radius: 5px;
+        }
+        #notification {
+            display: none;
+            text-align: center;
+            margin-top: 10px;
+            padding: 10px;
+            background-color: #f0fff0;
+            border: 1px solid #e0eee0;
+            border-radius: 5px;
+            color: green;
+        }
+        #notification1 {
+        display: none;
+        position: fixed;
+        top: 20%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background-color: rgba(0, 0, 0, 0.6);
+       color: white;
+       padding: 20px;
+       border-radius: 10px;
+       z-index: 1000;
+       opacity: 0;
+       transition: opacity 0.3s ease-in-out;
+        }
+         #notification1.show {
+            display: block;
+            opacity: 1;
+         }
+        .button {
+        padding: 2px 2px;
+        font-size: 12px;
+        cursor: pointer;
+        background-color: rgba(0, 0, 0, 0.6);
+        color: white;
+        }
+    #whatsapp-button {
+    position: fixed;
+    bottom: 10px;
+    right: 10px;
+    z-index: 999;
+    cursor: pointer;
+  }
+  #whatsapp-button img {
+    width: 35px;
+    height: 35px;
+  }
+
+  .modal {
+    display: none;
+    position: fixed;
+    z-index: 1;
+    left: 0px;
+    top: 0px;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0,0,0,0.5); 
+    }
+
+  .modal-content {
+    background-color: ;
+    margin: 120% auto;
+    padding: 5px;
+    border-radius: 10px;
+    color: red;
+    width: 80%; 
+    font-size: 15px;
+
+  }
+  .close-button:hover,
+  .close-button:focus {
+    color: red;
+    text-decoration: none;
+    cursor: pointer;
+  }
+
+  .modal-buttons {
+    text-align: right;
+    margin-top: 0px;
+  }
+
+  .modal-buttons button {
+    padding: 0px 0px;
+    margin-left: 1px;
+    cursor: pointer;
+    
+  }
+          .download-button {
+            padding: 3px 3px;
+            font-size: 1em;
+            background-color: #007b;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        .download-button:hover {
+            background-color: #0056;
+        }
+        .message {
+            margin-top: 0px;
+            color: red;
+            font-weight: bold;
+        }
+        
+    </style>
+</head>
+<body>
+   <div id="whatsapp-button">
+  <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/6/6b/WhatsApp.svg/512px-WhatsApp.svg.png" alt="WhatsApp Chat" onclick="openModal()">
+</div>
+
+   <div id="paymentModal" class="modal">
+  <div class="modal-content">
+    <span class="close-button" onclick="closeModal()"></span>
+    <p><center><strong>"ANDA PERLU MELAKUKAN PEMBELIAN POTO UNTUK MELANJUTKAN KE WHATSAPP"</center></strong></p><hr
+    <div class="modal-buttons">
+      <button onclick="closeModal()">BACK</button> 
+    </div>
+  </div>
+    </div>
+  
+    <div class="header">
+        <h1 class="gallery-title" ><marquee behavior="alternate"> ← GALLERY SHINTA →</marquee></h1>
+    </div>
+    <div class="container">
+        <p class="header"><marquee><strong>•SELAMAT DATANG SAHABAT SHINTA ❤️ SEMOGA KALIAN SUKA DENGAN KOLEKSI POTO/VIDIO PRIBADI SINTA 💦• </marquee></strong></p>
+        <hr style="border: 1px solid #eee; margin: 10px 0;">
+        <div class="gallery-wrapper" id="supabase-gallery">
+            <div class="gallery-item">
+                <img src="https://jfhcwtsxchweaetsjryf.supabase.co/storage/v1/object/public/media//IMG_20250510_213445.jpg" alt="Foto 1" onclick="openPopup('https://jfhcwtsxchweaetsjryf.supabase.co/storage/v1/object/public/media//IMG_20250510_213445.jpg')">
+            </div>
+            <div class="gallery-item">
+                <img src="https://jfhcwtsxchweaetsjryf.supabase.co/storage/v1/object/public/media//IMG_20250510_213457.jpg" alt="Foto 2" onclick="openPopup('https://jfhcwtsxchweaetsjryf.supabase.co/storage/v1/object/public/media//IMG_20250510_213457.jpg')">
+            </div>
+            <div class="gallery-item">
+                <img src="https://jfhcwtsxchweaetsjryf.supabase.co/storage/v1/object/public/media//IMG_20250510_213507.jpg" alt="Foto 3" onclick="openPopup('https://jfhcwtsxchweaetsjryf.supabase.co/storage/v1/object/public/media//IMG_20250510_213507.jpg')">
+            </div>
+            <div class="gallery-item">
+                <img src="https://jfhcwtsxchweaetsjryf.supabase.co/storage/v1/object/public/media//IMG_20250510_213517.jpg" alt="Foto 3" onclick="openPopup('https://jfhcwtsxchweaetsjryf.supabase.co/storage/v1/object/public/media//IMG_20250510_213517.jpg')">
+            </div>
+            <div class="gallery-item">
+                <img src="https://jfhcwtsxchweaetsjryf.supabase.co/storage/v1/object/public/media//IMG_20250510_213529.jpg" alt="Foto 3" onclick="openPopup('https://jfhcwtsxchweaetsjryf.supabase.co/storage/v1/object/public/media//IMG_20250510_213529.jpg')">
+            </div>
+            <div class="gallery-item">
+                <img src="https://jfhcwtsxchweaetsjryf.supabase.co/storage/v1/object/public/media//IMG_20250510_214842.jpg" alt="Foto 3" onclick="openPopup('https://jfhcwtsxchweaetsjryf.supabase.co/storage/v1/object/public/media//IMG_20250510_214842.jpg')">
+            </div>
+            <div class="gallery-item">
+                <img src="https://jfhcwtsxchweaetsjryf.supabase.co/storage/v1/object/public/media//IMG_20250510_214852.jpg" alt="Foto 3" onclick="openPopup('https://jfhcwtsxchweaetsjryf.supabase.co/storage/v1/object/public/media//IMG_20250510_214852.jpg')">
+            </div>
+            <div class="gallery-item">
+                <img src="https://jfhcwtsxchweaetsjryf.supabase.co/storage/v1/object/public/media//IMG_20250510_214908.jpg" alt="Foto 3" onclick="openPopup('https://jfhcwtsxchweaetsjryf.supabase.co/storage/v1/object/public/media//IMG_20250510_214908.jpg')">
+            </div>
+            <div class="gallery-item">
+                <img src="https://jfhcwtsxchweaetsjryf.supabase.co/storage/v1/object/public/media//IMG_20250510_214920.jpg" alt="Foto 3" onclick="openPopup('https://jfhcwtsxchweaetsjryf.supabase.co/storage/v1/object/public/media//IMG_20250510_214920.jpg')">
+            </div>
+            <div class="gallery-item">
+                <img src="https://jfhcwtsxchweaetsjryf.supabase.co/storage/v1/object/public/media//IMG_20250510_214944.jpg" alt="Foto 3" onclick="openPopup('https://jfhcwtsxchweaetsjryf.supabase.co/storage/v1/object/public/media//IMG_20250510_214944.jpg')">
+            </div>
+            <div class="gallery-item">
+                <img src="https://jfhcwtsxchweaetsjryf.supabase.co/storage/v1/object/public/media//IMG_20250510_214955.jpg" alt="Foto 3" onclick="openPopup('https://jfhcwtsxchweaetsjryf.supabase.co/storage/v1/object/public/media//IMG_20250510_214955.jpg')">
+            </div>
+            <div class="gallery-item">
+                <img src="https://jfhcwtsxchweaetsjryf.supabase.co/storage/v1/object/public/media//IMG_20250510_231432.jpg" alt="Foto 3" onclick="openPopup('https://jfhcwtsxchweaetsjryf.supabase.co/storage/v1/object/public/media//IMG_20250510_231432.jpg')">
+            </div>
+            <div class="gallery-item">
+                <img src="https://jfhcwtsxchweaetsjryf.supabase.co/storage/v1/object/public/media//IMG_20250510_231443.jpg" alt="Foto 3" onclick="openPopup('https://jfhcwtsxchweaetsjryf.supabase.co/storage/v1/object/public/media//IMG_20250510_231443.jpg')">
+            </div>
+            <div class="gallery-item">
+                <img src="https://jfhcwtsxchweaetsjryf.supabase.co/storage/v1/object/public/media//IMG_20250510_231456.jpg" alt="Foto 3" onclick="openPopup('https://jfhcwtsxchweaetsjryf.supabase.co/storage/v1/object/public/media//IMG_20250510_231456.jpg')">
+            </div>
+            <div class="gallery-item">
+                <img src="https://jfhcwtsxchweaetsjryf.supabase.co/storage/v1/object/public/media//IMG_20250510_231520.jpg" alt="Foto 3" onclick="openPopup('https://jfhcwtsxchweaetsjryf.supabase.co/storage/v1/object/public/media//IMG_20250510_231520.jpg')">
+            </div>
+            <div class="gallery-item">
+                <img src="https://jfhcwtsxchweaetsjryf.supabase.co/storage/v1/object/public/media//IMG_20250510_232447.jpg" alt="Foto 3" onclick="openPopup('https://jfhcwtsxchweaetsjryf.supabase.co/storage/v1/object/public/media//IMG_20250510_232447.jpg')">
+            </div>
+             <div class="gallery-item">
+                <img src="https://jfhcwtsxchweaetsjryf.supabase.co/storage/v1/object/public/media//IMG_20250510_232456.jpg" alt="Foto 3" onclick="openPopup('https://jfhcwtsxchweaetsjryf.supabase.co/storage/v1/object/public/media//IMG_20250510_232456.jpg')">
+            </div>
+            <div class="gallery-item">
+                <img src="https://jfhcwtsxchweaetsjryf.supabase.co/storage/v1/object/public/media//IMG_20250510_232522.jpg" alt="Foto 3" onclick="openPopup('https://jfhcwtsxchweaetsjryf.supabase.co/storage/v1/object/public/media//IMG_20250510_232522.jpg')">
+            </div>
+            <div class="gallery-item">
+                <img src="https://jfhcwtsxchweaetsjryf.supabase.co/storage/v1/object/public/media//IMG_20250510_232533.jpg" alt="Foto 3" onclick="openPopup('https://jfhcwtsxchweaetsjryf.supabase.co/storage/v1/object/public/media//IMG_20250510_232533.jpg')">
+            </div>
+            <div class="gallery-item">
+                <img src="https://jfhcwtsxchweaetsjryf.supabase.co/storage/v1/object/public/media//IMG_20250510_232545.jpg" alt="Foto 3" onclick="openPopup('https://jfhcwtsxchweaetsjryf.supabase.co/storage/v1/object/public/media//IMG_20250510_232545.jpg')">
+            </div>
+            <div class="gallery-item">
+                <img src="https://jfhcwtsxchweaetsjryf.supabase.co/storage/v1/object/public/media//IMG_20250510_232559.jpg" alt="Foto 3" onclick="openPopup('https://jfhcwtsxchweaetsjryf.supabase.co/storage/v1/object/public/media//IMG_20250510_232559.jpg')">
+            </div>
+             <div class="gallery-item">
+                <img src="https://jfhcwtsxchweaetsjryf.supabase.co/storage/v1/object/public/media//IMG_20250510_232610.jpg" alt="Foto 3" onclick="openPopup('https://jfhcwtsxchweaetsjryf.supabase.co/storage/v1/object/public/media//IMG_20250510_232610.jpg')">
+            </div>
+ <div class="gallery-item">
+                <img src="https://jfhcwtsxchweaetsjryf.supabase.co/storage/v1/object/public/media//IMG_20250510_232622.jpg" alt="Foto 3" onclick="openPopup('https://jfhcwtsxchweaetsjryf.supabase.co/storage/v1/object/public/media//IMG_20250510_232622.jpg')">
+            </div>
+ <div class="gallery-item">
+                <img src="https://jfhcwtsxchweaetsjryf.supabase.co/storage/v1/object/public/media//IMG_20250510_232636.jpg" alt="Foto 3" onclick="openPopup('https://jfhcwtsxchweaetsjryf.supabase.co/storage/v1/object/public/media//IMG_20250510_232636.jpg')">
+            </div>
+ <div class="gallery-item">
+                <img src="https://jfhcwtsxchweaetsjryf.supabase.co/storage/v1/object/public/media//Sexi_13.jpg" alt="Foto 3" onclick="openPopup('https://jfhcwtsxchweaetsjryf.supabase.co/storage/v1/object/public/media//Sexi_13.jpg')">
+            </div>
+ <div class="gallery-item">
+                <img src="https://jfhcwtsxchweaetsjryf.supabase.co/storage/v1/object/public/media//Sexi_14.jpg" alt="Foto 3" onclick="openPopup('https://jfhcwtsxchweaetsjryf.supabase.co/storage/v1/object/public/media//Sexi_14.jpg')">
+            </div>
+ <div class="gallery-item">
+                <img src="https://jfhcwtsxchweaetsjryf.supabase.co/storage/v1/object/public/media//Sexi_15.jpg" alt="Foto 3" onclick="openPopup('https://jfhcwtsxchweaetsjryf.supabase.co/storage/v1/object/public/media//Sexi_15.jpg')">
+            </div>
+ <div class="gallery-item">
+                <img src="https://jfhcwtsxchweaetsjryf.supabase.co/storage/v1/object/public/media//Sexi_19.jpg" alt="Foto 3" onclick="openPopup('https://jfhcwtsxchweaetsjryf.supabase.co/storage/v1/object/public/media//Sexi_19.jpg')">
+            </div>
+            </div>
+    </div>
+    <div id="overlay" class="overlay" onclick="closePopup()">
+        <div id="popupContent" class="popup" onclick="event.stopPropagation()">
+            <div id="imageContainer" class="popup-image-container">
+                <img id="popupImage" class="popup-image" src="" alt="Gambar Popup">
+            </div>
+            <button id="payButton" class="pay-button" onclick="showQRIS()">Bayar</button>
+            <span style="font-size: 0.8em; color: #555;"><strong>(Lanjutkan membayar poto dengan harga Rp.10.000)</strong></span>
+
+          <div id="qrisContainer" class="qris-container">
+    <div class="qris-info">
+        <strong>BAYAR DENGAN E-WALLET</strong><br><hr>
+        <strong>NAMA : Y** G**** A*** Q****</strong>&nbsp;&nbsp;&nbsp;<span id="qrisNama"></span><br>
+        <strong>NOMOR : 0821-1444-1814</strong> <span id="qrisNomor"  ></span><strong>(DANA)</strong><br>
+          <button class="button" onclick="salinNomor()">Salin Nomor</button><br>
+  <div id="notification1">Nomor telah disalin!</div><br>
+        <strong>BAYAR DENGAN SCAN QRIS</strong>
+    </div>
+    <div class="qris-image-container">
+        <img id="qrisImage" class="qris-image" src="" alt="QRIS">
+    </div>
+    <button id="downloadButton" class="download-button">Download Qris</button>
+    <p id="statusMessage" class="message"></p>
+    <button class="done-button" onclick="processPayment()">KONFIRMASI PEMBAYARAN</button>
+    <div id="notification"></div>
+    <span style="font-size: 0.8em; color: #555;"><strong>(konfirmasi jika sudah melakukan tranfer)<hr></strong></span>
+            </div>
+        </div>
+    </div>
+    <footer>
+          </div>
+        <span style="font-size: 0.5em; color: #555;"><strong><center>HANYA DENGAN Rp.10.000,- KAMU ❤️ SUDAH BISA MELIHAT KOLEKSI POTO PREMIUM SHINTA</center></strong>
+        <p><center>&copy; 2025 GALLERY SHINTA. Hak Cipta Dilindungi.</p>
+        <p><a href="/kebijakan-privasi">Kebijakan Privasi</a> | <a href="/syarat-dan-ketentuan">Syarat & Ketentuan</a></center></p>
+    </footer>
+    <script>
+      function salinNomor() {
+  var nomorUntukDisalin = "082114441814";
+  var notificationDiv = document.getElementById("notification1");
+
+  navigator.clipboard.writeText(nomorUntukDisalin);
+
+  notificationDiv.classList.add("show");
+
+  setTimeout(function() {
+    notificationDiv.classList.remove("show");
+  }, 1000);
+}
+      
+        const galleryImages = document.querySelectorAll('.gallery-item img, .popup-image');
+
+galleryImages.forEach(img => {
+    img.addEventListener('contextmenu', (e) => {
+        e.preventDefault();
+    });
+
+    img.addEventListener('dragstart', (e) => {
+        e.preventDefault();
+    });
+});
+        
+        const overlay = document.getElementById('overlay');
+        const popupContent = document.getElementById('popupContent');
+        const popupImage = document.getElementById('popupImage');
+        const payButton = document.getElementById('payButton');
+        const imageContainer = document.getElementById('imageContainer');
+        const qrisContainer = document.getElementById('qrisContainer');
+        const qrisImage = document.getElementById('qrisImage');
+        const notificationDiv = document.getElementById('notification');
+        const defaultQrisUrl = 'https://jfhcwtsxchweaetsjryf.supabase.co/storage/v1/object/public/qris//1-.jpg';
+        let currentImageSource = '';
+
+        function openPopup(imageSrc) {
+            currentImageSource = imageSrc;
+            popupImage.src = currentImageSource;
+            payButton.style.display = 'block';
+            qrisContainer.style.display = 'none';
+            notificationDiv.style.display = 'none';
+            qrisImage.src = defaultQrisUrl;
+            overlay.style.display = 'flex';
+        }
+
+        function closePopup() {
+            overlay.style.display = 'none';
+            popupImage.classList.remove('blurred');
+            payButton.style.display = 'block';
+            qrisContainer.style.display = 'none';
+            notificationDiv.style.display = 'none';
+        }
+function showQRIS() {
+    document.getElementById('qrisNama').textContent = "";
+    document.getElementById('qrisNomor').textContent = "";
+
+    popupImage.classList.remove('blurred');
+    popupImage.style.display = 'none';
+    qrisImage.style.display = 'block';
+    qrisContainer.style.display = 'flex';
+    payButton.style.display = 'none';
+    notificationDiv.style.display = 'none';
+        }
+
+        function processPayment() {
+            notificationDiv.textContent = "Pembayaran sedang diproses oleh sistem...";
+            notificationDiv.style.display = 'block';
+            setTimeout(() => {
+                window.location.reload();
+            }, 2000);
+        }
+  var modal = document.getElementById("paymentModal");
+
+  function openModal() {
+    modal.style.display = "block";
+  }
+  function closeModal() {
+    modal.style.display = "none";
+
+  }
+  window.onclick = function(event) {
+    if (event.target == modal) {
+      modal.style.display = "none";
+    }
+  }
+   document.getElementById('downloadButton').addEventListener('click', function() {
+            const imageUrl = 'https://jfhcwtsxchweaetsjryf.supabase.co/storage/v1/object/public/qris//1-.jpg';
+            const fileName = 'QRIS-SHINTA.jpg';
+
+            const statusMessage = document.getElementById('statusMessage');
+            statusMessage.textContent = 'Memulai unduhan...';
+            statusMessage.style.color = 'blue';
+
+            fetch(imageUrl)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    return response.blob();
+                })
+                .then(blob => {
+                    const url = window.URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = fileName;
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                    window.URL.revokeObjectURL(url);
+
+                    statusMessage.textContent = 'Berhasil!';
+                    statusMessage.style.color = 'green';
+                })
+                .catch(e => {
+                    console.error('Download error:', e);
+                    statusMessage.textContent = 'Gagal mengunduh gambar. Silakan coba lagi.';
+                    statusMessage.style.color = 'red';
+                  
+                    if (e.message.includes('Failed to fetch') || e.message.includes('NetworkError')) {
+                        statusMessage.textContent += ' (Kemungkinan masalah CORS atau jaringan.)';
+                    }
+                });
+        });
+  </script>
+ </body>
+</html>
