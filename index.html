@@ -301,22 +301,23 @@ document.getElementById('register').addEventListener('submit', async e => {
     return;
   }
 
-const { data, error: signUpError } = await supabase.auth.signUp({
-  email,
-  password: pw1
+const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
+  email,
+  password: pw1
 });
 
 if (signUpError) {
-  alert('Gagal daftar!');
-  return;
+  alert('Gagal daftar!');
+  return;
 }
 
-
 await supabase.from('users_data').insert({
-  username,
-  email,
-  saldo: 0 
+  user_id: signUpData.user.id,  // penting ini
+  username,
+  email,
+  saldo: 0
 });
+
 alert('Pendaftaran berhasil!');
 });
 
