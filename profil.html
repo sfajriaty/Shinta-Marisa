@@ -216,7 +216,7 @@
     'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtieXBtdHFoeGN2ZnF0c2dnbmR5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDgwMTQ0MzksImV4cCI6MjA2MzU5MDQzOX0.CChsDYoTN3OI36QmZNCBS_xKEmCjkUsFAonD8gN2Qj0'
   );
 
-  const uid = localStorage.getItem('uid'); // pastikan UID sudah disimpan saat login
+  const uid = localStorage.getItem('uid,user_id'); // pastikan UID sudah disimpan saat login
 
 async function handleMetodeChange() {
   if (!metode) return;
@@ -309,7 +309,6 @@ async function handleMetodeChange() {
   };
 
   document.getElementById('dep-submit').onclick = async () => {
-    const nama = document.getElementById('dep-nama').value;
     const metode = document.getElementById('dep-metode').value;
     const jumlah = document.getElementById('dep-jumlah').value;
 
@@ -319,7 +318,7 @@ async function handleMetodeChange() {
     }
 
     const { error } = await supabase.from('deposit_requests').insert([
-      { user_id: uid, nama, metode, amount: parseInt(jumlah), status: 'pending' }
+      { user_id: uid, metode, amount: parseInt(jumlah), status: 'pending' }
     ]);
 
     if (error) alert("Gagal kirim deposit.");
