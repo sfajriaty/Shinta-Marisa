@@ -158,13 +158,11 @@
   <div class="tabs">
     <button class="tab-btn active" data-tab="login">Login</button>
     <button class="tab-btn" data-tab="register">Daftar</button>
-    <button class="tab-btn" data-tab="deposit">Deposit</button>
-    <button class="tab-btn" data-tab="withdraw">Penarikan</button>
   </div>
 
   
   <form id="login" class="active">
-    <label for="login-username">Email</label>
+    <label for="login-username">Email / Username</label>
     <input type="text" id="login-username" placeholder="Masukkan email atau username" required />
 
     <label for="login-password">Password</label>
@@ -189,49 +187,6 @@
     <input type="password" id="reg-password2" placeholder="Konfirmasi password" required />
 
     <button type="submit" class="submit-btn">Daftar</button>
-  </form>
-
-  
-  <form id="deposit">
-    <label for="deposit-method">Metode Deposit</label>
-    <select id="deposit-method" required>
-      <option value="" disabled selected>Pilih metode</option>
-      <option value="qris">QRIS</option>
-    </select>
-
-    <label for="deposit-amount">Jumlah Deposit (Rp)</label>
-    <input type="text" id="deposit-amount" placeholder="Masukkan jumlah deposit" required pattern="^[0-9]*$" />
-  
- <div id="qris-container" style="display:none; text-align:center; margin-bottom: 20px;">
-
-  <img src="https://kbypmtqhxcvfqtsggndy.supabase.co/storage/v1/object/public/qris//1748057891785.png" alt="QRIS" style="width: 180px; border-radius: 15px; box-shadow: 0 0 10px #ff9500;" />
-</div>
-
-    <button type="submit" class="submit-btn">Lanjutkan Deposit</button>
-  </form>
-
-
-<div style="text-align:center; margin: 30px;">
-   <button class="submit-btn" onclick="mainkanGame()">Mainkan Game</button>
-</div>
-  
-  <form id="withdraw">
-    <label for="withdraw-name">Nama Lengkap</label>
-    <input type="text" id="withdraw-name" placeholder="Masukkan nama lengkap" required />
-
-    <label for="withdraw-ewallet-number">Nomor E-wallet</label>
-    <input type="text" id="withdraw-ewallet-number" placeholder="Masukkan nomor e-wallet" required />
-
-    <label for="withdraw-ewallet-type">Jenis E-wallet</label>
-    <select id="withdraw-ewallet-type" required>
-      <option value="" disabled selected>Pilih jenis e-wallet</option>
-      <option value="dana">Dana</option>
-    </select>
-
-    <label for="withdraw-amount">Jumlah Penarikan (Rp)</label>
-    <input type="text" id="withdraw-amount" placeholder="Masukkan jumlah penarikan" required pattern="^[0-9]*$" />
-
-    <button type="submit" class="submit-btn">Kirim Penarikan</button>
   </form>
 </div>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -321,63 +276,6 @@ await supabase.from('users_data').insert({
 alert('Pendaftaran berhasil!');
 });
 
-  document.getElementById('deposit-method').addEventListener('change', function () {
-  const qrisContainer = document.getElementById('qris-container');
-  qrisContainer.style.display = this.value === 'qris' ? 'block' : 'none';
-});
-
-  document.getElementById('deposit').addEventListener('submit', async e => {
-  e.preventDefault();
- const uid = localStorage.getItem('uid');
-  const amount = parseInt(document.getElementById('deposit-amount').value);
-if (isNaN(amount) || amount <= 0) {
-  alert('Masukkan jumlah deposit yang valid');
-  return;
-}
-  if (!uid || !amount) return alert('Harus login dulu!');
-
-  await supabase.rpc('update_saldo', { uid, jumlah: amount });
-  alert('Deposit berhasil!');
-});
- 
-  document.getElementById('withdraw').addEventListener('submit', async e => {
-  e.preventDefault();
- const uid = localStorage.getItem('uid');
-
-  const amount = parseInt(document.getElementById('withdraw-amount').value);
-
-  if (!uid || !amount) return alert('Harus login dulu!');
-
-  const { error } = await supabase.rpc('tarik_saldo', { uid, jumlah_tarik: amount });
-  alert(error ? 'Gagal tarik saldo' : 'Penarikan dikirim!');
-});
-
-     async function mainkanGame() {
-    const uid = localStorage.getItem('uid');
-    if (!uid) {
-      alert("Silakan login terlebih dahulu.");
-      return;
-    }
-
-   
-    const { data, error } = await supabase
-      .from('users_data')
-      .select('saldo')
-     .eq('user_id', uid)
-      .single();
-
-    if (error || !data) {
-      alert("Gagal memuat data saldo.");
-      return;
-    }
-
-   
-    localStorage.setItem('saldo', data.saldo);
-
-   
-    window.location.href = `slot.html`;
-  }
-  
 </script>
 </body>
 </html>
