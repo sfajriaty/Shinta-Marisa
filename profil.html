@@ -278,7 +278,7 @@
   document.getElementById('dep-submit').onclick = async () => {
     const nomor = document.getElementById('dep-nomor').value;
     const nama = document.getElementById('dep-nama').value;
-    const metode = document.getElementById('dep-metode').value;
+    const metode = document.getElementById('pilih-metode').value;
     const jumlah = document.getElementById('dep-jumlah').value;
 
     if (!nama || !metode || nomor  || !jumlah) {
@@ -334,7 +334,7 @@ document.getElementById('pilih-metode').addEventListener('change', async functio
     const metode = document.getElementById('with-metode').value;
     const jumlah = document.getElementById('with-jumlah').value;
 
-    if (!nama || !metode || !jumlah) {
+    if (!nama || !metode || !nomor  || !jumlah) {
       alert("Lengkapi semua kolom.");
       return;
     }
@@ -357,5 +357,5 @@ document.getElementById('pilih-metode').addEventListener('change', async functio
   window.onload = loadProfile;
 </script>
 </body>
-  </html>
-  
+</html>
+        
