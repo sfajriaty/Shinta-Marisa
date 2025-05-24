@@ -256,29 +256,37 @@
     });
   });
 document.getElementById('login').addEventListener('submit', async e => {
-  e.preventDefault();
-  const email = document.getElementById('login-username').value;
-  const password = document.getElementById('login-password').value;
+  e.preventDefault();
+  const email = document.getElementById('login-username').value;
+  const password = document.getElementById('login-password').value;
 
-const { data, error } = await supabase.auth.signInWithPassword({
-  email,
-  password
-});
+  const { data, error } = await supabase.auth.signInWithPassword({
+    email,
+    password
+  });
 
-  const uid = data.user.id;
-  localStorage.setItem('uid', uid);
-if (data && data.user) {
+  if (error || !data.user) {
+    alert('Login gagal. Periksa kembali email dan password.');
+    return;
+  }
+
   const uid = data.user.id;
   localStorage.setItem('uid', uid);
-  const { data: userData, error } = await supabase
+
+  const { data: userData, error: userError } = await supabase
     .from('users_data')
     .select('saldo')
     .eq('user_id', uid)
     .single();
-  alert(`Login berhasil! Saldo Anda: Rp${userData?.saldo ?? 0}`);
-} else {
-  alert('Login gagal. Periksa kembali email dan password.');
-}
+
+  if (userError) {
+    alert('Gagal mengambil data saldo');
+    return;
+  }
+
+  localStorage.setItem('saldo', userData.saldo);
+  alert(`Login berhasil! Saldo Anda: Rp${userData.saldo ?? 0}`);
+  window.location.href = 'slot.html'; // langsung arahkan ke game
 });
 
 document.getElementById('register').addEventListener('submit', async e => {
