@@ -1,101 +1,140 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Profil Pemain - GameZone</title>
-<style>
-  @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap');
-  * {
-    box-sizing: border-box;
-  }
-  body, html {
-    margin: 0; padding: 0; min-height: 100vh;
-    font-family: 'Poppins', sans-serif;
-    background: linear-gradient(135deg, #1e3c72, #2a5298);
-    color: #fff;
-  }
-  .container {
-    max-width: 600px;
-    margin: 40px auto 80px;
-    background: rgba(0,0,0,0.6);
-    border-radius: 15px;
-    padding: 30px 40px;
-    box-shadow: 0 0 25px 4px rgba(255,165,0,0.5);
-  }
-  h1 {
-    text-align: center;
-    color: #ff9500;
-    text-shadow: 0 0 12px #ffb347;
-    margin-bottom: 30px;
-  }
-  .saldo {
-    font-size: 22px;
-    font-weight: 700;
-    text-align: center;
-    margin-bottom: 25px;
-    color: #ffb347;
-  }
-  .btn-group {
-    display: flex;
-    justify-content: center;
-    gap: 20px;
-    margin-bottom: 30px;
-  }
-  .btn {
-    background: #ff9500;
-    border: none;
-    border-radius: 30px;
-    padding: 12px 25px;
-    font-size: 16px;
-    font-weight: 700;
-    cursor: pointer;
-    color: #fff;
-    box-shadow: 0 0 12px #ffb347;
-    transition: background 0.3s;
-  }
-  .btn:hover {
-    background: #ffb347;
-  }
-  h2 {
-    border-bottom: 2px solid #ff9500;
-    padding-bottom: 8px;
-    margin-bottom: 15px;
-  }
-  table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-bottom: 30px;
-  }
-  th, td {
-    padding: 10px 12px;
-    text-align: left;
-    border-bottom: 1px solid #444;
-  }
-  th {
-    background: #ff9500;
-    color: #222;
-  }
-  .empty {
-    color: #bbb;
-    font-style: italic;
-    text-align: center;
-    padding: 15px 0;
-  }
-  @media (max-width: 480px) {
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Profil Pemain - GameZone</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap');
+    * {
+      box-sizing: border-box;
+    }
+    body, html {
+      margin: 0; padding: 0; min-height: 100vh;
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(135deg, #1e3c72, #2a5298);
+      color: #fff;
+    }
     .container {
-      margin: 20px 15px 60px;
-      padding: 20px 25px;
+      max-width: 600px;
+      margin: 40px auto 80px;
+      background: rgba(0,0,0,0.6);
+      border-radius: 15px;
+      padding: 30px 40px;
+      box-shadow: 0 0 25px 4px rgba(255,165,0,0.5);
+    }
+    h1 {
+      text-align: center;
+      color: #ff9500;
+      text-shadow: 0 0 12px #ffb347;
+      margin-bottom: 30px;
+    }
+    .saldo {
+      font-size: 22px;
+      font-weight: 700;
+      text-align: center;
+      margin-bottom: 25px;
+      color: #ffb347;
     }
     .btn-group {
-      flex-direction: column;
-      gap: 12px;
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+      margin-bottom: 30px;
     }
     .btn {
-      width: 100%;
+      background: #ff9500;
+      border: none;
+      border-radius: 30px;
+      padding: 12px 25px;
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
+      color: #fff;
+      box-shadow: 0 0 12px #ffb347;
+      transition: background 0.3s;
     }
-  }
-</style>
+    .btn:hover {
+      background: #ffb347;
+    }
+    h2 {
+      border-bottom: 2px solid #ff9500;
+      padding-bottom: 8px;
+      margin-bottom: 15px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 30px;
+    }
+    th, td {
+      padding: 10px 12px;
+      text-align: left;
+      border-bottom: 1px solid #444;
+    }
+    th {
+      background: #ff9500;
+      color: #222;
+    }
+    .empty {
+      color: #bbb;
+      font-style: italic;
+      text-align: center;
+      padding: 15px 0;
+    }
+    @media (max-width: 480px) {
+      .container {
+        margin: 20px 15px 60px;
+        padding: 20px 25px;
+      }
+      .btn-group {
+        flex-direction: column;
+        gap: 12px;
+      }
+      .btn {
+        width: 100%;
+      }
+    }
+    /* Popup */
+    .popup-form {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0, 0, 0, 0.7);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 999;
+    }
+    .popup-inner {
+      background: #fff;
+      color: #000;
+      padding: 25px;
+      border-radius: 12px;
+      box-shadow: 0 0 20px #ff9500;
+      width: 90%;
+      max-width: 400px;
+    }
+    .popup-inner input, .popup-inner select {
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 12px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+    }
+    .popup-inner button {
+      padding: 10px 16px;
+      border: none;
+      border-radius: 6px;
+      background: #ff9500;
+      color: white;
+      cursor: pointer;
+      margin-right: 8px;
+    }
+    .popup-inner button:last-child {
+      background: #888;
+    }
+  </style>
 </head>
 <body>
 
@@ -103,30 +142,54 @@
   <h1>Profil Pemain</h1>
   <div class="saldo" id="saldo-display">Saldo: Rp0</div>
   <div class="btn-group">
-    <button class="btn" onclick="window.location.href='deposit.html'">Deposit</button>
-    <button class="btn" onclick="window.location.href='withdraw.html'">Penarikan</button>
+    <button class="btn" id="btn-deposit">Deposit</button>
+    <button class="btn" id="btn-withdraw">Penarikan</button>
     <button class="btn" id="btn-main-game">Mainkan Game</button>
   </div>
 
   <h2>Riwayat Deposit</h2>
   <table id="riwayat-deposit">
-    <thead>
-      <tr><th>Tanggal</th><th>Jumlah (Rp)</th></tr>
-    </thead>
-    <tbody>
-      <tr><td colspan="2" class="empty">Memuat data...</td></tr>
-    </tbody>
+    <thead><tr><th>Tanggal</th><th>Jumlah (Rp)</th></tr></thead>
+    <tbody><tr><td colspan="2" class="empty">Memuat data...</td></tr></tbody>
   </table>
 
   <h2>Riwayat Penarikan</h2>
   <table id="riwayat-penarikan">
-    <thead>
-      <tr><th>Tanggal</th><th>Jumlah (Rp)</th></tr>
-    </thead>
-    <tbody>
-      <tr><td colspan="2" class="empty">Memuat data...</td></tr>
-    </tbody>
+    <thead><tr><th>Tanggal</th><th>Jumlah (Rp)</th></tr></thead>
+    <tbody><tr><td colspan="2" class="empty">Memuat data...</td></tr></tbody>
   </table>
+</div>
+
+<!-- Popup Deposit -->
+<div id="popup-deposit" class="popup-form" style="display:none;">
+  <div class="popup-inner">
+    <h2>Form Deposit</h2>
+    <input type="text" id="dep-nama" placeholder="Nama" />
+    <select id="dep-metode">
+      <option value="">Pilih Metode</option>
+      <option value="QRIS">QRIS</option>
+      <option value="eWallet">eWallet</option>
+    </select>
+    <input type="number" id="dep-jumlah" placeholder="Jumlah (Rp)" />
+    <button id="dep-submit">Kirim</button>
+    <button onclick="closePopup('popup-deposit')">Batal</button>
+  </div>
+</div>
+
+<!-- Popup Penarikan -->
+<div id="popup-withdraw" class="popup-form" style="display:none;">
+  <div class="popup-inner">
+    <h2>Form Penarikan</h2>
+    <input type="text" id="with-nama" placeholder="Nama" />
+    <select id="with-metode">
+      <option value="">Pilih Metode</option>
+      <option value="QRIS">QRIS</option>
+      <option value="eWallet">eWallet</option>
+    </select>
+    <input type="number" id="with-jumlah" placeholder="Jumlah (Rp)" />
+    <button id="with-submit">Kirim</button>
+    <button onclick="closePopup('popup-withdraw')">Batal</button>
+  </div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -136,15 +199,9 @@
     'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtieXBtdHFoeGN2ZnF0c2dnbmR5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDgwMTQ0MzksImV4cCI6MjA2MzU5MDQzOX0.CChsDYoTN3OI36QmZNCBS_xKEmCjkUsFAonD8gN2Qj0'
   );
 
-  async function loadProfile() {
-    const uid = localStorage.getItem('uid');
-    if (!uid) {
-      alert('Silakan login terlebih dahulu.');
-      window.location.href = 'index.html'; // arahkan ke halaman login/register
-      return;
-    }
+  const uid = localStorage.getItem('uid'); // pastikan UID sudah disimpan saat login
 
-    // Ambil saldo
+  async function loadProfile() {
     const { data: userData, error: userError } = await supabase
       .from('users_data')
       .select('saldo')
@@ -158,8 +215,7 @@
 
     document.getElementById('saldo-display').textContent = `Saldo: Rp${userData.saldo ?? 0}`;
 
-    // Ambil riwayat deposit
-    const { data: depositData, error: depositError } = await supabase
+    const { data: depositData } = await supabase
       .from('deposit_history')
       .select('created_at, amount')
       .eq('user_id', uid)
@@ -167,7 +223,7 @@
 
     const depositTableBody = document.querySelector('#riwayat-deposit tbody');
     depositTableBody.innerHTML = '';
-    if (depositError || !depositData || depositData.length === 0) {
+    if (!depositData || depositData.length === 0) {
       depositTableBody.innerHTML = '<tr><td colspan="2" class="empty">Belum ada riwayat deposit.</td></tr>';
     } else {
       depositData.forEach(row => {
@@ -176,8 +232,7 @@
       });
     }
 
-    // Ambil riwayat penarikan
-    const { data: withdrawData, error: withdrawError } = await supabase
+    const { data: withdrawData } = await supabase
       .from('withdraw_history')
       .select('created_at, amount')
       .eq('user_id', uid)
@@ -185,7 +240,7 @@
 
     const withdrawTableBody = document.querySelector('#riwayat-penarikan tbody');
     withdrawTableBody.innerHTML = '';
-    if (withdrawError || !withdrawData || withdrawData.length === 0) {
+    if (!withdrawData || withdrawData.length === 0) {
       withdrawTableBody.innerHTML = '<tr><td colspan="2" class="empty">Belum ada riwayat penarikan.</td></tr>';
     } else {
       withdrawData.forEach(row => {
@@ -194,6 +249,60 @@
       });
     }
   }
+
+  function closePopup(id) {
+    document.getElementById(id).style.display = 'none';
+  }
+
+  document.getElementById('btn-deposit').onclick = () => {
+    document.getElementById('popup-deposit').style.display = 'flex';
+  };
+
+  document.getElementById('btn-withdraw').onclick = () => {
+    document.getElementById('popup-withdraw').style.display = 'flex';
+  };
+
+  document.getElementById('dep-submit').onclick = async () => {
+    const nama = document.getElementById('dep-nama').value;
+    const metode = document.getElementById('dep-metode').value;
+    const jumlah = document.getElementById('dep-jumlah').value;
+
+    if (!nama || !metode || !jumlah) {
+      alert("Lengkapi semua kolom.");
+      return;
+    }
+
+    const { error } = await supabase.from('deposit_requests').insert([
+      { user_id: uid, nama, metode, amount: parseInt(jumlah), status: 'pending' }
+    ]);
+
+    if (error) alert("Gagal kirim deposit.");
+    else {
+      alert("Permintaan deposit dikirim. Menunggu konfirmasi admin.");
+      closePopup('popup-deposit');
+    }
+  };
+
+  document.getElementById('with-submit').onclick = async () => {
+    const nama = document.getElementById('with-nama').value;
+    const metode = document.getElementById('with-metode').value;
+    const jumlah = document.getElementById('with-jumlah').value;
+
+    if (!nama || !metode || !jumlah) {
+      alert("Lengkapi semua kolom.");
+      return;
+    }
+
+    const { error } = await supabase.from('withdraw_requests').insert([
+      { user_id: uid, nama, metode, amount: parseInt(jumlah) }
+    ]);
+
+    if (error) alert("Gagal kirim penarikan.");
+    else {
+      alert("Permintaan penarikan dikirim.");
+      closePopup('popup-withdraw');
+    }
+  };
 
   document.getElementById('btn-main-game').addEventListener('click', () => {
     window.location.href = 'slot.html';
