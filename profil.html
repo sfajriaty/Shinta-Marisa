@@ -216,10 +216,16 @@
     'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtieXBtdHFoeGN2ZnF0c2dnbmR5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDgwMTQ0MzksImV4cCI6MjA2MzU5MDQzOX0.CChsDYoTN3OI36QmZNCBS_xKEmCjkUsFAonD8gN2Qj0'
   );
 
-  const uid = localStorage.getItem('uid'); // pastikan UID sudah disimpan saat login
-
 async function handleMetodeChange() {
+  const metode = document.getElementById('dep-metode').value;
+  const qrisBox = document.getElementById('dep-info-qris');
+  const ewalletBox = document.getElementById('dep-info-ewallet');
+
+  qrisBox.style.display = 'none';
+  ewalletBox.style.display = 'none';
+
   if (!metode) return;
+
   const { data, error } = await supabase
     .from('deposit_config')
     .select('*')
@@ -240,6 +246,7 @@ async function handleMetodeChange() {
     ewalletBox.style.display = 'block';
   }
 }
+
 
   async function loadProfile() {
     const { data: userData, error: userError } = await supabase
