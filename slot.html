@@ -198,7 +198,7 @@ async function loadSaldo() {
   const { data, error } = await supabase
     .from('users_data')
     .select('saldo')
-    .eq('id', uid)
+    .eq('user_id', uid)
     .single();
 
   if (error || !data) {
@@ -437,7 +437,7 @@ async function spin() {
 await supabase
   .from('users_data')
   .update({ saldo: balance })
-  .eq('id', uid);
+  .eq('user_id', uid);
 
 
   if (totalWin > 0) {
@@ -486,5 +486,4 @@ await supabase
   init();
 </script>
 </body>
-  </html>
-  
+</html>
