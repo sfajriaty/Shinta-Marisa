@@ -1,560 +1,374 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Galeri Shinta</title>
-    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9937136601785737"
-     crossorigin="anonymous"></script>
-    <style>
-        body {
-            font-family: sans-serif;
-            margin: 0;
-            background: linear-gradient(to bottom, #F67a, #FFC0CB, #DDA);
-            background-size: cover;
-            background-repeat: no-repeat;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            min-height: 100vh;
-            padding-top: 6px;
-            padding-bottom: 0px;
-        }
-        .header {
-            color: #67a;
-            text-align: center;
-            position: fixed;
-            top: -15px;
-            left: 0;
-            width: 100%;
-            background-color: transparent;
-            padding: 0;
-            z-index: 1000;
-        }
-        .gallery-title {
-            color: #fff;
-            text-align: center;
-            position: fixed;
-            top: -2px;
-            left: 0;
-            width: 100%;
-            background-color: #f69;
-            padding: 5px 0px;
-            z-index: 1;
-        }
-        .container {
-            top: 0;
-            padding: 20px;
-            border-radius: 10px;
-            text-align: center;
-            max-width: 90%;
-            margin-top: 50px;
-            margin-bottom: 5px;
-        }
-
-        .gallery-wrapper {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 1px;
-            margin-bottom: 0;
-        }
-        .gallery-item {
-            border-radius: 10px;
-            overflow: hidden;
-            text-align: center;
-            aspect-ratio: 1 / 1;
-        }
-
-        .gallery-item img {
-            width: 100%;
-            height: 100%;
-            border-radius: 10px;
-            filter: blur(1px);
-            cursor: pointer;
-        }
-
-        .overlay {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.8);
-            backdrop-filter: blur(2px);
-            justify-content: center;
-            align-items: center;
-            z-index: 10;
-        }
-
-        .popup {
-            background-color: #dda;
-            padding: 20px;
-            border-radius: 5px;
-            text-align: center;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
-            max-width: 100vw;
-            max-height: 100vh;
-            overflow: auto;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-
-        .popup-image-container {
-            margin-bottom: 0px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-
-        .popup-image {
-            max-width: 90%;
-            max-height: 70vh;
-            border-radius: 5px;
-            filter: blur(1px);
-            display: block;
-        }
-
-        .pay-button, .done-button {
-            background-color: #28a745;
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 15px;
-            cursor: pointer;
-            font-size: 1em;
-            margin-top: 10px;
-        }
-
-        .pay-button:hover, .done-button:hover {
-            background-color: #1e7e34;
-        }
-
-        .qris-container {
-            display: none;
-            text-align: center;
-            margin-top: 20px;
-            flex-direction: column;
-            align-items: center;
-            width: 80%;
-            max-width: 300px;
-        }
-
-        .qris-info {
-            text-align: top;
-            font-size: 15px; bold;
-            margin-bottom: 10px;
-            background-color: rgba(0, 0, 0, 0.1); 
-            color: ;
-        }
-        .qris-image-container {
-            margin-bottom: 10px;
-        }
-        .qris-image {
-            max-width: 100%;
-            max-height: 300px;
-            filter: none;
-            border-radius: 5px;
-        }
-        #notification {
-            display: none;
-            text-align: center;
-            margin-top: 10px;
-            padding: 10px;
-            background-color: #f0fff0;
-            border: 1px solid #e0eee0;
-            border-radius: 5px;
-            color: green;
-        }
-        #notification1 {
-        display: none;
-        position: fixed;
-        top: 20%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        background-color: rgba(0, 0, 0, 0.6);
-       color: white;
-       padding: 20px;
-       border-radius: 10px;
-       z-index: 1000;
-       opacity: 0;
-       transition: opacity 0.3s ease-in-out;
-        }
-         #notification1.show {
-            display: block;
-            opacity: 1;
-         }
-        .button {
-        padding: 2px 2px;
-        font-size: 12px;
-        cursor: pointer;
-        background-color: rgba(0, 0, 0, 0.6);
-        color: white;
-        }
-    #whatsapp-button {
-    position: fixed;
-    bottom: -3px;
-    right: 15px;
-    z-index: 999;
-    cursor: pointer;
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>GameZone - Aplikasi Game</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap');
+  * {
+    box-sizing: border-box;
   }
-  #whatsapp-button img {
-    width: 35px;
-    height: 35px;
-  }
-
-  .modal {
-    display: none;
-    position: fixed;
-    z-index: 1;
-    left: 0px;
-    top: 0px;
-    width: 100%;
-    height: 100%;
-    overflow: auto;
-    background-color: rgba(0,0,0,0.9); 
-    }
-
-  .modal-content {
-    background-color: rgba(0,0,0,0.9);
-    margin: 120% auto;
-    padding: 5px;
-    border-radius: 10px;
-    color: red;
-    width: 80%; 
-    font-size: 15px;
-
-  }
-  .close-button:hover,
-  .close-button:focus {
+  body, html {
+    margin: 0; padding: 0; height: 100%;
+    font-family: 'Poppins', sans-serif;
+    background: linear-gradient(135deg, #1e3c72, #2a5298);
+    overflow-x: hidden;
     color: #fff;
-    text-decoration: none;
-    cursor: pointer;
+  }
+  
+  body::before {
+    content: '';
+    position: fixed;
+    top:0; left:0; right:0; bottom:0;
+    background:
+      radial-gradient(2px 2px at 20% 10%, #fff, transparent),
+      radial-gradient(2px 2px at 40% 30%, #fff, transparent),
+      radial-gradient(2px 2px at 60% 70%, #fff, transparent),
+      radial-gradient(2px 2px at 80% 50%, #fff, transparent),
+      radial-gradient(2px 2px at 90% 80%, #fff, transparent);
+    background-repeat: repeat;
+    animation: star-move 30s linear infinite;
+    z-index: 0;
+  }
+  @keyframes star-move {
+    from {background-position: 0 0, 0 0, 0 0, 0 0, 0 0;}
+    to {background-position: 10000px 10000px, 5000px 6000px, 8000px 7000px, 6000px 9000px, 4000px 8000px;}
+  }
+  .container {
+    position: relative;
+    z-index: 1;
+    max-width: 400px;
+    margin: 50px auto 80px;
+    background: rgba(0, 0, 0, 0.55);
+    border-radius: 15px;
+    padding: 30px 40px;
+    box-shadow: 0 0 25px 4px rgba(255, 165, 0, 0.5);
   }
 
-  .modal-buttons {
-    text-align: right;
-    margin-top: 0px;
+  h1 {
+    text-align: center;
+    font-size: 36px;
+    margin-bottom: 40px;
+    letter-spacing: 4px;
+    color: #ff9500;
+    text-shadow: 0 0 12px #ffb347;
   }
 
-  .modal-buttons button {
-    padding: 0px 0px;
-    margin-left: 1px;
-    cursor: pointer;
-    
+  
+  .tabs {
+    display: flex;
+    justify-content: space-around;
+    margin-bottom: 30px;
   }
-          .download-button {
-            padding: 3px 3px;
-            font-size: 1em;
-            background-color: #007b;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: background-color 0.3s ease;
-        }
-        .download-button:hover {
-            background-color: #0056;
-        }
-        .message {
-            margin-top: 0px;
-            color: red;
-            font-weight: bold;
-        }
-                .slideshow-container {
-            position: relative;
-            max-width: 800px;
-            margin: auto;
-            overflow: hidden;
-            border: 0px solid #fff;
-        }
-        .mySlides {
-            display: none; 
-            width: 100%;
-            transition: transform 0.8s ease-in-out; 
-        }
-        .mySlides img {
-            width: 97%;
-            padding: 5px;
-            height: auto;
-            display: block;
-            border-radius: 10px;
-        }
-        .slide-from-right {
-            transform: translateX(100%);
-        }
-        .slide-to-center {
-            transform: translateX(0%);
-        }
-        .slide-to-left {
-            transform: translateX(100%);
-        }
-    </style>
+  .tab-btn {
+    flex: 1;
+    padding: 12px 0;
+    cursor: pointer;
+    font-weight: 600;
+    border: none;
+    background: transparent;
+    color: #ff9500;
+    font-size: 18px;
+    border-bottom: 3px solid transparent;
+    transition: border-color 0.3s;
+  }
+  .tab-btn.active {
+    border-color: #ff9500;
+    font-size: 20px;
+  }
+
+  
+  form {
+    display: none;
+    flex-direction: column;
+  }
+  form.active {
+    display: flex;
+  }
+
+  label {
+    margin-bottom: 6px;
+    font-weight: 500;
+  }
+  input, select {
+    padding: 10px 14px;
+    margin-bottom: 20px;
+    border-radius: 30px;
+    border: none;
+    outline: none;
+    font-size: 16px;
+  }
+  input[type="text"], input[type="email"], input[type="password"], select {
+    background: #222;
+    color: #fff;
+  }
+  input::placeholder {
+    color: #bbb;
+  }
+
+  button.submit-btn {
+    background: #ff9500;
+    border: none;
+    padding: 15px;
+    border-radius: 30px;
+    color: #fff;
+    font-weight: 700;
+    font-size: 18px;
+    cursor: pointer;
+    transition: background 0.3s;
+    box-shadow: 0 0 12px #ffb347;
+  }
+  button.submit-btn:hover {
+    background: #ffb347;
+  }
+
+  
+  .small-text {
+    text-align: center;
+    margin-top: 10px;
+    font-size: 13px;
+    color: #aaa;
+  }
+  .link-text {
+    color: #ff9500;
+    cursor: pointer;
+    text-decoration: underline;
+  }
+
+  
+  @media (max-width: 480px) {
+    .container {
+      margin: 20px 15px 60px;
+      padding: 20px 25px;
+    }
+    h1 {
+      font-size: 28px;
+    }
+    .tab-btn {
+      font-size: 16px;
+    }
+  }
+</style>
 </head>
 <body>
-   <div id="whatsapp-button">
-  <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/6/6b/WhatsApp.svg/512px-WhatsApp.svg.png" alt="WhatsApp Chat" onclick="openModal()">
+
+<div class="container">
+  <h1>GameZone<hr></h1>
+  <div class="tabs">
+    <button class="tab-btn active" data-tab="login">Login</button>
+    <button class="tab-btn" data-tab="register">Daftar</button>
+    <button class="tab-btn" data-tab="deposit">Deposit</button>
+    <button class="tab-btn" data-tab="withdraw">Penarikan</button>
+  </div>
+
+  
+  <form id="login" class="active">
+    <label for="login-username">Email / Username</label>
+    <input type="text" id="login-username" placeholder="Masukkan email atau username" required />
+
+    <label for="login-password">Password</label>
+    <input type="password" id="login-password" placeholder="Masukkan password" required />
+
+    <button type="submit" class="submit-btn">Login</button>
+    <p class="small-text"><span class="link-text" onclick="alert('Fitur lupa password belum tersedia')">Lupa Password?</span></p>
+  </form>
+
+  
+  <form id="register">
+    <label for="reg-username">Username</label>
+    <input type="text" id="reg-username" placeholder="Masukkan username" required />
+
+    <label for="reg-email">Email</label>
+    <input type="email" id="reg-email" placeholder="Masukkan email" required />
+
+    <label for="reg-password">Password</label>
+    <input type="password" id="reg-password" placeholder="Masukkan password" required />
+
+    <label for="reg-password2">Konfirmasi Password</label>
+    <input type="password" id="reg-password2" placeholder="Konfirmasi password" required />
+
+    <button type="submit" class="submit-btn">Daftar</button>
+  </form>
+
+  
+  <form id="deposit">
+    <label for="deposit-method">Metode Deposit</label>
+    <select id="deposit-method" required>
+      <option value="" disabled selected>Pilih metode</option>
+      <option value="qris">QRIS</option>
+    </select>
+
+    <label for="deposit-amount">Jumlah Deposit (Rp)</label>
+    <input type="text" id="deposit-amount" placeholder="Masukkan jumlah deposit" required pattern="^[0-9]*$" />
+  
+ <div id="qris-container" style="display:none; text-align:center; margin-bottom: 20px;">
+
+  <img src="https://kbypmtqhxcvfqtsggndy.supabase.co/storage/v1/object/public/qris//1748057891785.png" alt="QRIS" style="width: 180px; border-radius: 15px; box-shadow: 0 0 10px #ff9500;" />
 </div>
 
-   <div id="paymentModal" class="modal">
-  <div class="modal-content">
-    <span class="close-button" onclick="closeModal()"></span>
-    <p><center><strong>"ANDA PERLU MELAKUKAN PEMBELIAN POTO UNTUK MELANJUTKAN KE WHATSAPP"</center></strong></p><hr
-    <div class="modal-buttons">
-      <button onclick="closeModal()">BACK</button> 
-    </div>
-  </div>
-    </div>
+    <button type="submit" class="submit-btn">Lanjutkan Deposit</button>
+  </form>
+
+
+<div style="text-align:center; margin: 30px;">
+   <button class="submit-btn" onclick="mainkanGame()">Mainkan Game</button>
+</div>
   
-    <div class="header">
-        <h1 class="gallery-title" ><marquee behavior="alternate"> ← GALLERY SHINTA →</marquee></h1>
-    </div>
-    <div class="container">
-        <p class="header"><marquee><strong>•SELAMAT DATANG SAHABAT SHINTA ❤️ SEMOGA KALIAN SUKA DENGAN KOLEKSI POTO/VIDIO PRIBADI SINTA 💦• </marquee></strong></p>
-        <hr style="border: 1px solid #eee; margin: 10px 0;">
-        <div class="gallery-wrapper" id="supabase-gallery">
-            <div class="gallery-item">
-                <img src="https://jfhcwtsxchweaetsjryf.supabase.co/storage/v1/object/public/qris//IMG_20250521_123113.jpg" alt="Foto 1" onclick="openPopup('https://jfhcwtsxchweaetsjryf.supabase.co/storage/v1/object/public/qris//IMG_20250521_123113.jpg')">
-            </div>
-                <div class="slideshow-container">
+  <form id="withdraw">
+    <label for="withdraw-name">Nama Lengkap</label>
+    <input type="text" id="withdraw-name" placeholder="Masukkan nama lengkap" required />
 
-        <div class="mySlides fade">
-            <div class="numbertext"></div>
-            <img src="https://jfhcwtsxchweaetsjryf.supabase.co/storage/v1/object/public/qris//IMG_20250521_141226.jpg" alt="Gambar 1">
-        </div>
+    <label for="withdraw-ewallet-number">Nomor E-wallet</label>
+    <input type="text" id="withdraw-ewallet-number" placeholder="Masukkan nomor e-wallet" required />
 
-        <div class="mySlides fade">
-            <div class="numbertext"></div>
-            <img src="https://jfhcwtsxchweaetsjryf.supabase.co/storage/v1/object/public/qris//IMG_20250521_144024.jpg" alt="Gambar 2">
-        </div>
+    <label for="withdraw-ewallet-type">Jenis E-wallet</label>
+    <select id="withdraw-ewallet-type" required>
+      <option value="" disabled selected>Pilih jenis e-wallet</option>
+      <option value="dana">Dana</option>
+    </select>
 
-        <div class="mySlides fade">
-            <div class="numbertext"></div>
-            <img src="https://jfhcwtsxchweaetsjryf.supabase.co/storage/v1/object/public/qris//IMG_20250521_140707.jpg" alt="Gambar 3">
-        </div>
-    <br>
-    </div>
-    <div id="overlay" class="overlay" onclick="closePopup()">
-        <div id="popupContent" class="popup" onclick="event.stopPropagation()">
-            <div id="imageContainer" class="popup-image-container">
-                <img id="popupImage" class="popup-image" src="" alt="Gambar Popup">
-            </div>
-            <button id="payButton" class="pay-button" onclick="showQRIS()">Bayar</button>
-            <span style="font-size: 0.8em; color: #555;"><strong>(Lanjutkan membayar poto dengan harga Rp.25.000)</strong></span>
+    <label for="withdraw-amount">Jumlah Penarikan (Rp)</label>
+    <input type="text" id="withdraw-amount" placeholder="Masukkan jumlah penarikan" required pattern="^[0-9]*$" />
 
-          <div id="qrisContainer" class="qris-container">
-    <div class="qris-info">
-        <strong>BAYAR DENGAN E-WALLET</strong><br><hr>
-        <strong>NAMA : Y** G**** A*** Q****</strong>&nbsp;&nbsp;&nbsp;<span id="qrisNama"></span><br>
-        <strong>NOMOR : 0821-1444-1814</strong> <span id="qrisNomor"  ></span><strong>(DANA)</strong><br>
-          <button class="button" onclick="salinNomor()">Salin Nomor</button><br>
-  <div id="notification1">Nomor telah disalin!</div><br>
-        <strong>BAYAR DENGAN SCAN QRIS</strong>
-    </div>
-    <div class="qris-image-container">
-        <img id="qrisImage" class="qris-image" src="" alt="QRIS">
-    </div>
-    <button id="downloadButton" class="download-button">Download Qris</button>
-    <p id="statusMessage" class="message"></p>
-    <button class="done-button" onclick="processPayment()">KONFIRMASI PEMBAYARAN</button>
-    <div id="notification"></div>
-    <span style="font-size: 0.8em; color: #555;"><strong>(konfirmasi jika sudah melakukan tranfer)<hr></strong></span>
-            </div>
-        </div>
-    </div>
-    <footer>
-          </div>
-        <span style="font-size: 0.5em; color: #555;"><strong><center>HANYA DENGAN Rp.25.000,- KAMU ❤️ SUDAH BISA MELIHAT KOLEKSI POTO PREMIUM SHINTA</center></strong>
-        <p><center>&copy; 2025 GALLERY SHINTA. Hak Cipta Dilindungi.</p>
-        <p><a href="/kebijakan-privasi">Kebijakan Privasi</a> | <a href="/syarat-dan-ketentuan">Syarat & Ketentuan</a></center></p>
-    </footer>
-    <script>
-      function salinNomor() {
-  var nomorUntukDisalin = "082114441814";
-  var notificationDiv = document.getElementById("notification1");
+    <button type="submit" class="submit-btn">Kirim Penarikan</button>
+  </form>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+  const supabase = window.supabase.createClient(
+    'https://kbypmtqhxcvfqtsggndy.supabase.co',
+    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtieXBtdHFoeGN2ZnF0c2dnbmR5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDgwMTQ0MzksImV4cCI6MjA2MzU5MDQzOX0.CChsDYoTN3OI36QmZNCBS_xKEmCjkUsFAonD8gN2Qj0'
+  );
+</script>
+<script>
+  
+  const tabs = document.querySelectorAll('.tab-btn');
+  const forms = document.querySelectorAll('form');
 
-  navigator.clipboard.writeText(nomorUntukDisalin);
+  tabs.forEach(tab => {
+    tab.addEventListener('click', () => {
+      tabs.forEach(t => t.classList.remove('active'));
+      forms.forEach(f => f.classList.remove('active'));
 
-  notificationDiv.classList.add("show");
-
-  setTimeout(function() {
-    notificationDiv.classList.remove("show");
-  }, 1000);
-}
-      
-        const galleryImages = document.querySelectorAll('.gallery-item img, .popup-image');
-
-galleryImages.forEach(img => {
-    img.addEventListener('contextmenu', (e) => {
-        e.preventDefault();
+      tab.classList.add('active');
+      document.getElementById(tab.dataset.tab).classList.add('active');
     });
+  });
+document.getElementById('login').addEventListener('submit', async e => {
+  e.preventDefault();
+  const email = document.getElementById('login-username').value;
+  const password = document.getElementById('login-password').value;
 
-    img.addEventListener('dragstart', (e) => {
-        e.preventDefault();
-    });
+const { data, error } = await supabase.auth.signInWithPassword({
+  email,
+  password
 });
-        
-        const overlay = document.getElementById('overlay');
-        const popupContent = document.getElementById('popupContent');
-        const popupImage = document.getElementById('popupImage');
-        const payButton = document.getElementById('payButton');
-        const imageContainer = document.getElementById('imageContainer');
-        const qrisContainer = document.getElementById('qrisContainer');
-        const qrisImage = document.getElementById('qrisImage');
-        const notificationDiv = document.getElementById('notification');
-        const defaultQrisUrl = 'https://jfhcwtsxchweaetsjryf.supabase.co/storage/v1/object/public/qris//1-.jpg';
-        let currentImageSource = '';
 
-        function openPopup(imageSrc) {
-            currentImageSource = imageSrc;
-            popupImage.src = currentImageSource;
-            payButton.style.display = 'block';
-            qrisContainer.style.display = 'none';
-            notificationDiv.style.display = 'none';
-            qrisImage.src = defaultQrisUrl;
-            overlay.style.display = 'flex';
-        }
+  const uid = data.user.id;
+  localStorage.setItem('uid', uid);
+if (data && data.user) {
+  const uid = data.user.id;
+  localStorage.setItem('uid', uid);
+  const { data: userData, error } = await supabase
+    .from('users_data')
+    .select('saldo')
+    .eq('user_id', uid)
+    .single();
+  alert(`Login berhasil! Saldo Anda: Rp${userData?.saldo ?? 0}`);
+} else {
+  alert('Login gagal. Periksa kembali email dan password.');
+}
+});
 
-        function closePopup() {
-            overlay.style.display = 'none';
-            popupImage.classList.remove('blurred');
-            payButton.style.display = 'block';
-            qrisContainer.style.display = 'none';
-            notificationDiv.style.display = 'none';
-        }
-function showQRIS() {
-    document.getElementById('qrisNama').textContent = "";
-    document.getElementById('qrisNomor').textContent = "";
+document.getElementById('register').addEventListener('submit', async e => {
+  e.preventDefault();
+  const email = document.getElementById('reg-email').value;
+  const username = document.getElementById('reg-username').value;
+  const pw1 = document.getElementById('reg-password').value;
+  const pw2 = document.getElementById('reg-password2').value;
 
-    popupImage.classList.remove('blurred');
-    popupImage.style.display = 'none';
-    qrisImage.style.display = 'block';
-    qrisContainer.style.display = 'flex';
-    payButton.style.display = 'none';
-    notificationDiv.style.display = 'none';
-        }
-
-        function processPayment() {
-            notificationDiv.textContent = "Pembayaran sedang diproses oleh sistem...";
-            notificationDiv.style.display = 'block';
-            setTimeout(() => {
-                window.location.reload();
-            }, 2000);
-        }
-  var modal = document.getElementById("paymentModal");
-
-  function openModal() {
-    modal.style.display = "block";
+  if (pw1 !== pw2) {
+    alert('Password tidak cocok!');
+    return;
   }
-  function closeModal() {
-    modal.style.display = "none";
 
-  }
-  window.onclick = function(event) {
-    if (event.target == modal) {
-      modal.style.display = "none";
-    }
-  }
-   document.getElementById('downloadButton').addEventListener('click', function() {
-            const imageUrl = 'https://jfhcwtsxchweaetsjryf.supabase.co/storage/v1/object/public/qris//1-.jpg';
-            const fileName = 'QRIS-SHINTA.jpg';
+const { data, error: signUpError } = await supabase.auth.signUp({
+  email,
+  password: pw1
+});
 
-            const statusMessage = document.getElementById('statusMessage');
-            statusMessage.textContent = 'Memulai unduhan...';
-            statusMessage.style.color = 'blue';
+if (signUpError) {
+  alert('Gagal daftar!');
+  return;
+}
 
-            fetch(imageUrl)
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error(`HTTP error! status: ${response.status}`);
-                    }
-                    return response.blob();
-                })
-                .then(blob => {
-                    const url = window.URL.createObjectURL(blob);
-                    const a = document.createElement('a');
-                    a.href = url;
-                    a.download = fileName;
-                    document.body.appendChild(a);
-                    a.click();
-                    document.body.removeChild(a);
-                    window.URL.revokeObjectURL(url);
 
-                    statusMessage.textContent = 'Berhasil!';
-                    statusMessage.style.color = 'green';
-                })
-                .catch(e => {
-                    console.error('Download error:', e);
-                    statusMessage.textContent = 'Gagal mengunduh gambar. Silakan coba lagi.';
-                    statusMessage.style.color = 'red';
-                  
-                    if (e.message.includes('Failed to fetch') || e.message.includes('NetworkError')) {
-                        statusMessage.textContent += ' (Kemungkinan masalah CORS atau jaringan.)';
-                    }
-                });
-        });
-        let slideIndex = 1; 
-        let slideshowInterval;
-        function showSlides() {
-            let i;
-            let slides = document.getElementsByClassName("mySlides");
-            let dots = document.getElementsByClassName("dot");
+await supabase.from('users_data').insert({
+  username,
+  email,
+  saldo: 0 
+});
+alert('Pendaftaran berhasil!');
+});
 
-            
-            for (i = 0; i < slides.length; i++) {
-                slides[i].style.display = "none";
-                slides[i].classList.remove('slide-from-right', 'slide-to-center', 'slide-to-left');
-            }
+  document.getElementById('deposit-method').addEventListener('change', function () {
+  const qrisContainer = document.getElementById('qris-container');
+  qrisContainer.style.display = this.value === 'qris' ? 'block' : 'none';
+});
 
-            
-            for (i = 0; i < dots.length; i++) {
-                dots[i].className = dots[i].className.replace(" active", "");
-            }
+  document.getElementById('deposit').addEventListener('submit', async e => {
+  e.preventDefault();
+ const uid = localStorage.getItem('uid');
+  const amount = parseInt(document.getElementById('deposit-amount').value);
+if (isNaN(amount) || amount <= 0) {
+  alert('Masukkan jumlah deposit yang valid');
+  return;
+}
+  if (!uid || !amount) return alert('Harus login dulu!');
 
-            slideIndex++;
-            if (slideIndex > slides.length) {
-                slideIndex = 1; 
-            }
+  await supabase.rpc('update_saldo', { uid, jumlah: amount });
+  alert('Deposit berhasil!');
+});
+ 
+  document.getElementById('withdraw').addEventListener('submit', async e => {
+  e.preventDefault();
+ const uid = localStorage.getItem('uid');
 
-            
-            slides[slideIndex - 1].style.display = "block";
-            slides[slideIndex - 1].classList.add('slide-from-right');
-            setTimeout(() => {
-                slides[slideIndex - 1].classList.remove('slide-from-right');
-                slides[slideIndex - 1].classList.add('slide-to-center');
-            }, 50);
+  const amount = parseInt(document.getElementById('withdraw-amount').value);
 
-            dots[slideIndex - 1].className += " active";
-        }
+  if (!uid || !amount) return alert('Harus login dulu!');
 
-        
-        function plusSlides(n) {
-            
-            clearInterval(slideshowInterval);
-            slideIndex += n - 1; 
-            showSlides();
-            startSlideshow();
-        }
+  const { error } = await supabase.rpc('tarik_saldo', { uid, jumlah_tarik: amount });
+  alert(error ? 'Gagal tarik saldo' : 'Penarikan dikirim!');
+});
 
-        
-        function currentSlide(n) {
+     async function mainkanGame() {
+    const uid = localStorage.getItem('uid');
+    if (!uid) {
+      alert("Silakan login terlebih dahulu.");
+      return;
+    }
 
-            clearInterval(slideshowInterval);
-            slideIndex = n - 1;
-            showSlides();
-          
-            startSlideshow();
-        }
+   
+    const { data, error } = await supabase
+      .from('users_data')
+      .select('saldo')
+     .eq('user_id', uid)
+      .single();
 
-        
-        function startSlideshow() {
-            
-            slideshowInterval = setInterval(showSlides, 3000);
-        }
+    if (error || !data) {
+      alert("Gagal memuat data saldo.");
+      return;
+    }
 
-        
-        document.addEventListener("DOMContentLoaded", startSlideshow);
-  </script>
- </body>    
+   
+    localStorage.setItem('saldo', data.saldo);
+
+   
+    window.location.href = `slot.html`;
+  }
+  
+</script>
+</body>
 </html>
