@@ -325,7 +325,7 @@ document.getElementById('pilih-metode').addEventListener('change', async functio
     document.getElementById('dep-nomor').value = data.nomor;
   } else if (metode === 'QRIS') {
     document.getElementById('form-qris').style.display = 'block';
-    document.getElementById('gambar-qris').src = data.gambar_url;
+    document.getElementById('gambar-qris').src = data.qris_url;
   }
 });
 
@@ -358,5 +358,5 @@ document.getElementById('pilih-metode').addEventListener('change', async functio
   window.onload = loadProfile;
 </script>
 </body>
-  </html>
+    </html>
   
