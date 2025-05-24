@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mahjong Slot UI</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+<audio id="spinSound" src="https://www.soundjay.com/button/sounds/button-16.mp3"></audio>
+<audio id="bgm" src="https://www.bensound.com/bensound-music/bensound-epic.mp3" loop></audio>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+  const supabase = window.supabase.createClient(
+    'https://kbypmtqhxcvfqtsggndy.supabase.co',
+    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtieXBtdHFoeGN2ZnF0c2dnbmR5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDgwMTQ0MzksImV4cCI6MjA2MzU5MDQzOX0.CChsDYoTN3OI36QmZNCBS_xKEmCjkUsFAonD8gN2Qj0'
+  );
+  const uid = localStorage.getItem('uid');
+</script>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+    body {
+      margin: 0;
+      font-family: 'Poppins', sans-serif;
+      background: #177c44;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 3px 10px;
+      color: #fff;
+    }
+    h1 {
+      font-size: 2em;
+      color: gold;
+      margin-bottom: 15px;
+      text-shadow: 2px 2px 6px #000;
+      text-align: center;
+    }
+    .slot-frame {
+      background: red;
+      padding: 0px;
+      border-radius: 2px;
+      box-shadow: inset 0 0 4px rgba(0,0,0,0.3);
+    }
+    .slot-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 70px);
+      grid-template-rows: repeat(5, 85px);
+      gap: 0px;
+      justify-content: center;
+      border: 3px solid red;
+    }
+    .tile {
+      background: #dda;
+      border: 1px solid #177c44;
+      border-radius: 0px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 40px;
+      font-weight: bold;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+      transition: transform 3.0s ease;
+    }
+    .tile.break {
+      animation: breakAnim 0.5s forwards;
+    }
+    @keyframes breakAnim {
+      0% { transform: scale(1); opacity: 1; }
+      100% { transform: scale(0); opacity: 1; }
+    }
+    .popup {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: #222;
+      color: gold;
+      padding: 20px 30px;
+      border: 2px solid gold;
+      border-radius: 10px;
+      font-size: 1.5em;
+      box-shadow: 0 0 20px rgba(0,0,0,0.7);
+      z-index: 9999;
+      display: none;
+    }
+    .controls {
+      margin-top: 15px;
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+    .balance, .bet-display {
+      background: #000;
+      padding: 6px 4px;
+      border-radius: 10px;
+      color: red;
+      border: 2px solid gold;
+      font-size: 20px;
+      font-weight: bold;
+    }
+    .multiplier {
+     border: 2px solid gold;
+      position: fixed;
+      top: 70px;
+      background: black;
+      padding: 4px 4px;
+      border-radius: 0px;
+      color: #f0c04d;
+      font-size: 30px;
+      font-weight: bold;
+    }
+    .spin-button {
+      background: black;
+      border: 2px solid gold;
+      border-radius: 100%;
+      width: 60px;
+      height: 60px;
+      font-size: 30px;
+      font-weight: bold;
+      color: #000;
+      cursor: pointer;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.4);
+    }
+    .bet-controls button {
+      background: #222;
+      color: white;
+      border: 1px solid gold;
+      border-radius: 100px;
+      padding: 6px 6px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  
+  <audio id="rollSound" src="https://www.soundjay.com/misc/sounds/slot-machine-01.mp3"></audio>
+<audio id="winSmallSound" src="https://www.soundjay.com/button/sounds/button-3.mp3"></audio>
+<audio id="winBigSound" src="https://www.soundjay.com/misc/sounds/cash-register-01.mp3"></audio>
+  <audio id="breakSound" src="https://www.soundjay.com/button/sounds/button-29.mp3"></audio>
+  <div id="popup" class="popup"></div>
+  
+  <h1>MAHJONG MINI<hr></h1>
+  <div class="slot-frame">
+    <div class="slot-grid" id="grid"></div>
+  </div>
+
+  <div class="controls">
+<div class="balance" id="balanceDisplay">Saldo: Rp0</div>
+    <div class="bet-controls">
+      <button id="betMinus">-</button>
+      <span class="bet-display" id="betDisplay">100</span>
+      <button id="betPlus">+</button>
+    </div>
+    <button class="spin-button" id="spinButton">🪙</button>
+    <div class="multiplier" id="multiplierDisplay">x0</div>
+  </div>
+
+  <script>
+    const grid = document.getElementById('grid');
+    const spinButton = document.getElementById('spinButton');
+    const balanceDisplay = document.getElementById('balanceDisplay');
+    const betDisplay = document.getElementById('betDisplay');
+    const multiplierDisplay = document.getElementById('multiplierDisplay');
+    const rollSound = document.getElementById('rollSound');
+       rollSound.currentTime = 0;
+       rollSound.play();
+    const betMinusBtn = document.getElementById('betMinus');
+    const betPlusBtn = document.getElementById('betPlus');
+       const symbolPayouts = {
+   '💎': 20,
+   '⚔️': 20,
+   '🎂': 15,
+   '🕶️': 20,
+   '⚕️': 15,
+   '🍭': 15,
+   '🛡️': 15,
+   '💰': 30,
+   '🔥': 10,
+ }
+    const width = 5;
+    const height = 5;
+const symbols = ['🔥', '🍭', '🎂', '💰', '⚕️', '⚔️', '🕶️', '🛡️', '💎'];
+    let currentSymbols = [];
+    let balance = 0; // sementara 0, isi dari Supabase nanti
+
+async function loadSaldo() {
+  if (!uid) {
+    alert("User belum login!");
+    window.location.href = "index.html"; // redirect ke login kalau belum login
+    return;
+  }
+
+  const { data, error } = await supabase
+    .from('users_data')
+    .select('saldo')
+    .eq('id', uid)
+    .single();
+
+  if (error || !data) {
+    alert("Gagal mengambil saldo user!");
+    return;
+  }
+
+  balance = data.saldo;
+  updateBalance(0);
+}
+
+window.onload = () => {
+  loadSaldo();
+  init(); // jalankan game
+};
+    let bet = 100;
+    const minBet = 50;
+    const maxBet = 1000;
+    let multiplier = 0;
+
+    function generateRandomSymbols() {
+      const arr = [];
+      for (let i = 0; i < width * height; i++) {
+        arr.push(symbols[Math.floor(Math.random() * symbols.length)]);
+      }
+      return arr;
+    }
+
+    function renderGrid(symbolsArr) {
+      grid.innerHTML = '';
+      symbolsArr.forEach(sym => {
+        const div = document.createElement('div');
+        div.className = 'tile';
+        div.textContent = sym;
+        grid.appendChild(div);
+      });
+    }
+
+function animateReelShake(col) {
+  return new Promise(resolve => {
+    const reelSymbols = [];
+    for (let row = 0; row < height; row++) {
+      reelSymbols.push(currentSymbols[row * width + col]);
+    }
+
+    const reelTiles = [];
+    for (let row = 0; row < height; row++) {
+      reelTiles.push(grid.children[row * width + col]);
+    }
+
+    let position = 0;
+    const tileHeight = 20;
+    const totalScrolls = 10 + col * 5;
+    let scrollCount = 0;
+
+    const rollSound = document.getElementById('rollSound');
+    rollSound.currentTime = 0;
+    rollSound.play();
+
+    function step() {
+      position += 10;
+      if (position >= tileHeight) {
+        position -= tileHeight;
+        scrollCount++;
+      
+        reelSymbols.unshift(symbols[Math.floor(Math.random() * symbols.length)]);
+        reelSymbols.pop();
+        
+        for (let r = 0; r < height; r++) {
+          reelTiles[r].textContent = reelSymbols[r];
+        }
+      }
+      
+      for (let r = 0; r < height; r++) {
+        reelTiles[r].style.transform = `translateY(-${position}px)`;
+      }
+      if (scrollCount >= totalScrolls) {
+        
+        for (let r = 0; r < height; r++) {
+          reelTiles[r].style.transform = 'translateY(0)';
+        }
+        rollSound.pause();
+        rollSound.currentTime = 0;
+
+        
+        for (let r = 0; r < height; r++) {
+          currentSymbols[r * width + col] = reelSymbols[r];
+        }
+
+        resolve();
+      } else {
+        requestAnimationFrame(step);
+      }
+    }
+
+    step();
+  });
+}
+
+    function getWinningTiles(symbolsArr) {
+     const winningTiles = new Set();
+
+     for (const symbol of symbols) {
+     let consecutiveColumns = 0;
+     const matchedIndices = [];
+
+     for (let col = 0; col < width; col++) {
+       let foundInColumn = false;
+
+       for (let row = 0; row < height; row++) {
+         const index = row * width + col;
+         if (symbolsArr[index] === symbol) {
+           matchedIndices.push(index);
+           foundInColumn = true;
+         }
+       }
+
+       if (foundInColumn) {
+         consecutiveColumns++;
+         if (consecutiveColumns >= 3 && col === width - 1) {
+           matchedIndices.forEach(i => winningTiles.add(i));
+         }
+       } else {
+         if (consecutiveColumns >= 3) {
+           matchedIndices.forEach(i => winningTiles.add(i));
+         }
+         break;
+       }
+     }
+   }
+       return Array.from(winningTiles);
+}
+      function animateWinningTiles(indices) {
+      const sound = document.getElementById('breakSound');
+      document.querySelectorAll('.tile').forEach((tile, i) => {
+        if (indices.includes(i)) {
+          tile.classList.add('break');
+        }
+      });
+      sound.play();
+    }
+    async function handleTileCollapse(winningIndices) {
+      const delay = ms => new Promise(res => setTimeout(res, ms));
+      animateWinningTiles(winningIndices);
+      await delay(300);
+      for (let i = 0; i < currentSymbols.length; i++) {
+        if (winningIndices.includes(i)) {
+          currentSymbols[i] = null;
+        }
+      }
+      for (let col = 0; col < width; col++) {
+        const colSymbols = [];
+        for (let row = height - 1; row >= 0; row--) {
+          const idx = row * width + col;
+          if (currentSymbols[idx] !== null) {
+            colSymbols.unshift(currentSymbols[idx]);
+          }
+        }
+         const sound = document.getElementById('breakSound');
+         sound.play();
+        
+         while (colSymbols.length < height) {
+          colSymbols.unshift(symbols[Math.floor(Math.random() * symbols.length)]);
+        }
+        for (let row = 0; row < height; row++) {
+          currentSymbols[row * width + col] = colSymbols[row];
+        }
+      }
+      renderGrid(currentSymbols);
+    }
+    function updateBalance(amount) {
+  balance += amount;
+  balanceDisplay.textContent = `Saldo: Rp${balance}`;
+}
+
+    function updateBetDisplay() {
+      betDisplay.textContent = `${bet}`;
+    }
+    function showPopup(message) {
+      const popup = document.getElementById('popup');
+      popup.textContent = message;
+      popup.style.display = 'block';
+      setTimeout(() => {
+        popup.style.display = 'none';
+      }, 1000);
+    }
+
+async function spin() {
+  if (balance < bet) return;
+  const spinSound = document.getElementById('spinSound');
+  spinSound.currentTime = 0;
+  spinSound.play();
+
+  updateBalance(-bet);
+  spinButton.disabled = true;
+
+  multiplier = 0;
+  multiplierDisplay.textContent = `x${multiplier}`;
+
+  rollSound.currentTime = 0;
+  rollSound.play();
+
+  for (let col = 0; col < width; col++) {
+    await animateReelShake(col);
+  }
+
+  rollSound.pause();
+  rollSound.currentTime = 0;
+
+  let totalWin = 0;
+  while (true) {
+    const winTiles = getWinningTiles(currentSymbols);
+    if (winTiles.length === 0) break;
+    multiplier = Math.min(multiplier + 1, 5);
+    multiplierDisplay.textContent = `x${multiplier}`;
+    await handleTileCollapse(winTiles);
+   let symbolCount = {};
+    winTiles.forEach(i => {
+   const sym = currentSymbols[i];
+   symbolCount[sym] = (symbolCount[sym] || 0) + 1;
+});
+
+   for (let sym in symbolCount) {
+   const count = symbolCount[sym];
+   const payout = symbolPayouts[sym] || 1;
+   totalWin += count * payout * (bet / 100) * multiplier;
+  }
+
+    await new Promise(res => setTimeout(res, 300));
+  }
+
+  multiplier = 0;
+  multiplierDisplay.textContent = `x${multiplier}`;
+  updateBalance(totalWin);
+  // Sync saldo ke Supabase
+await supabase
+  .from('users_data')
+  .update({ saldo: balance })
+  .eq('id', uid);
+
+
+  if (totalWin > 0) {
+    if (totalWin >= bet * 10) {
+      document.getElementById('winBigSound').play();
+    } else {
+      document.getElementById('winSmallSound').play();
+    }
+    showPopup(`You won $${totalWin}!`);
+  }
+
+  spinButton.disabled = false;
+}
+
+    betMinusBtn.onclick = () => {
+      if (bet - 100 >= minBet) {
+        bet -= 100;
+        updateBetDisplay();
+      }
+    };
+    betPlusBtn.onclick = () => {
+      if (bet + 100 <= maxBet && bet + 100 <= balance) {
+        bet += 100;
+        updateBetDisplay();
+      }
+    };
+    spinButton.onclick = spin;
+
+  const bgm = document.getElementById('bgm');
+  bgm.volume = 0.3;
+
+  function init() {
+  currentSymbols = generateRandomSymbols();
+  renderGrid(currentSymbols);
+  updateBalance(0);
+  updateBetDisplay();
+
+  const bgm = document.getElementById('bgm');
+  bgm.volume = 0.3;
+  bgm.play().catch(() => {
+    document.body.addEventListener('click', () => {
+      bgm.play();
+    }, { once: true });
+  });
+}
+  init();
+</script>
+</body>
+  </html>
+  
