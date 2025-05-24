@@ -6,8 +6,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Mahjong Slot UI</title>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
-<audio id="spinSound" src="https://www.soundjay.com/button/sounds/button-16.mp3"></audio>
-<audio id="bgm" src="https://www.bensound.com/bensound-music/bensound-epic.mp3" loop></audio>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
   const supabase = window.supabase.createClient(
@@ -160,6 +158,9 @@
     <div class="multiplier" id="multiplierDisplay">x0</div>
   </div>
 
+<audio id="spinSound" src="https://www.soundjay.com/button/sounds/button-16.mp3"></audio>
+<audio id="bgm" src="https://www.bensound.com/bensound-music/bensound-epic.mp3" loop></audio>
+
   <script>
     const grid = document.getElementById('grid');
     const spinButton = document.getElementById('spinButton');
@@ -167,8 +168,6 @@
     const betDisplay = document.getElementById('betDisplay');
     const multiplierDisplay = document.getElementById('multiplierDisplay');
     const rollSound = document.getElementById('rollSound');
-       rollSound.currentTime = 0;
-       rollSound.play();
     const betMinusBtn = document.getElementById('betMinus');
     const betPlusBtn = document.getElementById('betPlus');
        const symbolPayouts = {
@@ -257,7 +256,7 @@ function animateReelShake(col) {
     const rollSound = document.getElementById('rollSound');
     rollSound.currentTime = 0;
     rollSound.play();
-
+     
     function step() {
       position += 10;
       if (position >= tileHeight) {
@@ -483,6 +482,7 @@ await supabase
     }, { once: true });
   });
 }
+
   init();
 </script>
 </body>
