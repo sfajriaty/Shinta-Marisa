@@ -425,7 +425,7 @@ const { error } = await supabase
 if (error) {
   alert('Gagal mengirim permintaan.');
 } else {
-  // Ambil saldo sekarang
+ 
   const { data: userData, error: saldoError } = await supabase
     .from('users_data')
     .select('saldo')
@@ -451,6 +451,8 @@ if (error) {
     alert('Permintaan penarikan dikirim dan saldo berhasil dikurangi.');
     closePopup('popup-withdraw');
     loadProfile();
+    
+    await loadWithdrawHistory();
   }
 }
 };
@@ -462,4 +464,5 @@ if (error) {
   window.onload = loadProfile;
 </script>
 </body>
-</html>
+  </html>
+  
