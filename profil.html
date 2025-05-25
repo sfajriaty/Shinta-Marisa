@@ -184,8 +184,10 @@
   <div class="popup-inner">
     <h2>Form Penarikan</h2>
     <input type="text" id="with-nama" placeholder="Nama" />
+    
     <div style="display: flex; align-items: center; margin-bottom: 12px;">
       <input type="text" id="with-nomor" placeholder="Nomor" />
+      </button>
     </div>
 
     <select id="with-metode">
@@ -414,16 +416,44 @@ document.getElementById('btn-kembali-ewallet').onclick = async () => {
       return;
     }
 
-    const { error } = await supabase.from('withdraw_requests').insert([
-      { user_id: uid, nama, metode, amount: parseInt(jumlah) }
-    ]);
+const { error } = await supabase
+  .from('withdraw_requests')
+  .insert([
+    { user_id: uid, nama, metode, amount: parseInt(jumlah) }
+  ]);
 
-    if (error) alert("Gagal kirim penarikan.");
-    else {
-      alert("Permintaan penarikan dikirim.");
-      closePopup('popup-withdraw');
-    }
-  };
+if (error) {
+  alert('Gagal mengirim permintaan.');
+} else {
+  // Ambil saldo sekarang
+  const { data: userData, error: saldoError } = await supabase
+    .from('users_data')
+    .select('saldo')
+    .eq('user_id', uid)
+    .single();
+
+  if (saldoError || !userData) {
+    alert('Gagal mengambil saldo user.');
+    return;
+  }
+
+  const saldoBaru = userData.saldo - parseInt(jumlah);
+
+  const { error: updateError } = await supabase
+    .from('users_data')
+    .update({ saldo: saldoBaru })
+    .eq('user_id', uid);
+
+  if (updateError) {
+    alert('Permintaan disimpan, tapi gagal mengurangi saldo.');
+    console.error(updateError);
+  } else {
+    alert('Permintaan penarikan dikirim dan saldo berhasil dikurangi.');
+    closePopup('popup-withdraw');
+    loadProfile();
+  }
+}
+};
 
   document.getElementById('btn-main-game').onclick = () => {
     window.location.href = 'slot.html';
@@ -432,5 +462,4 @@ document.getElementById('btn-kembali-ewallet').onclick = async () => {
   window.onload = loadProfile;
 </script>
 </body>
-       </html>
-       
+</html>
