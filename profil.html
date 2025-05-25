@@ -6,9 +6,7 @@
   <title>Profil Pemain - GameZone</title>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap');
-    * {
-      box-sizing: border-box;
-    }
+    * { box-sizing: border-box; }
     body, html {
       margin: 0; padding: 0; min-height: 100vh;
       font-family: 'Poppins', sans-serif;
@@ -54,9 +52,7 @@
       box-shadow: 0 0 12px #ffb347;
       transition: background 0.3s;
     }
-    .btn:hover {
-      background: #ffb347;
-    }
+    .btn:hover { background: #ffb347; }
     h2 {
       border-bottom: 2px solid #ff9500;
       padding-bottom: 8px;
@@ -87,15 +83,9 @@
         margin: 20px 15px 60px;
         padding: 20px 25px;
       }
-      .btn-group {
-        flex-direction: column;
-        gap: 12px;
-      }
-      .btn {
-        width: 100%;
-      }
+      .btn-group { flex-direction: column; gap: 12px; }
+      .btn { width: 100%; }
     }
-    /* Popup */
     .popup-form {
       position: fixed;
       top: 0; left: 0;
@@ -115,7 +105,7 @@
       width: 90%;
       max-width: 400px;
     }
-    .popup-inner input, .popup-inner select {
+    .popup-inner input {
       width: 100%;
       padding: 10px;
       margin-bottom: 12px;
@@ -137,7 +127,6 @@
   </style>
 </head>
 <body>
-
 <div class="container">
   <h1>Profil Pemain</h1>
   <div class="saldo" id="saldo-display">Saldo: Rp0</div>
@@ -162,31 +151,28 @@
 
 <!-- Popup Deposit -->
 <div id="popup-deposit" class="popup-form" style="display:none;">
-  <div class="popup-inner">
-    <h2>Form Deposit</h2>
-    <select id="pilih-metode">
-      <option value="">Pilih Metode</option>
-      <option value="QRIS">QRIS</option>
-      <option value="eWallet">eWallet</option>
-    </select>
+  <div class="popup-inner">
+    <h2>Deposit</h2>
+    <input type="text" id="dep-nama" placeholder="Nama" readonly />
+    <input type="text" id="dep-nomor" placeholder="Nomor" readonly />
 
-    <!-- Ini buat eWallet -->
-    <div id="form-ewallet" style="display:none;">
-      <input type="text" id="dep-nama" placeholder="Nama" readonly />
-      <input type="text" id="dep-nomor" placeholder="Nomor" readonly />
-    </div>
-
-    <!-- Ini buat QRIS -->
-    <div id="form-qris" style="display:none; text-align:center;">
-      <img src="" alt="QRIS" id="gambar-qris" style="max-width: 100%; height: auto; margin: 10px 0;" />
-    </div>
-
-    <input type="number" id="dep-jumlah" placeholder="Jumlah (Rp)" />
-    <button id="dep-submit">Kirim</button>
-    <button onclick="closePopup('popup-deposit')">Batal</button>
-  </div>
+    <div style="text-align:center; margin: 12px 0;">
+      <button id="btn-qris" style="background:#ff9500; padding:8px 16px; border:none; border-radius:6px; color:#fff; cursor:pointer;">QRIS</button>
+    </div>
+    
+   <div style="text-align:center; margin: 12px 0;">
+   <button id="btn-kembali-ewallet" style="background:#888; padding:6px 16px; border:none; border-radius:6px; color: #fff; cursor:pointer; display:none;">Kembali ke eWallet</button>
 </div>
 
+    <div id="form-qris" style="display:none; text-align:center;">
+      <img src="" alt="QRIS" id="gambar-qris" style="max-width: 100%; height: auto; margin: 10px 0;" />
+    </div>
+
+    <input type="number" id="dep-jumlah" placeholder="Jumlah (Rp)" />
+    <button id="dep-submit">Kirim</button>
+    <button onclick="closePopup('popup-deposit')">Batal</button>
+  </div>
+</div>
 
 <!-- Popup Penarikan -->
 <div id="popup-withdraw" class="popup-form" style="display:none;">
@@ -194,11 +180,12 @@
     <h2>Form Penarikan</h2>
     <input type="text" id="with-nama" placeholder="Nama" />
     <input type="text" id="with-nomor" placeholder="Nomor" readonly />
-     <select id="with-metode">
-      <option value="">Pilih Metode</option>
-      <option value="QRIS">QRIS</option>
-      <option value="eWallet">eWallet</option>
-    </select>
+    <select id="with-metode">
+     <option value="">Pilih e-Wallet</option>
+     <option value="OVO">DANA</option>
+     <option value="OVO">OVO</option>
+     <option value="GoPay">GoPay</option>
+     </select>
     <input type="number" id="with-jumlah" placeholder="Jumlah (Rp)" />
     <button id="with-submit">Kirim</button>
     <button onclick="closePopup('popup-withdraw')">Batal</button>
@@ -212,7 +199,7 @@
     'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtieXBtdHFoeGN2ZnF0c2dnbmR5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDgwMTQ0MzksImV4cCI6MjA2MzU5MDQzOX0.CChsDYoTN3OI36QmZNCBS_xKEmCjkUsFAonD8gN2Qj0'
   );
 
-  const uid = localStorage.getItem('uid'); // pastikan UID sudah disimpan saat login
+  const uid = localStorage.getItem('uid');
 
   async function loadProfile() {
     const { data: userData, error: userError } = await supabase
@@ -267,67 +254,99 @@
     document.getElementById(id).style.display = 'none';
   }
 
-  document.getElementById('btn-deposit').onclick = () => {
+  document.getElementById('btn-deposit').onclick = async () => {
     document.getElementById('popup-deposit').style.display = 'flex';
+
+    // Default: tampilkan eWallet info
+    const { data, error } = await supabase
+      .from('deposit_config')
+      .select('*')
+      .eq('metode', 'eWallet')
+      .single();
+
+    if (error || !data) {
+      alert('Gagal ambil data eWallet.');
+      return;
+    }
+
+    document.getElementById('dep-nama').value = data.nama;
+    document.getElementById('dep-nomor').value = data.nomor;
+    document.getElementById('dep-submit').dataset.metode = 'eWallet';
   };
+
+  document.getElementById('btn-qris').onclick = async () => {
+  const { data, error } = await supabase
+    .from('deposit_config')
+    .select('*')
+    .eq('metode', 'QRIS')
+    .single();
+
+  if (error || !data) {
+    alert('Gagal ambil data QRIS.');
+    return;
+  }
+
+  document.getElementById('form-qris').style.display = 'block';
+  document.getElementById('gambar-qris').src = data.qris_url;
+  document.getElementById('dep-submit').dataset.metode = 'QRIS';
+
+  // Tampilkan tombol kembali
+  document.getElementById('btn-kembali-ewallet').style.display = 'inline-block';
+};
+
+document.getElementById('btn-kembali-ewallet').onclick = async () => {
+  const { data, error } = await supabase
+    .from('deposit_config')
+    .select('*')
+    .eq('metode', 'eWallet')
+    .single();
+
+  if (error || !data) {
+    alert('Gagal ambil data eWallet.');
+    return;
+  }
+
+  document.getElementById('form-qris').style.display = 'none';
+  document.getElementById('dep-nama').value = data.nama;
+  document.getElementById('dep-nomor').value = data.nomor;
+  document.getElementById('dep-submit').dataset.metode = 'eWallet';
+
+  document.getElementById('btn-kembali-ewallet').style.display = 'none';
+};
+
+  document.getElementById('dep-submit').onclick = async () => {
+  const nomor = document.getElementById('dep-nomor').value;
+  const nama = document.getElementById('dep-nama').value;
+  const jumlah = document.getElementById('dep-jumlah').value;
+  const metode = 'eWallet'; // karena kita tidak pakai dropdown lagi
+
+  if (!nama || !nomor || !jumlah) {
+    alert("Lengkapi semua kolom.");
+    return;
+  }
+
+  if (!uid) {
+    alert("User belum login atau UID tidak ditemukan.");
+    return;
+  }
+
+  const { error } = await supabase.from('deposit_requests').insert([
+    { user_id: uid, nama, metode, amount: parseInt(jumlah), status: 'pending' }
+  ]);
+
+  if (error) {
+    console.error(error); // tampilkan error di console
+    alert("Gagal kirim deposit.");
+  } else {
+    alert("Permintaan deposit dikirim. Menunggu konfirmasi admin.");
+    closePopup('popup-deposit');
+  }
+};
+
 
   document.getElementById('btn-withdraw').onclick = () => {
     document.getElementById('popup-withdraw').style.display = 'flex';
   };
-
-  document.getElementById('dep-submit').onclick = async () => {
-    const nomor = document.getElementById('dep-nomor').value;
-    const nama = document.getElementById('dep-nama').value;
-    const metode = document.getElementById('pilih-metode').value;
-    const jumlah = document.getElementById('dep-jumlah').value;
-
-    if (!nama || !metode || !nomor  || !jumlah) {
-      alert("Lengkapi semua kolom.");
-      return;
-    }
-
-    const { error } = await supabase.from('deposit_requests').insert([
-      { user_id: uid, nama, metode, amount: parseInt(jumlah), status: 'pending' }
-    ]);
-
-    if (error) alert("Gagal kirim deposit.");
-    else {
-      alert("Permintaan deposit dikirim. Menunggu konfirmasi admin.");
-      closePopup('popup-deposit');
-    }
-  };
-
-document.getElementById('pilih-metode').addEventListener('change', async function () {
-  const metode = this.value;
-
-  // Sembunyikan dulu
-  document.getElementById('form-ewallet').style.display = 'none';
-  document.getElementById('form-qris').style.display = 'none';
-
-  if (!metode) return;
-
-  // Ambil data dari Supabase
-  const { data, error } = await supabase
-    .from('deposit_config')
-    .select('*')
-    .eq('metode', metode)
-    .single();
-
-  if (error || !data) {
-    alert('Gagal ambil data metode.');
-    return;
-  }
-
-  // Tampilkan sesuai metode
-  if (metode === 'eWallet') {
-    document.getElementById('form-ewallet').style.display = 'block';
-    document.getElementById('dep-nama').value = data.nama;
-    document.getElementById('dep-nomor').value = data.nomor;
-  } else if (metode === 'QRIS') {
-    document.getElementById('form-qris').style.display = 'block';
-    document.getElementById('gambar-qris').src = data.qris_url;
-  }
-});
 
   document.getElementById('with-submit').onclick = async () => {
     const nama = document.getElementById('with-nama').value;
@@ -335,7 +354,7 @@ document.getElementById('pilih-metode').addEventListener('change', async functio
     const nomor = document.getElementById('with-nomor').value;
     const jumlah = document.getElementById('with-jumlah').value;
 
-    if (!nama || !metode || !nomor  || !jumlah) {
+    if (!nama || !metode || !nomor || !jumlah) {
       alert("Lengkapi semua kolom.");
       return;
     }
@@ -351,12 +370,11 @@ document.getElementById('pilih-metode').addEventListener('change', async functio
     }
   };
 
-  document.getElementById('btn-main-game').addEventListener('click', () => {
+  document.getElementById('btn-main-game').onclick = () => {
     window.location.href = 'slot.html';
-  });
+  };
 
   window.onload = loadProfile;
 </script>
 </body>
-    </html>
-  
+</html>
