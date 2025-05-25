@@ -19,14 +19,34 @@
       box-sizing: border-box;
     }
     body {
+      background: linear-gradient(135deg, #1e3c72, #2a5298);
+    overflow-x: hidden;
+    color: #fff;
       margin: 0;
       font-family: 'Poppins', sans-serif;
-      background: #177c44;
       display: flex;
       flex-direction: column;
       align-items: center;
       padding: 3px 10px;
       color: #fff;
+    }
+      body::before {
+    content: '';
+    position: fixed;
+    top:0; left:0; right:0; bottom:0;
+    background:
+      radial-gradient(2px 2px at 20% 10%, #fff, transparent),
+      radial-gradient(2px 2px at 40% 30%, #fff, transparent),
+      radial-gradient(2px 2px at 60% 70%, #fff, transparent),
+      radial-gradient(2px 2px at 80% 50%, #fff, transparent),
+      radial-gradient(2px 2px at 90% 80%, #fff, transparent);
+    background-repeat: repeat;
+    animation: star-move 30s linear infinite;
+    z-index: 0;
+  }
+  @keyframes star-move {
+    from {background-position: 0 0, 0 0, 0 0, 0 0, 0 0;}
+    to {background-position: 10000px 10000px, 5000px 6000px, 8000px 7000px, 6000px 9000px, 4000px 8000px;}
     }
     h1 {
       font-size: 2em;
@@ -34,9 +54,9 @@
       margin-bottom: 15px;
       text-shadow: 2px 2px 6px #000;
       text-align: center;
+      margin: -10px;
     }
     .slot-frame {
-      background: red;
       padding: 0px;
       border-radius: 2px;
       box-shadow: inset 0 0 4px rgba(0,0,0,0.3);
@@ -44,14 +64,13 @@
     .slot-grid {
       display: grid;
       grid-template-columns: repeat(5, 70px);
-      grid-template-rows: repeat(5, 85px);
+      grid-template-rows: repeat(6, 85px);
       gap: 0px;
       justify-content: center;
-      border: 3px solid red;
+      border: 2px solid #fff
     }
     .tile {
-      background: #dda;
-      border: 1px solid #177c44;
+      border: 1px solid #fff
       border-radius: 0px;
       display: flex;
       align-items: center;
@@ -101,14 +120,14 @@
       font-weight: bold;
     }
     .multiplier {
-     border: 2px solid gold;
+     border: 1px solid gold;
       position: fixed;
-      top: 70px;
+      top: 53px;
       background: black;
-      padding: 4px 4px;
+      padding: 0px 5px;
       border-radius: 0px;
       color: #f0c04d;
-      font-size: 30px;
+      font-size: 25px;
       font-weight: bold;
     }
     .spin-button {
@@ -135,14 +154,14 @@
   </style>
 </head>
 <body>
-  
+  <marquee>•nikmati keseruan bermain dengan kemanangan yang tidak pernah terbayangkan•lakukan strategi agar dapat memenangkan permain dan dapatkan uang secara mudah</marquee>
   <audio id="rollSound" src="https://www.soundjay.com/misc/sounds/slot-machine-01.mp3"></audio>
 <audio id="winSmallSound" src="https://www.soundjay.com/button/sounds/button-3.mp3"></audio>
 <audio id="winBigSound" src="https://www.soundjay.com/misc/sounds/cash-register-01.mp3"></audio>
   <audio id="breakSound" src="https://www.soundjay.com/button/sounds/button-29.mp3"></audio>
   <div id="popup" class="popup"></div>
   
-  <h1>MAHJONG MINI<hr></h1>
+  <h1>GAME ZONE<hr></h1>
   <div class="slot-frame">
     <div class="slot-grid" id="grid"></div>
   </div>
@@ -173,17 +192,19 @@
        const symbolPayouts = {
    '💎': 20,
    '⚔️': 20,
-   '🎂': 15,
+   '🎂': 20,
    '🕶️': 20,
    '⚕️': 15,
    '🍭': 15,
    '🛡️': 15,
    '💰': 30,
-   '🔥': 10,
+   '🔥': 20,
+   '🌺': 20,
+   '🧠': 20,
  }
     const width = 5;
-    const height = 5;
-const symbols = ['🔥', '🍭', '🎂', '💰', '⚕️', '⚔️', '🕶️', '🛡️', '💎'];
+    const height = 6;
+    const symbols = ['🔥', '🍭', '🎂', '💰', '⚕️', '⚔️', '🕶️', '🛡️', '💎', '🌺', '🧠'];
     let currentSymbols = [];
     let balance = 0; // sementara 0, isi dari Supabase nanti
 
@@ -258,40 +279,39 @@ function animateReelShake(col) {
     rollSound.play();
      
     function step() {
-      position += 10;
-      if (position >= tileHeight) {
-        position -= tileHeight;
-        scrollCount++;
-      
-        reelSymbols.unshift(symbols[Math.floor(Math.random() * symbols.length)]);
-        reelSymbols.pop();
-        
-        for (let r = 0; r < height; r++) {
-          reelTiles[r].textContent = reelSymbols[r];
-        }
-      }
-      
-      for (let r = 0; r < height; r++) {
-        reelTiles[r].style.transform = `translateY(-${position}px)`;
-      }
-      if (scrollCount >= totalScrolls) {
-        
-        for (let r = 0; r < height; r++) {
-          reelTiles[r].style.transform = 'translateY(0)';
-        }
-        rollSound.pause();
-        rollSound.currentTime = 0;
+  position += 5;
+  if (position >= tileHeight) {
+    position -= tileHeight;
+    scrollCount++;
 
-        
-        for (let r = 0; r < height; r++) {
-          currentSymbols[r * width + col] = reelSymbols[r];
-        }
+    reelSymbols.unshift(symbols[Math.floor(Math.random() * symbols.length)]);
+    reelSymbols.pop();
 
-        resolve();
-      } else {
-        requestAnimationFrame(step);
-      }
-    }
+    for (let r = 0; r < height; r++) {
+      reelTiles[r].textContent = reelSymbols[r];
+    }
+  }
+
+  for (let r = 0; r < height; r++) {
+    reelTiles[r].style.transform = `translateY(${Math.sin(scrollCount / totalScrolls * Math.PI) * -20}px)`;
+  }
+
+  if (scrollCount >= totalScrolls) {
+    for (let r = 0; r < height; r++) {
+      reelTiles[r].style.transform = 'translateY(0)';
+    }
+    rollSound.pause();
+    rollSound.currentTime = 0;
+
+    for (let r = 0; r < height; r++) {
+      currentSymbols[r * width + col] = reelSymbols[r];
+    }
+
+    resolve();
+  } else {
+    requestAnimationFrame(step);
+  }
+}
 
     step();
   });
