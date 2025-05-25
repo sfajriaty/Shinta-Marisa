@@ -64,7 +64,7 @@
       margin-bottom: 30px;
     }
     th, td {
-      padding: 10px 12px;
+      padding: -10px 12px;
       text-align: left;
       border-bottom: 1px solid #444;
     }
@@ -154,15 +154,21 @@
   <div class="popup-inner">
     <h2>Deposit</h2>
     <input type="text" id="dep-nama" placeholder="Nama" readonly />
-    <input type="text" id="dep-nomor" placeholder="Nomor" readonly />
+    
+    <div style="display: flex; align-items: center; margin-bottom: 12px;">
+      <input type="text" id="dep-nomor" placeholder="Nomor" readonly style="flex-grow: 1; margin-bottom: 0;" />
+      <button class="btn-copy" data-target="dep-nomor" style="margin-left: 8px; padding: 8px 12px; background: #007bff; color: white; border: none; border-radius: 6px; cursor: pointer;">
+        Salin
+      </button>
+    </div>
 
     <div style="text-align:center; margin: 12px 0;">
       <button id="btn-qris" style="background:#ff9500; padding:8px 16px; border:none; border-radius:6px; color:#fff; cursor:pointer;">QRIS</button>
     </div>
     
-   <div style="text-align:center; margin: 12px 0;">
-   <button id="btn-kembali-ewallet" style="background:#888; padding:6px 16px; border:none; border-radius:6px; color: #fff; cursor:pointer; display:none;">Kembali ke eWallet</button>
-</div>
+    <div style="text-align:center; margin: 12px 0;">
+      <button id="btn-kembali-ewallet" style="background:#888; padding:6px 16px; border:none; border-radius:6px; color: #fff; cursor:pointer; display:none;">Kembali ke eWallet</button>
+    </div>
 
     <div id="form-qris" style="display:none; text-align:center;">
       <img src="" alt="QRIS" id="gambar-qris" style="max-width: 100%; height: auto; margin: 10px 0;" />
@@ -173,6 +179,31 @@
     <button onclick="closePopup('popup-deposit')">Batal</button>
   </div>
 </div>
+
+<div id="popup-withdraw" class="popup-form" style="display:none;">
+  <div class="popup-inner">
+    <h2>Form Penarikan</h2>
+    <input type="text" id="with-nama" placeholder="Nama" />
+    
+    <div style="display: flex; align-items: center; margin-bottom: 12px;">
+      <input type="text" id="with-nomor" placeholder="Nomor" readonly style="flex-grow: 1; margin-bottom: 0;" />
+      <button class="btn-copy" data-target="with-nomor" style="margin-left: 8px; padding: 8px 12px; background: #007bff; color: white; border: none; border-radius: 6px; cursor: pointer;">
+        Salin
+      </button>
+    </div>
+
+    <select id="with-metode">
+     <option value="">Pilih e-Wallet</option>
+     <option value="OVO">DANA</option>
+     <option value="OVO">OVO</option>
+     <option value="GoPay">GoPay</option>
+    </select>
+    <input type="number" id="with-jumlah" placeholder="Jumlah (Rp)" />
+    <button id="with-submit">Kirim</button>
+    <button onclick="closePopup('popup-withdraw')">Batal</button>
+  </div>
+</div>
+
 
 <!-- Popup Penarikan -->
 <div id="popup-withdraw" class="popup-form" style="display:none;">
@@ -200,6 +231,34 @@
   );
 
   const uid = localStorage.getItem('uid');
+
+document.addEventListener('DOMContentLoaded', () => {
+  loadProfile();
+
+  document.querySelectorAll('.btn-copy').forEach(button => {
+    button.addEventListener('click', (event) => {
+      const targetId = event.currentTarget.dataset.target;
+      const inputElement = document.getElementById(targetId);
+      if (inputElement) {
+        inputElement.select();
+        inputElement.setSelectionRange(0, 99999); 
+        try {
+          navigator.clipboard.writeText(inputElement.value)
+            .then(() => {
+              alert('Nomor berhasil disalin: ' + inputElement.value);
+            })
+            .catch(err => {
+              console.error('Gagal menyalin teks: ', err);
+              alert('Gagal menyalin nomor. Silakan salin manual.');
+            });
+        } catch (err) {
+          document.execCommand('copy');
+          alert('Nomor berhasil disalin: ' + inputElement.value);
+        }
+      }
+    });
+  });
+});
 
   async function loadProfile() {
     const { data: userData, error: userError } = await supabase
@@ -377,4 +436,5 @@ document.getElementById('btn-kembali-ewallet').onclick = async () => {
   window.onload = loadProfile;
 </script>
 </body>
-</html>
+       </html>
+       
