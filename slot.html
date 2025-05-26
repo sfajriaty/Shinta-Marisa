@@ -18,16 +18,31 @@
     * {
       box-sizing: border-box;
     }
-    body {
-      background: #f76c9a;
-      margin: 0;
-      font-family: 'Poppins', sans-serif;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      padding: 3px 10px;
-      color: #fff;
-    }
+body {
+  background: linear-gradient(270deg, #fff89a, blue, yellow, red); /* Ubah warna sesuai selera */
+  background-size: 150% 40%; 
+  animation: gradientAnimation 5s ease infinite; 
+  margin: 0;
+  font-family: 'Poppins', sans-serif;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 3px 10px;
+  color: #fff;
+}
+
+@keyframes gradientAnimation {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
     h1 {
       font-size: 2em;
       color: gold;
@@ -37,10 +52,11 @@
       margin: -10px;
     }
     .slot-frame {
-      background: red;
+      background: #fff;
       padding: 0px;
       border-radius: 2px;
       box-shadow: inset 0 0 4px rgba(0,0,0,0.3);
+      border: 2px solid #fff;
     }
     .slot-grid {
       display: grid;
@@ -48,39 +64,39 @@
       grid-template-rows: repeat(6, 85px);
       gap: 0px;
       justify-content: center;
-      border: 3px solid red;
+      border: 1px solid red;
+    
     }
     .tile {
-      background: #dda;
-      border: 1px solid #1774;
+      background: ;
       border-radius: 0px;
       display: flex;
       align-items: center;
       justify-content: center;
       font-size: 40px;
       font-weight: bold;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-      transition: transform 3.0s ease;
+      box-shadow: 0 9px 9px rgba(0,0,0,0.2);
+      transition: transform 10s ease;
     }
     .tile.break {
-      animation: breakAnim 0.5s forwards;
+      animation: breakAnim 1.9s forwards;
     }
     @keyframes breakAnim {
       0% { transform: scale(1); opacity: 1; }
-      100% { transform: scale(0); opacity: 1; }
+      50% { transform: scale(0); opacity: 1; }
     }
     .popup {
       position: fixed;
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
-      background: #222;
+      background: #444;
       color: gold;
       padding: 20px 30px;
       border: 2px solid gold;
       border-radius: 10px;
-      font-size: 1.5em;
-      box-shadow: 0 0 20px rgba(0,0,0,0.7);
+      font-size: 1em;
+      box-shadow: 0 0 20px rgba(0,0,0,0.1);
       z-index: 9999;
       display: none;
     }
@@ -109,16 +125,16 @@
       padding: 0px 5px;
       border-radius: 0px;
       color: #f0c04d;
-      font-size: 25px;
+      font-size: 23px;
       font-weight: bold;
     }
     .spin-button {
       background: black;
       border: 2px solid gold;
       border-radius: 100%;
-      width: 60px;
-      height: 60px;
-      font-size: 30px;
+      width: 50px;
+      height: 50px;
+      font-size: 20px;
       font-weight: bold;
       color: #000;
       cursor: pointer;
@@ -172,25 +188,25 @@
     const betMinusBtn = document.getElementById('betMinus');
     const betPlusBtn = document.getElementById('betPlus');
        const symbolPayouts = {
-   '💎': 20,
-   '⚔️': 20,
-   '🎂': 20,
-   '🕶️': 20,
-   '⚕️': 15,
-   '🍭': 15,
-   '🛡️': 15,
-   '💰': 30,
-   '🔥': 20,
-   '🌺': 20,
-   '🧠': 20,
+        '🍓': 20,
+   '🍒': 20,
+   '🍐': 50,
+   '🍈': 10,
+   '🥭': 15,
+   '🍊': 15,
+   '🥑': 50,
+   '🍏': 20,
+   '🍇': 20,
+   '🍌': 20,
+   '🍍': 30,
  }
     const width = 5;
     const height = 6;
-    const symbols = ['🔥', '🍭', '🎂', '💰', '⚕️', '⚔️', '🕶️', '🛡️', '💎', '🌺', '🧠'];
+    const symbols = ['🍌', '🍇', '🍏', '🥑', '🥭', '🍍', '🍈', '🍐', '🍊', '🍓', '🍒'];
     let currentSymbols = [];
     let balance = 0; // sementara 0, isi dari Supabase nanti
 
-async function loadSaldo() {
+ async function loadSaldo() {
   if (!uid) {
     alert("User belum login!");
     window.location.href = "index.html"; // redirect ke login kalau belum login
@@ -216,6 +232,7 @@ window.onload = () => {
   loadSaldo();
   init(); // jalankan game
 };
+
     let bet = 100;
     const minBet = 50;
     const maxBet = 1000;
@@ -251,8 +268,8 @@ function animateReelShake(col) {
       reelTiles.push(grid.children[row * width + col]);
     }
 
-    let position = 0;
-    const tileHeight = 2;
+    let position = 1;
+    const tileHeight = 10;
     const totalScrolls = 10 + col * 5;
     let scrollCount = 0;
 
@@ -344,7 +361,7 @@ function animateReelShake(col) {
     async function handleTileCollapse(winningIndices) {
       const delay = ms => new Promise(res => setTimeout(res, ms));
       animateWinningTiles(winningIndices);
-      await delay(300);
+      await delay(500);
       for (let i = 0; i < currentSymbols.length; i++) {
         if (winningIndices.includes(i)) {
           currentSymbols[i] = null;
@@ -488,4 +505,5 @@ await supabase
   init();
 </script>
 </body>
-</html>
+  </html>
+  
