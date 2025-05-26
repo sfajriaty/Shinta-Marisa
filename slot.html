@@ -28,7 +28,7 @@ body {
   flex-direction: column;
   align-items: center;
   padding: 3px 10px;
-  color: #fff;
+  color: black;
 }
 
 @keyframes gradientAnimation {
@@ -44,15 +44,18 @@ body {
 }
 
     h1 {
+      background: #444;
       font-size: 2em;
       color: gold;
       margin-bottom: 15px;
       text-shadow: 2px 2px 6px #000;
       text-align: center;
-      margin: -10px;
+      margin: 2px;
+      border: 2px solid #444;
+      border-radius: 10px;
     }
     .slot-frame {
-      background: #fff;
+      background: #444;
       padding: 0px;
       border-radius: 2px;
       box-shadow: inset 0 0 4px rgba(0,0,0,0.3);
@@ -61,25 +64,26 @@ body {
     .slot-grid {
       display: grid;
       grid-template-columns: repeat(5, 70px);
-      grid-template-rows: repeat(6, 85px);
+      grid-template-rows: repeat(5, 85px);
       gap: 0px;
       justify-content: center;
       border: 1px solid red;
     
     }
-    .tile {
-      background: ;
-      border-radius: 0px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 40px;
-      font-weight: bold;
-      box-shadow: 0 9px 9px rgba(0,0,0,0.2);
-      transition: transform 10s ease;
+.tile {
+  background: #fff;
+  border-radius: 5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 40px;
+  font-weight: bold;
+  box-shadow: 0 9px 9px rgba(0,0,0,0.2);
+  transition: transform 0.8s linear; 
+  overflow: hidden; 
     }
     .tile.break {
-      animation: breakAnim 1.9s forwards;
+      animation: breakAnim 0.8s forwards;
     }
     @keyframes breakAnim {
       0% { transform: scale(1); opacity: 1; }
@@ -108,19 +112,33 @@ body {
       flex-wrap: wrap;
       justify-content: center;
     }
-    .balance, .bet-display {
+    .balance {
+      position: fixed;
+      top: 555px;
+      left: 20px;
       background: #000;
-      padding: 6px 4px;
-      border-radius: 10px;
+      padding: 6px 6px;
+      border-radius: 100px;
       color: red;
       border: 2px solid gold;
       font-size: 10px;
       font-weight: bold;
     }
+    .bet-display{
+      position: fixed;
+      left: 245px;
+      top: 555px;
+      background: #000;
+      padding: 1px 30px;
+      border-radius: 100px;
+      color: red;
+      border: 2px solid gold;
+      font-size: 1em
+    }
     .multiplier {
      border: 1px solid gold;
       position: fixed;
-      top: 53px;
+      top: 75px;
       background: black;
       padding: 0px 5px;
       border-radius: 0px;
@@ -128,55 +146,76 @@ body {
       font-size: 23px;
       font-weight: bold;
     }
-    .spin-button {
-      background: black;
-      border: 2px solid gold;
-      border-radius: 100%;
-      width: 50px;
-      height: 50px;
-      font-size: 20px;
-      font-weight: bold;
-      color: #000;
-      cursor: pointer;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.4);
-    }
-    .bet-controls button {
-      background: #222;
-      color: white;
-      border: 1px solid gold;
-      border-radius: 100px;
-      padding: 6px 6px;
-      font-weight: bold;
-      cursor: pointer;
+
+
+.spin-button {
+  position: fixed;
+  background: black;
+  border: 2px solid gold;
+  border-radius: 100%;
+  top: 590px;
+  width: 90px;
+  height: 60px;
+  font-size: 35px;
+  font-weight: bold;
+  color: #000;
+  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.4);
+  animation: breakAnim 0.8s forwards;
+}
+.bet-controls button {
+  position: fixed;
+  top: 600px;
+  left: 250px;
+  padding: 30px 30px;
+  background: #222;
+  color: #ff9baa;
+  border: 1px solid gold;
+  border-radius: 100px;
+  font-size: 5px;
+  
+  
+}
+ .bet-controls1 button {
+   position: fixed;
+   top: 600px;
+   left: 40px;
+  padding: 30px 30px;
+  background: #444 ;
+  color: red;
+  border: 1px solid gold;
+  border-radius: 100px;
+  font-size: 6px;
     }
   </style>
+  <audio id="rollSound" src="https://kbypmtqhxcvfqtsggndy.supabase.co/storage/v1/object/public/musicefek//Rol.mp3"></audio>
+<audio id="winSmallSound" src="https://kbypmtqhxcvfqtsggndy.supabase.co/storage/v1/object/public/musicefek//Win.mp3"></audio>
+<audio id="winBigSound" src="https://kbypmtqhxcvfqtsggndy.supabase.co/storage/v1/object/public/musicefek//Big_ein.mp3"></audio>
+  <audio id="breakSound" src="https://kbypmtqhxcvfqtsggndy.supabase.co/storage/v1/object/public/musicefek//Simbol_pecah.mp3"></audio>
+  <div id="popup" class="popup"></div>
+  <audio id="spinSound" src="https://kbypmtqhxcvfqtsggndy.supabase.co/storage/v1/object/public/musicefek//mixkit-game-ball-tap-2073.mp3"></audio>
+<audio id="bgm" src="https://www.bensound.com/bensound-music/bensound-epic.mp3" loop></audio>
 </head>
 <body>
-  <marquee>•nikmati keseruan bermain dengan kemanangan yang tidak pernah terbayangkan•lakukan strategi agar dapat memenangkan permain dan dapatkan uang secara mudah</marquee>
-  <audio id="rollSound" src="https://www.soundjay.com/misc/sounds/slot-machine-01.mp3"></audio>
-<audio id="winSmallSound" src="https://www.soundjay.com/button/sounds/button-3.mp3"></audio>
-<audio id="winBigSound" src="https://www.soundjay.com/misc/sounds/cash-register-01.mp3"></audio>
-  <audio id="breakSound" src="https://www.soundjay.com/button/sounds/button-29.mp3"></audio>
-  <div id="popup" class="popup"></div>
   
-  <h1>GAME ZONE<hr></h1>
+  <marquee>•nikmati keseruan bermain dengan kemanangan yang tidak pernah terbayangkan•lakukan strategi agar dapat memenangkan permain dan dapatkan uang secara mudah</marquee>
+
+  <h1>GAME ZONE ONE<hr></h1>
   <div class="slot-frame">
     <div class="slot-grid" id="grid"></div>
   </div>
-
-  <div class="controls">
-<div class="balance" id="balanceDisplay">Saldo: Rp0</div>
-    <div class="bet-controls">
-      <button id="betMinus">-</button>
-      <span class="bet-display" id="betDisplay">100</span>
-      <button id="betPlus">+</button>
+<div class="controls-container">
+  <div class="balance" id="balanceDisplay">Saldo: Rp0</div>
+  <div class="bet-controls">
+    <button id="betPlus">plus</button>
+     <div class="bet-controls1">
+    <button id="betMinus">min</button>
+    <span class="bet-display" id="betDisplay">100</span>
+  </div>
+</div>
     </div>
     <button class="spin-button" id="spinButton">🪙</button>
     <div class="multiplier" id="multiplierDisplay">x0</div>
   </div>
-
-<audio id="spinSound" src="https://www.soundjay.com/button/sounds/button-16.mp3"></audio>
-<audio id="bgm" src="https://www.bensound.com/bensound-music/bensound-epic.mp3" loop></audio>
 
   <script>
     const grid = document.getElementById('grid');
@@ -188,23 +227,23 @@ body {
     const betMinusBtn = document.getElementById('betMinus');
     const betPlusBtn = document.getElementById('betPlus');
        const symbolPayouts = {
-        '🍓': 20,
-   '🍒': 20,
-   '🍐': 50,
+   '🍓': 10,
+   '🍒': 10,
+   '🍐': 10,
    '🍈': 10,
-   '🥭': 15,
-   '🍊': 15,
-   '🥑': 50,
-   '🍏': 20,
-   '🍇': 20,
-   '🍌': 20,
-   '🍍': 30,
+   '🥭': 10,
+   '🍊': 10,
+   '🥑': 10,
+   '🍏': 10,
+   '🍇': 10,
+   '🍌': 10,
+   '🍍': 10,
  }
     const width = 5;
-    const height = 6;
+    const height = 5;
     const symbols = ['🍌', '🍇', '🍏', '🥑', '🥭', '🍍', '🍈', '🍐', '🍊', '🍓', '🍒'];
     let currentSymbols = [];
-    let balance = 0; // sementara 0, isi dari Supabase nanti
+    let balance = 600000; // sementara 0, isi dari Supabase nanti
 
  async function loadSaldo() {
   if (!uid) {
@@ -234,7 +273,7 @@ window.onload = () => {
 };
 
     let bet = 100;
-    const minBet = 50;
+    const minBet = 100;
     const maxBet = 1000;
     let multiplier = 0;
 
@@ -246,15 +285,15 @@ window.onload = () => {
       return arr;
     }
 
-    function renderGrid(symbolsArr) {
-      grid.innerHTML = '';
-      symbolsArr.forEach(sym => {
-        const div = document.createElement('div');
-        div.className = 'tile';
-        div.textContent = sym;
-        grid.appendChild(div);
-      });
-    }
+function renderGrid(symbolsArr) {
+  grid.innerHTML = '';
+  symbolsArr.forEach(sym => {
+    const div = document.createElement('div');
+    div.className = 'tile';
+    div.textContent = sym;
+    grid.appendChild(div);
+  });
+}
 
 function animateReelShake(col) {
   return new Promise(resolve => {
@@ -358,38 +397,48 @@ function animateReelShake(col) {
       });
       sound.play();
     }
-    async function handleTileCollapse(winningIndices) {
-      const delay = ms => new Promise(res => setTimeout(res, ms));
-      animateWinningTiles(winningIndices);
-      await delay(500);
-      for (let i = 0; i < currentSymbols.length; i++) {
-        if (winningIndices.includes(i)) {
-          currentSymbols[i] = null;
-        }
-      }
-      for (let col = 0; col < width; col++) {
-        const colSymbols = [];
-        for (let row = height - 1; row >= 0; row--) {
-          const idx = row * width + col;
-          if (currentSymbols[idx] !== null) {
-            colSymbols.unshift(currentSymbols[idx]);
-          }
-        }
-         const sound = document.getElementById('breakSound');
-         sound.play();
-        
-         while (colSymbols.length < height) {
-          colSymbols.unshift(symbols[Math.floor(Math.random() * symbols.length)]);
-        }
-        for (let row = 0; row < height; row++) {
-          currentSymbols[row * width + col] = colSymbols[row];
-        }
-      }
-      renderGrid(currentSymbols);
+async function handleTileCollapse(winningIndices) {
+  const delay = ms => new Promise(res => setTimeout(res, ms));
+
+  // Animasi pecah simbol dulu
+  animateWinningTiles(winningIndices);
+  // Putar suara pecah di sini, sekali saja untuk seluruh proses pecah
+  const breakSoundInstance = new Audio('https://kbypmtqhxcvfqtsggndy.supabase.co/storage/v1/object/public/musicefek//Simbol_pecah.mp3');
+  breakSoundInstance.play();
+
+  await delay(500); // Tunggu sebentar setelah animasi pecah
+
+  // Menghilangkan simbol yang pecah
+  for (let i = 0; i < currentSymbols.length; i++) {
+    if (winningIndices.includes(i)) {
+      currentSymbols[i] = null;
     }
+  }
+
+  // Kemudian proses jatuhnya simbol dan pengisian ulang per kolom
+  for (let col = 0; col < width; col++) {
+    const colSymbols = [];
+    for (let row = height - 1; row >= 0; row--) {
+      const idx = row * width + col;
+      if (currentSymbols[idx] !== null) {
+        colSymbols.unshift(currentSymbols[idx]);
+      }
+    }
+
+    // Isi ulang kolom dengan simbol baru dari atas
+    while (colSymbols.length < height) {
+      colSymbols.unshift(symbols[Math.floor(Math.random() * symbols.length)]);
+    }
+    for (let row = 0; row < height; row++) {
+      currentSymbols[row * width + col] = colSymbols[row];
+    }
+  }
+  renderGrid(currentSymbols);
+}
+
     function updateBalance(amount) {
   balance += amount;
-  balanceDisplay.textContent = `Saldo: Rp${balance}`;
+  balanceDisplay.textContent = `Saldo: Rp.${balance}`;
 }
 
     function updateBetDisplay() {
@@ -485,7 +534,7 @@ await supabase
     spinButton.onclick = spin;
 
   const bgm = document.getElementById('bgm');
-  bgm.volume = 0.3;
+  bgm.volume = 0.1;
 
   function init() {
   currentSymbols = generateRandomSymbols();
@@ -494,7 +543,7 @@ await supabase
   updateBetDisplay();
 
   const bgm = document.getElementById('bgm');
-  bgm.volume = 0.3;
+  bgm.volume = 0.1;
   bgm.play().catch(() => {
     document.body.addEventListener('click', () => {
       bgm.play();
@@ -506,4 +555,3 @@ await supabase
 </script>
 </body>
   </html>
-  
