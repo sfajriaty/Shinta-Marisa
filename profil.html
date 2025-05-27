@@ -230,7 +230,7 @@
 
   const uid = localStorage.getItem('uid');
 
-document.addEventListener('DOMContentLoaded', () => {
+ document.addEventListener('DOMContentLoaded', () => {
   loadProfile();
 
   document.querySelectorAll('.btn-copy').forEach(button => {
@@ -371,91 +371,96 @@ document.getElementById('btn-kembali-ewallet').onclick = async () => {
   document.getElementById('btn-kembali-ewallet').style.display = 'none';
 };
 
-  document.getElementById('dep-submit').onclick = async () => {
-  const nomor = document.getElementById('dep-nomor').value;
-  const nama = document.getElementById('dep-nama').value;
-  const jumlah = document.getElementById('dep-jumlah').value;
-  const metode = 'eWallet'; // karena kita tidak pakai dropdown lagi
+document.getElementById('dep-submit').onclick = async () => {
+  const nama = document.getElementById('dep-nama').value;
+  const nomor = document.getElementById('dep-nomor').value;
+  const jumlah = document.getElementById('dep-jumlah').value;
+  const metode = 'eWallet'; // karena kita tidak pakai dropdown lagi
 
-  if (!nama || !nomor || !jumlah) {
-    alert("Lengkapi semua kolom.");
-    return;
-  }
+  if (!nama || !nomor || !jumlah) {
+    alert("Lengkapi semua kolom.");
+    return;
+  }
 
-  if (!uid) {
-    alert("User belum login atau UID tidak ditemukan.");
-    return;
-  }
+  if (!uid) {
+    alert("User belum login atau UID tidak ditemukan.");
+    return;
+  }
 
-  const { error } = await supabase.from('deposit_requests').insert([
-    { user_id: uid, nama, metode, amount: parseInt(jumlah), status: 'pending' }
-  ]);
+  const { error } = await supabase.from('deposit_requests').insert([
+    { user_id: uid, nama, metode, amount: parseInt(jumlah), status: 'pending' }
+  ]);
 
-  if (error) {
-    console.error(error); // tampilkan error di console
-    alert("Gagal kirim deposit.");
-  } else {
-    alert("Permintaan deposit dikirim. Menunggu konfirmasi admin.");
-    closePopup('popup-deposit');
-  }
+  if (error) {
+    console.error(error); // tampilkan error di console
+    alert("Gagal kirim deposit.");
+  } else {
+    alert("Permintaan deposit dikirim. Menunggu konfirmasi admin.");
+    closePopup('popup-deposit');
+    // Panggil loadProfile() DI SINI untuk menyegarkan tabel riwayat
+    loadProfile();
+  }
 };
-
 
   document.getElementById('btn-withdraw').onclick = () => {
     document.getElementById('popup-withdraw').style.display = 'flex';
   };
 
   document.getElementById('with-submit').onclick = async () => {
-    const nama = document.getElementById('with-nama').value;
-    const metode = document.getElementById('with-metode').value;
-    const nomor = document.getElementById('with-nomor').value;
-    const jumlah = document.getElementById('with-jumlah').value;
+  const nama = document.getElementById('with-nama').value;
+  const metode = document.getElementById('with-metode').value;
+  const nomor = document.getElementById('with-nomor').value;
+  const jumlah = document.getElementById('with-jumlah').value;
 
-    if (!nama || !metode || !nomor || !jumlah) {
-      alert("Lengkapi semua kolom.");
+  if (!nama || !metode || !nomor || !jumlah) {
+    alert("Lengkapi semua kolom.");
+    return;
+  }
+
+  const { error } = await supabase
+    .from('withdraw_requests')
+    .insert([
+      { user_id: uid, nama, metode, amount: parseInt(jumlah) }
+    ]);
+
+  if (error) {
+    alert('Gagal mengirim permintaan.');
+  } else {
+    // Bagian ini untuk memperbarui saldo secara langsung.
+    // Dalam aplikasi nyata, pengurangan saldo sebaiknya dilakukan SETELAH admin menyetujui penarikan.
+    // Namun, jika Anda ingin langsung terlihat perubahannya:
+    const { data: userData, error: saldoError } = await supabase
+      .from('users_data')
+      .select('saldo')
+      .eq('user_id', uid)
+      .single();
+
+    if (saldoError || !userData) {
+      alert('Gagal mengambil saldo user.');
       return;
     }
 
-const { error } = await supabase
-  .from('withdraw_requests')
-  .insert([
-    { user_id: uid, nama, metode, amount: parseInt(jumlah) }
-  ]);
+    const saldoBaru = userData.saldo - parseInt(jumlah);
 
-if (error) {
-  alert('Gagal mengirim permintaan.');
-} else {
- 
-  const { data: userData, error: saldoError } = await supabase
-    .from('users_data')
-    .select('saldo')
-    .eq('user_id', uid)
-    .single();
+    const { error: updateError } = await supabase
+      .from('users_data')
+      .update({ saldo: saldoBaru })
+      .eq('user_id', uid);
 
-  if (saldoError || !userData) {
-    alert('Gagal mengambil saldo user.');
-    return;
-  }
-
-  const saldoBaru = userData.saldo - parseInt(jumlah);
-
-  const { error: updateError } = await supabase
-    .from('users_data')
-    .update({ saldo: saldoBaru })
-    .eq('user_id', uid);
-
-  if (updateError) {
-    alert('Permintaan disimpan, tapi gagal mengurangi saldo.');
-    console.error(updateError);
-  } else {
-    alert('Permintaan penarikan dikirim dan saldo berhasil dikurangi.');
-    closePopup('popup-withdraw');
-    loadProfile();
-    
-    await loadWithdrawHistory();
-  }
-}
+    if (updateError) {
+      alert('Permintaan disimpan, tapi gagal mengurangi saldo.');
+      console.error(updateError);
+    } else {
+      alert('Permintaan penarikan dikirim dan saldo berhasil dikurangi.');
+      closePopup('popup-withdraw');
+      // Panggil loadProfile() DI SINI untuk menyegarkan tabel riwayat dan tampilan saldo
+      loadProfile();
+      // Hapus baris ini karena loadWithdrawHistory() tidak ada dan sudah ditangani di loadProfile()
+      // await loadWithdrawHistory(); // HAPUS BARIS INI
+    }
+  }
 };
+
 
   document.getElementById('btn-main-game').onclick = () => {
     window.location.href = 'slot.html';
@@ -464,5 +469,4 @@ if (error) {
   window.onload = loadProfile;
 </script>
 </body>
-  </html>
-  
+</html>
