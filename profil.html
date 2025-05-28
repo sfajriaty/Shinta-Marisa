@@ -78,6 +78,18 @@
       text-align: center;
       padding: 15px 0;
     }
+    .status-pending { /* Tambahkan style ini */
+        color: orange;
+        font-weight: bold;
+    }
+    .status-approved { /* Tambahkan style ini */
+        color: lightgreen;
+        font-weight: bold;
+    }
+    .status-rejected { /* Tambahkan style ini */
+        color: red;
+        font-weight: bold;
+    }
     @media (max-width: 480px) {
       .container {
         margin: 20px 15px 60px;
@@ -138,14 +150,14 @@
 
   <h2>Riwayat Deposit</h2>
   <table id="riwayat-deposit">
-    <thead><tr><th>Tanggal</th><th>Jumlah (Rp)</th></tr></thead>
-    <tbody><tr><td colspan="2" class="empty">Memuat data...</td></tr></tbody>
+    <thead><tr><th>Tanggal</th><th>Jumlah (Rp)</th><th>Status</th></tr></thead>
+    <tbody><tr><td colspan="3" class="empty">Memuat data...</td></tr></tbody>
   </table>
 
   <h2>Riwayat Penarikan</h2>
   <table id="riwayat-penarikan">
-    <thead><tr><th>Tanggal</th><th>Jumlah (Rp)</th></tr></thead>
-    <tbody><tr><td colspan="2" class="empty">Memuat data...</td></tr></tbody>
+    <thead><tr><th>Tanggal</th><th>Jumlah (Rp)</th><th>Status</th></tr></thead>
+    <tbody><tr><td colspan="3" class="empty">Memuat data...</td></tr></tbody>
   </table>
 </div>
 
@@ -153,7 +165,8 @@
   <div class="popup-inner">
     <h2>Deposit</h2>
     <input type="text" id="dep-nama" placeholder="Nama" readonly />
-    <input type="email" id="dep-email" placeholder="Email" readonly style="margin-bottom: 12px;" /> <div style="display: flex; align-items: center; margin-bottom: 12px;">
+    <input type="email" id="dep-email" placeholder="Email" readonly style="margin-bottom: 12px;" />
+    <div style="display: flex; align-items: center; margin-bottom: 12px;">
       <input type="text" id="dep-nomor" placeholder="Nomor" readonly style="flex-grow: 1; margin-bottom: 0;" />
       <button class="btn-copy" data-target="dep-nomor" style="margin-left: 8px; padding: 8px 12px; background: #007bff; color: white; border: none; border-radius: 6px; cursor: pointer;">
         Salin
@@ -165,7 +178,7 @@
     </div>
     
     <div style="text-align:center; margin: 12px 0;">
-      <button id="btn-kembali-ewallet" style="background:#888; padding:6px 16px; border:none; border-radius:6px; color: #fff; cursor:pointer; display:none;">Kembali ke eWallet</button>
+      <button id="btn-kembali-ewallet" style="background:#888; padding:6px 16px; border:none; border-radius:6px; color: #fff; cursor:pointer; display:none;">Kembali ke eWallet</button>
     </div>
 
     <div id="form-qris" style="display:none; text-align:center;">
@@ -182,24 +195,23 @@
   <div class="popup-inner">
     <h2>Form Penarikan</h2>
     <input type="text" id="with-nama" placeholder="Nama" />
-    <input type="email" id="with-email" placeholder="Email" readonly style="margin-bottom: 12px;" /> <div style="display: flex; align-items: center; margin-bottom: 12px;">
+    <input type="email" id="with-email" placeholder="Email" readonly style="margin-bottom: 12px;" />
+    <div style="display: flex; align-items: center; margin-bottom: 12px;">
       <input type="text" id="with-nomor" placeholder="Nomor" />
       </button>
     </div>
 
     <select id="with-metode">
-     <option value="">Pilih e-Wallet</option>
-     <option value="DANA">DANA</option>
-     <option value="OVO">OVO</option>
-     <option value="GoPay">GoPay</option>
+      <option value="">Pilih e-Wallet</option>
+      <option value="DANA">DANA</option>
+      <option value="OVO">OVO</option>
+      <option value="GoPay">GoPay</option>
     </select>
     <input type="number" id="with-jumlah" placeholder="Jumlah (Rp)" />
     <button id="with-submit">Kirim</button>
     <button onclick="closePopup('popup-withdraw')">Batal</button>
   </div>
 </div>
-
-
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
@@ -208,20 +220,33 @@
     'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZxbWZhY2h4bmp5eHd1YXZwZ2RzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDg0MDYxNDAsImV4cCI6MjA2Mzk4MjE0MH0.Bzr8mUiEl8MzRWpVQ3_59eFxKk0EWZ3ca-4IEcpGLkk'
   );
 
-  const uid = localStorage.getItem('uid'); // Ini mungkin perlu disesuaikan jika UID tidak disimpan di localStorage
+  let uid = localStorage.getItem('uid'); // Menggunakan `let` agar bisa diubah
 
   // Fungsi untuk mendapatkan detail pengguna yang sedang login
   async function getCurrentUserEmail() {
     const { data: { user }, error } = await supabase.auth.getUser();
     if (error) {
-      console.error('Error fetching user:', error.message);
+      console.error('Error fetching user from Supabase auth:', error.message);
       return null;
+    }
+    // Set uid dari Supabase auth jika belum ada atau berbeda
+    if (user && uid !== user.id) {
+        uid = user.id;
+        localStorage.setItem('uid', user.id);
     }
     return user ? user.email : null;
   }
 
 document.addEventListener('DOMContentLoaded', () => {
-  loadProfile();
+  // Panggil getCurrentUserEmail lebih awal untuk memastikan UID tersedia
+  getCurrentUserEmail().then(() => {
+    loadProfile();
+  }).catch(err => {
+    console.error("Failed to initialize user session:", err);
+    // Mungkin redirect ke halaman login jika user belum terautentikasi sama sekali
+    alert("Sesi pengguna tidak valid. Silakan login kembali.");
+    window.location.href = 'login.html'; // Contoh redirect ke halaman login
+  });
 
   document.querySelectorAll('.btn-copy').forEach(button => {
     button.addEventListener('click', (event) => {
@@ -250,50 +275,86 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
   async function loadProfile() {
+    if (!uid) {
+        console.warn('UID tidak ditemukan. Tidak dapat memuat profil pengguna.');
+        document.getElementById('saldo-display').textContent = 'Saldo: Rp0 (Harap Login)';
+        document.querySelector('#riwayat-deposit tbody').innerHTML = '<tr><td colspan="3" class="empty">Silakan login untuk melihat riwayat.</td></tr>'; // colspan 3
+        document.querySelector('#riwayat-penarikan tbody').innerHTML = '<tr><td colspan="3" class="empty">Silakan login untuk melihat riwayat.</td></tr>'; // colspan 3
+        return; // Hentikan eksekusi jika UID tidak ada
+    }
+
     const { data: userData, error: userError } = await supabase
       .from('users_data')
       .select('saldo')
       .eq('user_id', uid)
       .single();
 
-    if (userError) {
-      alert('Gagal memuat data saldo.');
+    if (userError && userError.code !== 'PGRST116') { // PGRST116 adalah kode untuk "No rows found"
+      console.error('Error memuat data saldo:', userError.message);
+      alert('Gagal memuat data saldo: ' + userError.message);
+      document.getElementById('saldo-display').textContent = `Saldo: Rp0 (Error)`;
       return;
+    } else if (userError && userError.code === 'PGRST116') {
+        // User_id ada tapi tidak ada di tabel users_data (mungkin user baru)
+        console.warn('Pengguna baru, membuat entri saldo awal...');
+        document.getElementById('saldo-display').textContent = `Saldo: Rp0 (Baru)`;
+
+        // --- Tambahkan logika ini untuk membuat entri users_data jika belum ada ---
+        const { error: insertError } = await supabase
+            .from('users_data')
+            .insert([{ user_id: uid, saldo: 0 }]);
+
+        if (insertError) {
+            console.error('Error saat membuat entri saldo awal:', insertError.message);
+            alert('Gagal membuat entri saldo awal. Cek log.');
+            document.getElementById('saldo-display').textContent = `Saldo: Rp0 (Error Inisialisasi)`;
+        }
+        // --- END: Logika ini ---
+    } else {
+        document.getElementById('saldo-display').textContent = `Saldo: Rp${userData.saldo ?? 0}`;
     }
 
-    document.getElementById('saldo-display').textContent = `Saldo: Rp${userData.saldo ?? 0}`;
-
-    const { data: depositData } = await supabase
-      .from('deposit_history')
-      .select('created_at, amount')
+    // Ambil riwayat deposit dengan status (dari deposit_requests)
+    const { data: depositData, error: depHistoryError } = await supabase
+      .from('deposit_requests') 
+      .select('created_at, amount, status') 
       .eq('user_id', uid)
       .order('created_at', { ascending: false });
 
     const depositTableBody = document.querySelector('#riwayat-deposit tbody');
-    depositTableBody.innerHTML = '';
-    if (!depositData || depositData.length === 0) {
-      depositTableBody.innerHTML = '<tr><td colspan="2" class="empty">Belum ada riwayat deposit.</td></tr>';
+    depositTableBody.innerHTML = ''; // Kosongkan tabel sebelum mengisi
+    if (depHistoryError) {
+        console.error('Error fetching deposit history:', depHistoryError.message);
+        depositTableBody.innerHTML = '<tr><td colspan="3" class="empty">Gagal memuat riwayat deposit.</td></tr>';
+    } else if (!depositData || depositData.length === 0) {
+      depositTableBody.innerHTML = '<tr><td colspan="3" class="empty">Belum ada riwayat deposit.</td></tr>'; 
     } else {
       depositData.forEach(row => {
         const date = new Date(row.created_at).toLocaleString('id-ID');
-        depositTableBody.innerHTML += `<tr><td>${date}</td><td>Rp${row.amount}</td></tr>`;
+        const statusClass = `status-${row.status}`; 
+        depositTableBody.innerHTML += `<tr><td>${date}</td><td>Rp${row.amount.toLocaleString('id-ID')}</td><td class="${statusClass}">${row.status.charAt(0).toUpperCase() + row.status.slice(1)}</td></tr>`; 
       });
     }
 
-    const { data: withdrawData } = await supabase
-      .from('withdraw_history')
-      .select('created_at, amount')
+    // Ambil riwayat penarikan dengan status (dari withdraw_requests)
+    const { data: withdrawData, error: withdrawHistoryError } = await supabase
+      .from('withdraw_requests') 
+      .select('created_at, amount, status') 
       .eq('user_id', uid)
       .order('created_at', { ascending: false });
 
     const withdrawTableBody = document.querySelector('#riwayat-penarikan tbody');
-    withdrawTableBody.innerHTML = '';
-    if (!withdrawData || withdrawData.length === 0) {
-      withdrawTableBody.innerHTML = '<tr><td colspan="2" class="empty">Belum ada riwayat penarikan.</td></tr>';
+    withdrawTableBody.innerHTML = ''; // Kosongkan tabel sebelum mengisi
+    if (withdrawHistoryError) {
+        console.error('Error fetching withdraw history:', withdrawHistoryError.message);
+        withdrawTableBody.innerHTML = '<tr><td colspan="3" class="empty">Gagal memuat riwayat penarikan.</td></tr>';
+    } else if (!withdrawData || withdrawData.length === 0) {
+      withdrawTableBody.innerHTML = '<tr><td colspan="3" class="empty">Belum ada riwayat penarikan.</td></tr>'; 
     } else {
       withdrawData.forEach(row => {
         const date = new Date(row.created_at).toLocaleString('id-ID');
-        withdrawTableBody.innerHTML += `<tr><td>${date}</td><td>Rp${row.amount}</td></tr>`;
+        const statusClass = `status-${row.status}`; 
+        withdrawTableBody.innerHTML += `<tr><td>${date}</td><td>Rp${row.amount.toLocaleString('id-ID')}</td><td class="${statusClass}">${row.status.charAt(0).toUpperCase() + row.status.slice(1)}</td></tr>`; 
       });
     }
   }
@@ -303,6 +364,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   document.getElementById('btn-deposit').onclick = async () => {
+    if (!uid) { alert("Anda harus login untuk melakukan deposit."); return; }
     document.getElementById('popup-deposit').style.display = 'flex';
     const userEmail = await getCurrentUserEmail();
     if (userEmail) {
@@ -327,103 +389,119 @@ document.addEventListener('DOMContentLoaded', () => {
   };
 
   document.getElementById('btn-qris').onclick = async () => {
-  const { data, error } = await supabase
-    .from('deposit_config')
-    .select('*')
-    .eq('metode', 'QRIS')
-    .single();
+    const { data, error } = await supabase
+      .from('deposit_config')
+      .select('*')
+      .eq('metode', 'QRIS')
+      .single();
 
-  if (error || !data) {
-    alert('Gagal ambil data QRIS.');
-    return;
-  }
+    if (error || !data) {
+      alert('Gagal ambil data QRIS.');
+      return;
+    }
 
-  document.getElementById('form-qris').style.display = 'block';
-  document.getElementById('gambar-qris').src = data.qris_url;
-  document.getElementById('dep-submit').dataset.metode = 'QRIS';
+    document.getElementById('form-qris').style.display = 'block';
+    document.getElementById('gambar-qris').src = data.qris_url;
+    document.getElementById('dep-submit').dataset.metode = 'QRIS';
 
-  // Tampilkan tombol kembali
-  document.getElementById('btn-kembali-ewallet').style.display = 'inline-block';
-};
+    // Tampilkan tombol kembali
+    document.getElementById('btn-kembali-ewallet').style.display = 'inline-block';
+  };
 
-document.getElementById('btn-kembali-ewallet').onclick = async () => {
-  const { data, error } = await supabase
-    .from('deposit_config')
-    .select('*')
-    .eq('metode', 'eWallet')
-    .single();
+  document.getElementById('btn-kembali-ewallet').onclick = async () => {
+    const { data, error } = await supabase
+      .from('deposit_config')
+      .select('*')
+      .eq('metode', 'eWallet')
+      .single();
 
-  if (error || !data) {
-    alert('Gagal ambil data eWallet.');
-    return;
-  }
+    if (error || !data) {
+      alert('Gagal ambil data eWallet.');
+      return;
+    }
 
-  document.getElementById('form-qris').style.display = 'none';
-  document.getElementById('dep-nama').value = data.nama;
-  document.getElementById('dep-nomor').value = data.nomor;
-  document.getElementById('dep-submit').dataset.metode = 'eWallet';
+    document.getElementById('form-qris').style.display = 'none';
+    document.getElementById('dep-nama').value = data.nama;
+    document.getElementById('dep-nomor').value = data.nomor;
+    document.getElementById('dep-submit').dataset.metode = 'eWallet';
 
-  document.getElementById('btn-kembali-ewallet').style.display = 'none';
-};
+    document.getElementById('btn-kembali-ewallet').style.display = 'none';
+  };
 
   document.getElementById('dep-submit').onclick = async () => {
-  const nama = document.getElementById('dep-nama').value;
-    const email = document.getElementById('dep-email').value; // Ambil nilai email
-  const nomor = document.getElementById('dep-nomor').value;
-  const jumlah = document.getElementById('dep-jumlah').value;
-  const metode = 'eWallet'; // karena kita tidak pakai dropdown lagi
+    if (!uid) { alert("Anda harus login untuk melakukan deposit."); return; }
+    const nama = document.getElementById('dep-nama').value;
+    const email = document.getElementById('dep-email').value;
+    const nomor = document.getElementById('dep-nomor').value;
+    const jumlah = document.getElementById('dep-jumlah').value;
+    const metode = 'eWallet'; 
 
-  if (!nama || !nomor || !jumlah || !email) { // Tambahkan validasi email
-    alert("Lengkapi semua kolom.");
-    return;
-  }
+    if (!nama || !nomor || !jumlah || !email) {
+      alert("Lengkapi semua kolom.");
+      return;
+    }
 
-  if (!uid) {
-    alert("User belum login atau UID tidak ditemukan.");
-    return;
-  }
+    // --- START: Tambahkan ini untuk menampilkan di riwayat SECARA INSTAN ---
+    const depositTableBody = document.querySelector('#riwayat-deposit tbody');
+    const now = new Date();
+    const dateString = now.toLocaleString('id-ID'); // Format tanggal dan waktu saat ini
+    const newRowHTML = `<tr class="pending-item" data-id="temp-${Date.now()}"><td>${dateString}</td><td>Rp${parseInt(jumlah).toLocaleString('id-ID')}</td><td class="status-pending">Pending</td></tr>`;
+    
+    // Pastikan tidak ada pesan "Belum ada riwayat" jika ini entri pertama
+    if (depositTableBody.querySelector('.empty')) {
+      depositTableBody.innerHTML = ''; // Hapus pesan kosong
+    }
+    
+    // Tambahkan baris baru di PALING ATAS
+    depositTableBody.insertAdjacentHTML('afterbegin', newRowHTML);
+    // --- END: Tambahkan ini ---
 
-  const { error } = await supabase.from('deposit_requests').insert([
-    { user_id: uid, nama, metode, amount: parseInt(jumlah), status: 'pending', email: email } // Simpan email
-  ]);
+    // Kirim permintaan ke Supabase (tetap seperti sebelumnya)
+    const { error } = await supabase.from('deposit_requests').insert([
+      { user_id: uid, nama, metode, amount: parseInt(jumlah), status: 'pending', email: email }
+    ]);
 
-  if (error) {
-    console.error(error); // tampilkan error di console
-    alert("Gagal kirim deposit.");
-  } else {
-    alert("Permintaan deposit dikirim. Menunggu konfirmasi admin.");
-    closePopup('popup-deposit');
-  }
-};
+    if (error) {
+      console.error(error);
+      alert("Gagal kirim deposit. Silakan coba lagi.");
+      // --- START: Jika ada error, hapus atau ubah status "pending" yang instan tadi ---
+      const tempRow = depositTableBody.querySelector(`[data-id="temp-${now.getTime()}"]`); 
+      if (tempRow) {
+          tempRow.remove(); 
+      }
+      // --- END: Jika ada error ---
+    } else {
+      alert("Permintaan deposit dikirim. Menunggu konfirmasi admin.");
+      closePopup('popup-deposit');
+      loadProfile(); // Muat ulang profil untuk refresh data dari DB
+    }
+  };
 
-
-  document.getElementById('btn-withdraw').onclick = async () => { // Ubah jadi async
+  document.getElementById('btn-withdraw').onclick = async () => { 
+    if (!uid) { alert("Anda harus login untuk melakukan penarikan."); return; }
     document.getElementById('popup-withdraw').style.display = 'flex';
-    const userEmail = await getCurrentUserEmail(); // Panggil fungsi untuk ambil email
+    const userEmail = await getCurrentUserEmail(); 
     if (userEmail) {
-      document.getElementById('with-email').value = userEmail; // Isi kolom email
+      document.getElementById('with-email').value = userEmail; 
     }
   };
 
   document.getElementById('with-submit').onclick = async () => {
+    if (!uid) { alert("Anda harus login untuk melakukan penarikan."); return; }
+
     const nama = document.getElementById('with-nama').value;
     const email = document.getElementById('with-email').value;
     const metode = document.getElementById('with-metode').value;
     const nomor = document.getElementById('with-nomor').value;
-    const jumlah = parseInt(document.getElementById('with-jumlah').value); // Pastikan ini adalah angka
+    const jumlah = parseInt(document.getElementById('with-jumlah').value); 
 
     if (!nama || !metode || !nomor || !jumlah || !email) {
       alert("Lengkapi semua kolom.");
       return;
     }
 
-    if (isNaN(jumlah) || jumlah <= 0) { // Tambahkan validasi jumlah harus angka positif
+    if (isNaN(jumlah) || jumlah <= 0) { 
         alert("Jumlah penarikan harus angka positif.");
-        return;
-    }
-
-    if (!uid) {
-        alert("User belum login atau UID tidak ditemukan.");
         return;
     }
 
@@ -434,47 +512,87 @@ document.getElementById('btn-kembali-ewallet').onclick = async () => {
         .eq('user_id', uid)
         .single();
 
-    if (saldoError || !userData) {
-        alert('Gagal mengambil saldo user. Silakan coba lagi.');
-        console.error('Error fetching user saldo:', saldoError);
+    if (saldoError && saldoError.code !== 'PGRST116') { 
+        console.error('Error fetching user saldo for withdraw:', saldoError);
+        alert('Gagal mengambil saldo user untuk penarikan. Silakan coba lagi.');
+        return;
+    } else if (saldoError && saldoError.code === 'PGRST116' || (userData && userData.saldo === null)) {
+        alert('Saldo Anda 0. Tidak bisa melakukan penarikan.');
         return;
     }
-
+    
     const currentSaldo = userData.saldo;
 
-    // Validasi: Cek apakah jumlah penarikan melebihi saldo
     if (jumlah > currentSaldo) {
-        alert(`Saldo tidak mencukupi. Saldo Anda saat ini adalah Rp${currentSaldo}.`);
-        return; // Hentikan proses jika saldo tidak cukup
+        alert(`Saldo tidak mencukupi. Saldo Anda saat ini adalah Rp${currentSaldo.toLocaleString('id-ID')}.`);
+        return; 
     }
 
-    // Jika saldo mencukupi, lanjutkan dengan proses penarikan
-    const { error: insertError } = await supabase
+    // --- START: Tambahkan ini untuk menampilkan di riwayat SECARA INSTAN ---
+    const withdrawTableBody = document.querySelector('#riwayat-penarikan tbody');
+    const now = new Date();
+    const dateString = now.toLocaleString('id-ID'); 
+
+    const newRowHTML = `<tr class="pending-item" data-id="temp-${Date.now()}"><td>${dateString}</td><td>Rp${jumlah.toLocaleString('id-ID')}</td><td class="status-pending">Pending</td></tr>`;
+
+    if (withdrawTableBody.querySelector('.empty')) {
+      withdrawTableBody.innerHTML = ''; 
+    }
+    
+    withdrawTableBody.insertAdjacentHTML('afterbegin', newRowHTML);
+    // --- END: Tambahkan ini ---
+
+    // **Langkah 1: Kurangi saldo terlebih dahulu di database**
+    const saldoBaru = currentSaldo - jumlah;
+    
+    const { error: updateSaldoError } = await supabase
+        .from('users_data')
+        .update({ saldo: saldoBaru })
+        .eq('user_id', uid);
+
+    if (updateSaldoError) {
+        console.error('Error updating saldo during withdraw request:', updateSaldoError);
+        alert('Gagal mengurangi saldo. Silakan coba lagi. Saldo Anda tidak berkurang.');
+        const tempRow = withdrawTableBody.querySelector(`[data-id="temp-${now.getTime()}"]`);
+        if (tempRow) {
+            tempRow.remove(); 
+        }
+        return; 
+    }
+
+    document.getElementById('saldo-display').textContent = `Saldo: Rp${saldoBaru.toLocaleString('id-ID')}`;
+
+    // **Langkah 2: Jika pengurangan saldo berhasil, baru kirim permintaan penarikan**
+    const { error: insertRequestError } = await supabase
         .from('withdraw_requests')
         .insert([
-            { user_id: uid, nama, metode, amount: jumlah, email: email, status: 'pending' } // Tambahkan status pending
+            { user_id: uid, nama, metode, amount: jumlah, email: email, status: 'pending' }
         ]);
 
-    if (insertError) {
-        alert('Gagal mengirim permintaan penarikan.');
-        console.error('Error inserting withdraw request:', insertError);
-    } else {
-        // Kurangi saldo setelah permintaan penarikan berhasil dikirim
-        const saldoBaru = currentSaldo - jumlah;
-
-        const { error: updateError } = await supabase
+    if (insertRequestError) {
+        console.error('Error inserting withdraw request:', insertRequestError);
+        alert('Gagal mencatat permintaan penarikan. Saldo Anda akan dikembalikan. Silakan coba lagi.');
+        
+        const { error: refundError } = await supabase
             .from('users_data')
-            .update({ saldo: saldoBaru })
+            .update({ saldo: currentSaldo }) 
             .eq('user_id', uid);
 
-        if (updateError) {
-            alert('Permintaan disimpan, tapi gagal mengurangi saldo. Silakan hubungi admin.');
-            console.error('Error updating saldo:', updateError);
+        if (refundError) {
+            console.error('CRITICAL ERROR: Gagal mengembalikan saldo setelah permintaan penarikan gagal dicatat:', refundError);
+            alert('KRITIS: Saldo gagal dikembalikan setelah permintaan penarikan gagal dicatat. MOHON SEGERA HUBUNGI ADMIN!');
         } else {
-            alert('Permintaan penarikan dikirim dan saldo berhasil dikurangi. Menunggu proses admin.');
-            closePopup('popup-withdraw');
-            loadProfile(); // Muat ulang profil untuk menampilkan saldo terbaru dan riwayat
+            document.getElementById('saldo-display').textContent = `Saldo: Rp${currentSaldo.toLocaleString('id-ID')}`;
         }
+
+        const tempRow = withdrawTableBody.querySelector(`[data-id="temp-${now.getTime()}"]`);
+        if (tempRow) {
+            tempRow.remove();
+        }
+    } else {
+        alert('Permintaan penarikan dikirim dan saldo berhasil dikurangi. Menunggu proses admin.');
+        closePopup('popup-withdraw');
+        loadProfile(); 
     }
   };
 
@@ -483,8 +601,7 @@ document.getElementById('btn-kembali-ewallet').onclick = async () => {
     window.location.href = 'slot.html';
   };
 
-  window.onload = loadProfile;
-  
+  // Tidak perlu window.onload = loadProfile lagi karena sudah dihandle DOMContentLoaded
 </script>
 </body>
 </html>
