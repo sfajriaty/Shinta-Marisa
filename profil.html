@@ -366,35 +366,61 @@ document.getElementById('btn-kembali-ewallet').onclick = async () => {
   document.getElementById('btn-kembali-ewallet').style.display = 'none';
 };
 
-  document.getElementById('dep-submit').onclick = async () => {
-  const nama = document.getElementById('dep-nama').value;
-    const email = document.getElementById('dep-email').value; // Ambil nilai email
-  const nomor = document.getElementById('dep-nomor').value;
-  const jumlah = document.getElementById('dep-jumlah').value;
-  const metode = 'eWallet'; // karena kita tidak pakai dropdown lagi
+ document.getElementById('dep-submit').onclick = async () => {
+  const nama = document.getElementById('dep-nama').value;
+  const email = document.getElementById('dep-email').value;
+  const nomor = document.getElementById('dep-nomor').value;
+  const jumlah = document.getElementById('dep-jumlah').value;
+  const metode = 'eWallet'; // Metode ini akan diambil dari logika QRIS/eWallet yang sudah ada
 
-  if (!nama || !nomor || !jumlah || !email) { // Tambahkan validasi email
-    alert("Lengkapi semua kolom.");
-    return;
-  }
+  if (!nama || !nomor || !jumlah || !email) {
+    alert("Lengkapi semua kolom.");
+    return;
+  }
 
-  if (!uid) {
-    alert("User belum login atau UID tidak ditemukan.");
-    return;
-  }
+  if (!uid) {
+    alert("User belum login atau UID tidak ditemukan.");
+    return;
+  }
 
-  const { error } = await supabase.from('deposit_requests').insert([
-    { user_id: uid, nama, metode, amount: parseInt(jumlah), status: 'pending', email: email } // Simpan email
-  ]);
+  // --- START: Tambahkan ini untuk menampilkan di riwayat SECARA INSTAN ---
+  const depositTableBody = document.querySelector('#riwayat-deposit tbody');
+  const now = new Date();
+  const dateString = now.toLocaleString('id-ID'); // Format tanggal dan waktu saat ini
+  const newRowHTML = `<tr class="pending-item" data-id="temp-${Date.now()}"><td>${dateString}</td><td>Rp${parseInt(jumlah).toLocaleString('id-ID')} (Pending)</td></tr>`;
+  
+  // Pastikan tidak ada pesan "Belum ada riwayat" jika ini entri pertama
+  if (depositTableBody.querySelector('.empty')) {
+    depositTableBody.innerHTML = ''; // Hapus pesan kosong
+  }
+  
+  // Tambahkan baris baru di PALING ATAS
+  depositTableBody.insertAdjacentHTML('afterbegin', newRowHTML);
+  // --- END: Tambahkan ini ---
 
-  if (error) {
-    console.error(error); // tampilkan error di console
-    alert("Gagal kirim deposit.");
-  } else {
-    alert("Permintaan deposit dikirim. Menunggu konfirmasi admin.");
-    closePopup('popup-deposit');
-  }
+  // Kirim permintaan ke Supabase (tetap seperti sebelumnya)
+  const { error } = await supabase.from('deposit_requests').insert([
+    { user_id: uid, nama, metode, amount: parseInt(jumlah), status: 'pending', email: email }
+  ]);
+
+  if (error) {
+    console.error(error);
+    alert("Gagal kirim deposit. Silakan coba lagi.");
+    // --- START: Jika ada error, hapus atau ubah status "pending" yang instan tadi ---
+    const tempRow = depositTableBody.querySelector(`[data-id="temp-${now.getTime()}"]`); // Cari baris yang tadi ditambahkan
+    if (tempRow) {
+        tempRow.remove(); // Hapus baris jika gagal
+    }
+    // --- END: Jika ada error ---
+  } else {
+    alert("Permintaan deposit dikirim. Menunggu konfirmasi admin.");
+    closePopup('popup-deposit');
+    // Setelah sukses, muat ulang profil untuk mendapatkan data dari DB yang valid
+    // Ini juga akan me-replace baris "pending" instan dengan data DB yang lebih akurat
+    loadProfile(); 
+  }
 };
+
 
 
   document.getElementById('btn-withdraw').onclick = async () => { // Ubah jadi async
@@ -406,77 +432,113 @@ document.getElementById('btn-kembali-ewallet').onclick = async () => {
   };
 
   document.getElementById('with-submit').onclick = async () => {
-    const nama = document.getElementById('with-nama').value;
-    const email = document.getElementById('with-email').value;
-    const metode = document.getElementById('with-metode').value;
-    const nomor = document.getElementById('with-nomor').value;
-    const jumlah = parseInt(document.getElementById('with-jumlah').value); // Pastikan ini adalah angka
+  const nama = document.getElementById('with-nama').value;
+  const email = document.getElementById('with-email').value;
+  const metode = document.getElementById('with-metode').value;
+  const nomor = document.getElementById('with-nomor').value;
+  const jumlah = parseInt(document.getElementById('with-jumlah').value);
 
-    if (!nama || !metode || !nomor || !jumlah || !email) {
-      alert("Lengkapi semua kolom.");
-      return;
+  if (!nama || !metode || !nomor || !jumlah || !email) {
+    alert("Lengkapi semua kolom.");
+    return;
+  }
+
+  if (isNaN(jumlah) || jumlah <= 0) {
+    alert("Jumlah penarikan harus angka positif.");
+    return;
+  }
+
+  if (!uid) {
+    alert("User belum login atau UID tidak ditemukan.");
+    return;
+  }
+
+  // Ambil saldo pengguna saat ini dari database
+  const { data: userData, error: saldoError } = await supabase
+    .from('users_data')
+    .select('saldo')
+    .eq('user_id', uid)
+    .single();
+
+  if (saldoError || !userData) {
+    alert('Gagal mengambil saldo user. Silakan coba lagi.');
+    console.error('Error fetching user saldo:', saldoError);
+    return;
+  }
+
+  const currentSaldo = userData.saldo;
+
+  // Validasi: Cek apakah jumlah penarikan melebihi saldo
+  if (jumlah > currentSaldo) {
+    alert(`Saldo tidak mencukupi. Saldo Anda saat ini adalah Rp${currentSaldo.toLocaleString('id-ID')}.`);
+    return;
+  }
+
+  // --- START: Tambahkan ini untuk menampilkan di riwayat SECARA INSTAN ---
+  const withdrawTableBody = document.querySelector('#riwayat-penarikan tbody');
+  const now = new Date();
+  const dateString = now.toLocaleString('id-ID'); // Format tanggal dan waktu saat ini
+  const newRowHTML = `<tr class="pending-item" data-id="temp-${Date.now()}"><td>${dateString}</td><td>Rp${jumlah.toLocaleString('id-ID')} (Pending)</td></tr>`;
+
+  // Pastikan tidak ada pesan "Belum ada riwayat" jika ini entri pertama
+  if (withdrawTableBody.querySelector('.empty')) {
+    withdrawTableBody.innerHTML = ''; // Hapus pesan kosong
+  }
+  
+  // Tambahkan baris baru di PALING ATAS
+  withdrawTableBody.insertAdjacentHTML('afterbegin', newRowHTML);
+  // --- END: Tambahkan ini ---
+
+  // Kurangi saldo terlebih dahulu di UI dan database
+  const saldoBaru = currentSaldo - jumlah;
+  document.getElementById('saldo-display').textContent = `Saldo: Rp${saldoBaru.toLocaleString('id-ID')}`; // Update UI saldo
+
+  const { error: updateSaldoError } = await supabase
+    .from('users_data')
+    .update({ saldo: saldoBaru })
+    .eq('user_id', uid);
+
+  if (updateSaldoError) {
+    console.error('Error updating saldo:', updateSaldoError);
+    alert('Gagal mengurangi saldo. Silakan coba lagi atau hubungi admin.');
+    // --- START: Jika ada error, hapus atau ubah status "pending" yang instan tadi dan kembalikan saldo ---
+    const tempRow = withdrawTableBody.querySelector(`[data-id="temp-${now.getTime()}"]`);
+    if (tempRow) {
+        tempRow.remove();
     }
+    // Kembalikan saldo di UI jika update DB gagal
+    document.getElementById('saldo-display').textContent = `Saldo: Rp${currentSaldo.toLocaleString('id-ID')}`;
+    // --- END: Jika ada error ---
+    return; // Hentikan proses jika update saldo gagal
+  }
 
-    if (isNaN(jumlah) || jumlah <= 0) { // Tambahkan validasi jumlah harus angka positif
-        alert("Jumlah penarikan harus angka positif.");
-        return;
+  // Jika pengurangan saldo berhasil, baru kirim permintaan penarikan
+  const { error: insertError } = await supabase
+    .from('withdraw_requests')
+    .insert([
+      { user_id: uid, nama, metode, amount: jumlah, email: email, status: 'pending' }
+    ]);
+
+  if (insertError) {
+    alert('Gagal mengirim permintaan penarikan. Silakan hubungi admin.');
+    console.error('Error inserting withdraw request:', insertError);
+    // --- START: Jika ada error, hapus atau ubah status "pending" yang instan tadi (saldo sudah terlanjur dikurangi, perlu penanganan khusus oleh admin) ---
+    const tempRow = withdrawTableBody.querySelector(`[data-id="temp-${now.getTime()}"]`);
+    if (tempRow) {
+        tempRow.remove(); // Hapus baris jika gagal insert request
     }
+    // Penting: Jika sampai sini error, saldo sudah terlanjur dikurangi. Anda perlu mekanismenya admin untuk refund saldo atau memverifikasi ini.
+    alert('Permintaan penarikan gagal dicatat, namun saldo Anda sudah dikurangi. Mohon segera hubungi admin.');
+    // --- END: Jika ada error ---
+  } else {
+    alert('Permintaan penarikan dikirim dan saldo berhasil dikurangi. Menunggu proses admin.');
+    closePopup('popup-withdraw');
+    // Setelah sukses, muat ulang profil untuk mendapatkan data dari DB yang valid
+    // Ini juga akan me-replace baris "pending" instan dengan data DB yang lebih akurat
+    loadProfile(); 
+  }
+};
 
-    if (!uid) {
-        alert("User belum login atau UID tidak ditemukan.");
-        return;
-    }
-
-    // Ambil saldo pengguna saat ini dari database
-    const { data: userData, error: saldoError } = await supabase
-        .from('users_data')
-        .select('saldo')
-        .eq('user_id', uid)
-        .single();
-
-    if (saldoError || !userData) {
-        alert('Gagal mengambil saldo user. Silakan coba lagi.');
-        console.error('Error fetching user saldo:', saldoError);
-        return;
-    }
-
-    const currentSaldo = userData.saldo;
-
-    // Validasi: Cek apakah jumlah penarikan melebihi saldo
-    if (jumlah > currentSaldo) {
-        alert(`Saldo tidak mencukupi. Saldo Anda saat ini adalah Rp${currentSaldo}.`);
-        return; // Hentikan proses jika saldo tidak cukup
-    }
-
-    // Jika saldo mencukupi, lanjutkan dengan proses penarikan
-    const { error: insertError } = await supabase
-        .from('withdraw_requests')
-        .insert([
-            { user_id: uid, nama, metode, amount: jumlah, email: email, status: 'pending' } // Tambahkan status pending
-        ]);
-
-    if (insertError) {
-        alert('Gagal mengirim permintaan penarikan.');
-        console.error('Error inserting withdraw request:', insertError);
-    } else {
-        // Kurangi saldo setelah permintaan penarikan berhasil dikirim
-        const saldoBaru = currentSaldo - jumlah;
-
-        const { error: updateError } = await supabase
-            .from('users_data')
-            .update({ saldo: saldoBaru })
-            .eq('user_id', uid);
-
-        if (updateError) {
-            alert('Permintaan disimpan, tapi gagal mengurangi saldo. Silakan hubungi admin.');
-            console.error('Error updating saldo:', updateError);
-        } else {
-            alert('Permintaan penarikan dikirim dan saldo berhasil dikurangi. Menunggu proses admin.');
-            closePopup('popup-withdraw');
-            loadProfile(); // Muat ulang profil untuk menampilkan saldo terbaru dan riwayat
-        }
-    }
-  };
 
 
   document.getElementById('btn-main-game').onclick = () => {
