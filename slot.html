@@ -1,50 +1,51 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-  
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Mahjong Slot UI</title>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script>
-  const supabase = window.supabase.createClient(
-    'https://vqmfachxnjyxwuavpgds.supabase.co',
-    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZxbWZhY2h4bmp5eHd1YXZwZ2RzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDg0MDYxNDAsImV4cCI6MjA2Mzk4MjE0MH0.Bzr8mUiEl8MzRWpVQ3_59eFxKk0EWZ3ca-4IEcpGLkk'
-  );
-  const uid = localStorage.getItem('uid');
-</script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script>
+    const supabase = window.supabase.createClient(
+      'https://vqmfachxnjyxwuavpgds.supabase.co',
+      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZxbWZhY2h4bmp5eHd1YXZwZ2RzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDg0MDYxNDAsImV4cCI6MjA2Mzk4MjE0MH0.Bzr8mUiEl8MzRWpVQ3_59eFxKk0EWZ3ca-4IEcpGLkk'
+    );
+    const uid = localStorage.getItem('uid');
+  </script>
   <style>
     * {
       box-sizing: border-box;
     }
-body {
-  background: linear-gradient(270deg, #fff89a, blue, yellow, red); /* Ubah warna sesuai selera */
-  background-size: 150% 40%; 
-  animation: gradientAnimation 5s ease infinite; 
-  margin: 0;
-  font-family: 'Poppins', sans-serif;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 3px 10px;
-  color: black;
-}
+    body {
+    background: linear-gradient(270deg, #fff89a, blue, yellow, red);
+      background-size: 150% 40%;
+      animation: gradientAnimation 5s ease infinite;
+      margin: 0;
+      font-family: 'Poppins', sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 3px 10px;
+      color: black;
+    }
 
-@keyframes gradientAnimation {
-  0% {
-    background-position: 0% 50%;
-  }
-  50% {
-    background-position: 100% 50%;
-  }
-  100% {
-    background-position: 0% 50%;
-  }
-}
+    @keyframes gradientAnimation {
+      0% {
+        background-position: 0% 50%;
+      }
+      50% {
+        background-position: 100% 50%;
+      }
+      100% {
+        background-position: 0% 50%;
+      }
+    }
 
     h1 {
-      background: #444;
+      background: linear-gradient(270deg, #fff89a, #222, black, #444);
+      background-size: 150% 40%;
+      animation: gradientAnimation 5s ease infinite;
       font-size: 2em;
       color: gold;
       margin-bottom: 15px;
@@ -55,7 +56,7 @@ body {
       border-radius: 10px;
     }
     .slot-frame {
-      background: #444;
+      background:;
       padding: 0px;
       border-radius: 2px;
       box-shadow: inset 0 0 4px rgba(0,0,0,0.3);
@@ -68,19 +69,18 @@ body {
       gap: 0px;
       justify-content: center;
       border: 1px solid red;
-    
     }
-.tile {
-  background: #fff;
-  border-radius: 5px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 40px;
-  font-weight: bold;
-  box-shadow: 0 9px 9px rgba(0,0,0,0.2);
-  transition: transform 0.8s linear; 
-  overflow: hidden; 
+    .tile {
+      background:  ;
+      border-radius: 100px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 40px;
+      font-weight: bold;
+      box-shadow: 0 9px 9px rgba(0,0,0,0.5);
+      transition: transform 0.1s linear;
+      overflow: hidden;
     }
     .tile.break {
       animation: breakAnim 0.8s forwards;
@@ -136,9 +136,10 @@ body {
       font-size: 1em
     }
     .multiplier {
-     border: 1px solid gold;
+      border: 1px solid gold;
       position: fixed;
       top: 75px;
+      left:155px;
       background: black;
       padding: 0px 5px;
       border-radius: 0px;
@@ -147,75 +148,111 @@ body {
       font-weight: bold;
     }
 
+    .free-spin-display {
+      position: fixed;
+      top: 560px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #000;
+      padding: 5px 10px;
+      border-radius: 5px;
+      color: #00ff00;
+      border: 2px solid gold;
+      font-size: 1.2em;
+      font-weight: bold;
+      z-index: 100;
+      display: none;
+    }
 
-.spin-button {
-  position: fixed;
-  background: black;
-  border: 2px solid gold;
-  border-radius: 100%;
-  top: 590px;
-  width: 90px;
-  height: 60px;
-  font-size: 35px;
-  font-weight: bold;
-  color: #000;
-  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.4);
-  animation: breakAnim 0.8s forwards;
-}
-.bet-controls button {
-  position: fixed;
-  top: 600px;
-  left: 250px;
-  padding: 30px 30px;
-  background: #222;
-  color: #ff9baa;
-  border: 1px solid gold;
-  border-radius: 100px;
-  font-size: 5px;
-  
-  
-}
- .bet-controls1 button {
-   position: fixed;
-   top: 600px;
-   left: 40px;
-  padding: 30px 30px;
-  background: #444 ;
-  color: red;
-  border: 1px solid gold;
-  border-radius: 100px;
-  font-size: 6px;
+    .spin-button {
+      position: fixed;
+      background: black;
+      border: 2px solid gold;
+      border-radius: 100%;
+      top: 590px;
+      width: 90px;
+      height: 60px;
+      font-size: 35px;
+      font-weight: bold;
+      color: gold;
+      box-shadow: 0 5px 10px rgba(0, 0, 0, 0.4);
+    }
+    .bet-controls button {
+      position: fixed;
+      top: 600px;
+      left: 250px;
+      padding: 30px 30px;
+      background: #000;
+      color: #ff9baa;
+      border: 1px solid gold;
+      border-radius: 100px;
+      font-size: 5px;
+    }
+    .bet-controls1 button {
+      position: fixed;
+      top: 600px;
+      left: 40px;
+      padding: 30px 30px;
+      background: #000;
+      color: red;
+      border: 1px solid gold;
+      border-radius: 100px;
+      font-size: 6px;
+    }
+
+    .tile.wild-symbol {
+      font-size: 55px;
+      color: gold;
+      text-shadow: 0 0 10px yellow, 0 0 20px orange;
+      animation: pulse 1.5s infinite alternate;
+    }
+
+    .tile.scatter-symbol {
+      font-size: 55px;
+      color: cyan;
+      text-shadow: 0 0 10px blue, 0 0 20px lightblue;
+      animation: rotate 2s linear infinite;
+    }
+
+    @keyframes pulse {
+      0% { transform: scale(1); }
+      100% { transform: scale(1.1); }
+    }
+
+    @keyframes rotate {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
     }
   </style>
-  <audio id="rollSound" src="https://kbypmtqhxcvfqtsggndy.supabase.co/storage/v1/object/public/musicefek//Rol.mp3"></audio>
-<audio id="winSmallSound" src="https://kbypmtqhxcvfqtsggndy.supabase.co/storage/v1/object/public/musicefek//Win.mp3"></audio>
-<audio id="winBigSound" src="https://kbypmtqhxcvfqtsggndy.supabase.co/storage/v1/object/public/musicefek//Big_ein.mp3"></audio>
-  <audio id="breakSound" src="https://kbypmtqhxcvfqtsggndy.supabase.co/storage/v1/object/public/musicefek//Simbol_pecah.mp3"></audio>
+  <audio id="rollSound" src="___"></audio>
+  <audio id="winSmallSound" src="https://vqmfachxnjyxwuavpgds.supabase.co/storage/v1/object/public/music//mixkit-money-bag-drop-1989.mp3"></audio>
+  <audio id="winBigSound" src="https://vqmfachxnjyxwuavpgds.supabase.co/storage/v1/object/public/music//mixkit-final-level-bonus-2061.mp3)"></audio>
+  <audio id="breakSound" src="https://vqmfachxnjyxwuavpgds.supabase.co/storage/v1/object/public/music//mixkit-mechanical-crate-pick-up-3154%20(1).mp3"></audio>
   <div id="popup" class="popup"></div>
-  <audio id="spinSound" src="https://kbypmtqhxcvfqtsggndy.supabase.co/storage/v1/object/public/musicefek//mixkit-game-ball-tap-2073.mp3"></audio>
-<audio id="bgm" src="https://www.bensound.com/bensound-music/bensound-epic.mp3" loop></audio>
-</head>
+  <audio id="spinSound" src="https://vqmfachxnjyxwuavpgds.supabase.co/storage/v1/object/public/music//mixkit-game-ball-tap-2073.mp3"></audio>
+  <audio id="bgm" src="https://vqmfachxnjyxwuavpgds.supabase.co/storage/v1/object/public/music//dj-background-music-background-music-free-music-music-free-for-use-221916%20(1).mp3" loop></audio>
+  <audio id="freeSpinSound" src="https://vqmfachxnjyxwuavpgds.supabase.co/storage/v1/object/public/music//mixkit-game-level-completed-2059.mp3"></audio> <audio id="freeSpinBGM" src="https://www.bensound.com/bensound-music/bensound-epic.mp3" loop></audio> </head>
 <body>
-  
+
   <marquee>•nikmati keseruan bermain dengan kemanangan yang tidak pernah terbayangkan•lakukan strategi agar dapat memenangkan permain dan dapatkan uang secara mudah</marquee>
 
   <h1>GAME ZONE ONE<hr></h1>
   <div class="slot-frame">
     <div class="slot-grid" id="grid"></div>
   </div>
-<div class="controls-container">
-  <div class="balance" id="balanceDisplay">Saldo: Rp0</div>
-  <div class="bet-controls">
-    <button id="betPlus">plus</button>
-     <div class="bet-controls1">
-    <button id="betMinus">min</button>
-    <span class="bet-display" id="betDisplay">100</span>
-  </div>
-</div>
+  <div class="controls-container">
+    <div class="balance" id="balanceDisplay">Saldo: Rp0</div>
+    <div class="bet-controls">
+      <button id="betPlus">plus</button>
+      <div class="bet-controls1">
+        <button id="betMinus">min</button>
+        <span class="bet-display" id="betDisplay">100</span>
+      </div>
     </div>
-    <button class="spin-button" id="spinButton">🪙</button>
     <div class="multiplier" id="multiplierDisplay">x0</div>
+    <div class="free-spin-display" id="freeSpinDisplay">Free Spins: 0</div>
   </div>
+  <button class="spin-button" id="spinButton">🪙</button>
 
   <script>
     const grid = document.getElementById('grid');
@@ -226,26 +263,43 @@ body {
     const rollSound = document.getElementById('rollSound');
     const betMinusBtn = document.getElementById('betMinus');
     const betPlusBtn = document.getElementById('betPlus');
-       const symbolPayouts = {
-   '🍓': 10,
-   '🍒': 10,
-   '🍐': 10,
-   '🍈': 10,
-   '🥭': 10,
-   '🍊': 10,
-   '🥑': 10,
-   '🍏': 10,
-   '🍇': 10,
-   '🍌': 10,
-   '🍍': 10,
- }
+    const freeSpinDisplay = document.getElementById('freeSpinDisplay');
+
+    const symbolPayouts = {
+      '🪁': 10,
+      '🎭': 10,
+      '🧸': 10,
+      '🪅': 10,
+      '🏆': 10,
+      '🎏': 10,
+      '🪄': 10,
+      '🎱': 10,
+      '🀄': 10,
+      '🎎': 10,
+      '🎃': 10,
+    };
+
     const width = 5;
     const height = 5;
-    const symbols = ['🍌', '🍇', '🍏', '🥑', '🥭', '🍍', '🍈', '🍐', '🍊', '🍓', '🍒'];
-    let currentSymbols = [];
-    let balance = 600000; // sementara 0, isi dari Supabase nanti
+   const symbols = ['🎃', '🎎', '🀄', '🎱', '🪄', '🎏', '🏆', '🪅', '🧸', '🎭', '🪁', '🃏', '🐉'];
+    const WILD_SYMBOL = '🃏';
+    const SCATTER_SYMBOL = '🐉';
 
- async function loadSaldo() {
+    let currentSymbols = [];
+    let balance = 9990;
+    let bet = 100;
+    const minBet = 100;
+    const maxBet = 1000;
+    let multiplier = 0;
+    let freeSpinCount = 0;
+
+    // AUDIO BARU DAN VARIABEL FLAG
+    const bgm = document.getElementById('bgm');
+    const freeSpinSound = document.getElementById('freeSpinSound');
+    const freeSpinBGM = document.getElementById('freeSpinBGM');
+    let isInFreeSpinMode = false; // Flag untuk melacak status mode Free Spin
+
+async function loadSaldo() {
   if (!uid) {
     alert("User belum login!");
     window.location.href = "index.html"; // redirect ke login kalau belum login
@@ -272,252 +326,417 @@ window.onload = () => {
   init(); // jalankan game
 };
 
-    let bet = 100;
-    const minBet = 100;
-    const maxBet = 1000;
-    let multiplier = 0;
+window.onload = () => {
+  loadSaldo();
+  init(); // jalankan game
+};
 
     function generateRandomSymbols() {
       const arr = [];
       for (let i = 0; i < width * height; i++) {
-        arr.push(symbols[Math.floor(Math.random() * symbols.length)]);
+        let randomSymbol;
+        const col = i % width; // Hitung kolom saat ini (0 hingga 4)
+
+        const rand = Math.random();
+
+        if (col === 0) { // Jika berada di kolom pertama (indeks 0)
+            // Wild TIDAK AKAN MUNCUL di kolom pertama
+            if (rand < 0.01) { // Hanya Scatter (1% probabilitas)
+                randomSymbol = SCATTER_SYMBOL;
+            } else {
+                randomSymbol = symbols[Math.floor(Math.random() * (symbols.length - 2))]; // Simbol reguler
+            }
+        } else { // Untuk kolom 2, 3, 4, 5 (indeks 1, 2, 3, 4)
+            if (rand < 0.10) { // 4% kemungkinan Wild
+                randomSymbol = WILD_SYMBOL;
+            } else if (rand < 0.5) { // 1% kemungkinan Scatter
+                randomSymbol = SCATTER_SYMBOL;
+            } else {
+                randomSymbol = symbols[Math.floor(Math.random() * (symbols.length - 2))]; // Simbol reguler
+            }
+        }
+        arr.push(randomSymbol);
       }
       return arr;
     }
 
-function renderGrid(symbolsArr) {
-  grid.innerHTML = '';
-  symbolsArr.forEach(sym => {
-    const div = document.createElement('div');
-    div.className = 'tile';
-    div.textContent = sym;
-    grid.appendChild(div);
-  });
-}
-
-function animateReelShake(col) {
-  return new Promise(resolve => {
-    const reelSymbols = [];
-    for (let row = 0; row < height; row++) {
-      reelSymbols.push(currentSymbols[row * width + col]);
+    function renderGrid(symbolsArr) {
+      grid.innerHTML = '';
+      symbolsArr.forEach(sym => {
+        const div = document.createElement('div');
+        div.className = 'tile';
+        div.textContent = sym;
+        if (sym === WILD_SYMBOL) {
+          div.classList.add('wild-symbol');
+        } else if (sym === SCATTER_SYMBOL) {
+          div.classList.add('scatter-symbol');
+        }
+        grid.appendChild(div);
+      });
     }
 
-    const reelTiles = [];
-    for (let row = 0; row < height; row++) {
-      reelTiles.push(grid.children[row * width + col]);
+    function animateReelShake(col) {
+      return new Promise(resolve => {
+        const reelSymbols = [];
+        for (let row = 0; row < height; row++) {
+          reelSymbols.push(currentSymbols[row * width + col]);
+        }
+
+        const reelTiles = [];
+        for (let row = 0; row < height; row++) {
+          reelTiles.push(grid.children[row * width + col]);
+        }
+
+        let position = 1;
+        const tileHeight = 10;
+        const totalScrolls = 10 + col * 5;
+        let scrollCount = 0;
+
+        const rollSoundInstance = new Audio(rollSound.src);
+        rollSoundInstance.volume = 0.5;
+        rollSoundInstance.play();
+
+        function step() {
+          position += 5;
+          if (position >= tileHeight) {
+            position -= tileHeight;
+            scrollCount++;
+
+            let newSymbol;
+            const rand = Math.random();
+
+            if (col === 0) { // Jika kolom saat ini adalah kolom pertama
+                // Wild TIDAK AKAN MUNCUL di kolom pertama
+                if (rand < 0.05) { // Hanya Scatter (1% probabilitas)
+                    newSymbol = SCATTER_SYMBOL;
+                } else {
+                    newSymbol = symbols[Math.floor(Math.random() * (symbols.length - 2))]; // Simbol reguler
+                }
+            } else { // Untuk kolom lainnya
+                if (rand < 0.04) { // 4% kemungkinan Wild
+                    newSymbol = WILD_SYMBOL;
+                } else if (rand < 0.05) { // 1% kemungkinan Scatter
+                    newSymbol = SCATTER_SYMBOL;
+                } else {
+                    newSymbol = symbols[Math.floor(Math.random() * (symbols.length - 2))]; // Simbol reguler
+                }
+            }
+
+            reelSymbols.unshift(newSymbol);
+            reelSymbols.pop();
+
+            for (let r = 0; r < height; r++) {
+              reelTiles[r].textContent = reelSymbols[r];
+              reelTiles[r].classList.remove('wild-symbol', 'scatter-symbol');
+              if (reelSymbols[r] === WILD_SYMBOL) {
+                reelTiles[r].classList.add('wild-symbol');
+              } else if (reelSymbols[r] === SCATTER_SYMBOL) {
+                reelTiles[r].classList.add('scatter-symbol');
+              }
+            }
+          }
+
+          for (let r = 0; r < height; r++) {
+            reelTiles[r].style.transform = `translateY(${Math.sin(scrollCount / totalScrolls * Math.PI) * -20}px)`;
+          }
+
+          if (scrollCount >= totalScrolls) {
+            for (let r = 0; r < height; r++) {
+              reelTiles[r].style.transform = 'translateY(0)';
+            }
+            rollSoundInstance.pause();
+            rollSoundInstance.currentTime = 0;
+
+            for (let r = 0; r < height; r++) {
+              currentSymbols[r * width + col] = reelSymbols[r];
+            }
+            resolve();
+          } else {
+            requestAnimationFrame(step);
+          }
+        }
+        step();
+      });
     }
-
-    let position = 1;
-    const tileHeight = 10;
-    const totalScrolls = 10 + col * 5;
-    let scrollCount = 0;
-
-    const rollSound = document.getElementById('rollSound');
-    rollSound.currentTime = 0;
-    rollSound.play();
-     
-    function step() {
-  position += 5;
-  if (position >= tileHeight) {
-    position -= tileHeight;
-    scrollCount++;
-
-    reelSymbols.unshift(symbols[Math.floor(Math.random() * symbols.length)]);
-    reelSymbols.pop();
-
-    for (let r = 0; r < height; r++) {
-      reelTiles[r].textContent = reelSymbols[r];
-    }
-  }
-
-  for (let r = 0; r < height; r++) {
-    reelTiles[r].style.transform = `translateY(${Math.sin(scrollCount / totalScrolls * Math.PI) * -20}px)`;
-  }
-
-  if (scrollCount >= totalScrolls) {
-    for (let r = 0; r < height; r++) {
-      reelTiles[r].style.transform = 'translateY(0)';
-    }
-    rollSound.pause();
-    rollSound.currentTime = 0;
-
-    for (let r = 0; r < height; r++) {
-      currentSymbols[r * width + col] = reelSymbols[r];
-    }
-
-    resolve();
-  } else {
-    requestAnimationFrame(step);
-  }
-}
-
-    step();
-  });
-}
 
     function getWinningTiles(symbolsArr) {
-     const winningTiles = new Set();
+        const winningTiles = new Set();
+        const scatterTiles = new Set();
 
-     for (const symbol of symbols) {
-     let consecutiveColumns = 0;
-     const matchedIndices = [];
-
-     for (let col = 0; col < width; col++) {
-       let foundInColumn = false;
-
-       for (let row = 0; row < height; row++) {
-         const index = row * width + col;
-         if (symbolsArr[index] === symbol) {
-           matchedIndices.push(index);
-           foundInColumn = true;
-         }
-       }
-
-       if (foundInColumn) {
-         consecutiveColumns++;
-         if (consecutiveColumns >= 3 && col === width - 1) {
-           matchedIndices.forEach(i => winningTiles.add(i));
-         }
-       } else {
-         if (consecutiveColumns >= 3) {
-           matchedIndices.forEach(i => winningTiles.add(i));
-         }
-         break;
-       }
-     }
-   }
-       return Array.from(winningTiles);
-}
-      function animateWinningTiles(indices) {
-      const sound = document.getElementById('breakSound');
-      document.querySelectorAll('.tile').forEach((tile, i) => {
-        if (indices.includes(i)) {
-          tile.classList.add('break');
+        for (let i = 0; i < symbolsArr.length; i++) {
+            if (symbolsArr[i] === SCATTER_SYMBOL) {
+                scatterTiles.add(i);
+            }
         }
-      });
-      sound.play();
-    }
-async function handleTileCollapse(winningIndices) {
-  const delay = ms => new Promise(res => setTimeout(res, ms));
 
-  // Animasi pecah simbol dulu
-  animateWinningTiles(winningIndices);
-  // Putar suara pecah di sini, sekali saja untuk seluruh proses pecah
-  const breakSoundInstance = new Audio('https://kbypmtqhxcvfqtsggndy.supabase.co/storage/v1/object/public/musicefek//Simbol_pecah.mp3');
-  breakSoundInstance.play();
+        for (const symbol of symbols) {
+            if (symbol === WILD_SYMBOL || symbol === SCATTER_SYMBOL) continue;
 
-  await delay(500); // Tunggu sebentar setelah animasi pecah
+            let consecutiveColumns = 0;
+            let currentMatchedIndices = [];
 
-  // Menghilangkan simbol yang pecah
-  for (let i = 0; i < currentSymbols.length; i++) {
-    if (winningIndices.includes(i)) {
-      currentSymbols[i] = null;
-    }
-  }
+            for (let col = 0; col < width; col++) {
+                let foundInColumn = false;
+                let columnMatches = [];
 
-  // Kemudian proses jatuhnya simbol dan pengisian ulang per kolom
-  for (let col = 0; col < width; col++) {
-    const colSymbols = [];
-    for (let row = height - 1; row >= 0; row--) {
-      const idx = row * width + col;
-      if (currentSymbols[idx] !== null) {
-        colSymbols.unshift(currentSymbols[idx]);
-      }
+                for (let row = 0; row < height; row++) {
+                    const index = row * width + col;
+                    if (symbolsArr[index] === symbol || symbolsArr[index] === WILD_SYMBOL) {
+                        columnMatches.push(index);
+                        foundInColumn = true;
+                    }
+                }
+
+                if (foundInColumn) {
+                    consecutiveColumns++;
+                    currentMatchedIndices.push(...columnMatches);
+                } else {
+                    if (consecutiveColumns >= 3) {
+                        currentMatchedIndices.forEach(i => winningTiles.add(i));
+                    }
+                    consecutiveColumns = 0;
+                    currentMatchedIndices = [];
+                    break;
+                }
+
+                if (col === width - 1 && consecutiveColumns >= 3) {
+                    currentMatchedIndices.forEach(i => winningTiles.add(i));
+                }
+            }
+        }
+
+        return {
+            winningTiles: Array.from(winningTiles),
+            scatterCount: scatterTiles.size,
+            scatterIndices: Array.from(scatterTiles)
+        };
     }
 
-    // Isi ulang kolom dengan simbol baru dari atas
-    while (colSymbols.length < height) {
-      colSymbols.unshift(symbols[Math.floor(Math.random() * symbols.length)]);
+    function animateWinningTiles(indices) {
+        const sound = document.getElementById('breakSound');
+        document.querySelectorAll('.tile').forEach((tile, i) => {
+            if (indices.includes(i)) {
+                tile.classList.add('break');
+            }
+        });
+        sound.play();
     }
-    for (let row = 0; row < height; row++) {
-      currentSymbols[row * width + col] = colSymbols[row];
+
+    async function handleTileCollapse(indicesToBreak) {
+        const delay = ms => new Promise(res => setTimeout(res, ms));
+
+        if (indicesToBreak.length > 0) {
+            animateWinningTiles(indicesToBreak);
+            const breakSoundInstance = new Audio('https://kbypmtqhxcvfqtsggndy.supabase.co/storage/v1/object/public/musicefek//Simbol_pecah.mp3');
+            breakSoundInstance.play();
+            await delay(500);
+        }
+
+        for (let i = 0; i < currentSymbols.length; i++) {
+            if (indicesToBreak.includes(i)) {
+                currentSymbols[i] = null;
+            }
+        }
+
+        for (let col = 0; col < width; col++) {
+            const colSymbols = [];
+            for (let row = height - 1; row >= 0; row--) {
+                const idx = row * width + col;
+                if (currentSymbols[idx] !== null) {
+                    colSymbols.unshift(currentSymbols[idx]);
+                }
+            }
+
+            while (colSymbols.length < height) {
+                let newSymbol;
+                const rand = Math.random();
+                if (col === 0) {
+                    if (rand < 0.10) {
+                        newSymbol = SCATTER_SYMBOL;
+                    } else {
+                        newSymbol = symbols[Math.floor(Math.random() * (symbols.length - 2))];
+                    }
+                } else {
+                    if (rand < 0.05) {
+                        newSymbol = WILD_SYMBOL;
+                    } else if (rand < 0.05) {
+                        newSymbol = SCATTER_SYMBOL;
+                    } else {
+                        newSymbol = symbols[Math.floor(Math.random() * (symbols.length - 2))];
+                    }
+                }
+                colSymbols.unshift(newSymbol);
+            }
+            for (let row = 0; row < height; row++) {
+                currentSymbols[row * width + col] = colSymbols[row];
+            }
+        }
+        renderGrid(currentSymbols);
     }
-  }
-  renderGrid(currentSymbols);
-}
 
     function updateBalance(amount) {
-  balance += amount;
-  balanceDisplay.textContent = `Saldo: Rp.${balance}`;
-}
+        balance += amount;
+        balanceDisplay.textContent = `Saldo: Rp.${balance}`;
+    }
 
     function updateBetDisplay() {
-      betDisplay.textContent = `${bet}`;
+        betDisplay.textContent = `${bet}`;
     }
+
+    function updateFreeSpinDisplay() {
+        if (freeSpinCount > 0) {
+            freeSpinDisplay.textContent = `Free Spins: ${freeSpinCount}`;
+            freeSpinDisplay.style.display = 'block';
+        } else {
+            freeSpinDisplay.textContent = `Free Spins: 0`;
+            freeSpinDisplay.style.display = 'none';
+        }
+    }
+
     function showPopup(message) {
-      const popup = document.getElementById('popup');
-      popup.textContent = message;
-      popup.style.display = 'block';
-      setTimeout(() => {
-        popup.style.display = 'none';
-      }, 1000);
+        const popup = document.getElementById('popup');
+        popup.textContent = message;
+        popup.style.display = 'block';
+        setTimeout(() => {
+            popup.style.display = 'none';
+        }, 1500);
     }
 
-async function spin() {
-  if (balance < bet) return;
-  const spinSound = document.getElementById('spinSound');
-  spinSound.currentTime = 0;
-  spinSound.play();
+    async function spin() {
+        if (freeSpinCount === 0 && balance < bet) {
+            showPopup('Saldo tidak cukup!');
+            return;
+        }
 
-  updateBalance(-bet);
-  spinButton.disabled = true;
+        const spinSound = document.getElementById('spinSound');
+        spinSound.currentTime = 0;
+        spinSound.play();
 
-  multiplier = 0;
-  multiplierDisplay.textContent = `x${multiplier}`;
+        // Jangan mengurangi saldo jika sedang Free Spin
+        if (freeSpinCount === 0) {
+            updateBalance(-bet);
+        } else {
+            freeSpinCount--;
+        }
+        updateFreeSpinDisplay();
 
-  rollSound.currentTime = 0;
-  rollSound.play();
+        spinButton.disabled = true;
 
-  for (let col = 0; col < width; col++) {
-    await animateReelShake(col);
-  }
+        multiplier = 0;
+        multiplierDisplay.textContent = `x${multiplier}`;
 
-  rollSound.pause();
-  rollSound.currentTime = 0;
+        rollSound.currentTime = 0;
+        rollSound.play();
 
-  let totalWin = 0;
-  while (true) {
-    const winTiles = getWinningTiles(currentSymbols);
-    if (winTiles.length === 0) break;
-    multiplier = Math.min(multiplier + 1, 5);
-    multiplierDisplay.textContent = `x${multiplier}`;
-    await handleTileCollapse(winTiles);
-   let symbolCount = {};
-    winTiles.forEach(i => {
-   const sym = currentSymbols[i];
-   symbolCount[sym] = (symbolCount[sym] || 0) + 1;
-});
+        for (let col = 0; col < width; col++) {
+            await animateReelShake(col);
+        }
 
-   for (let sym in symbolCount) {
-   const count = symbolCount[sym];
-   const payout = symbolPayouts[sym] || 1;
-   totalWin += count * payout * (bet / 100) * multiplier;
-  }
+        rollSound.pause();
+        rollSound.currentTime = 0;
 
-    await new Promise(res => setTimeout(res, 300));
-  }
+        let totalWin = 0;
+        let chainReaction = true;
 
-  multiplier = 0;
-  multiplierDisplay.textContent = `x${multiplier}`;
-  updateBalance(totalWin);
-  // Sync saldo ke Supabase
-await supabase
-  .from('users_data')
-  .update({ saldo: balance })
-  .eq('user_id', uid);
+             while (chainReaction) {
+            chainReaction = false;
+            const { winningTiles, scatterCount, scatterIndices } = getWinningTiles(currentSymbols);
 
+            let currentRoundWin = 0;
+            const tilesToBreakInThisRound = new Set();
 
-  if (totalWin > 0) {
-    if (totalWin >= bet * 10) {
-      document.getElementById('winBigSound').play();
-    } else {
-      document.getElementById('winSmallSound').play();
+            if (scatterCount >= 3) {
+                let newFreeSpins = 0;
+                if (scatterCount === 3) newFreeSpins = 10;
+                else if (scatterCount === 4) newFreeSpins = 12;
+                else if (scatterCount >= 5) newFreeSpins = 15;
+
+                freeSpinCount += newFreeSpins;
+                showPopup(`Anda mendapatkan ${newFreeSpins} Free Spins!`);
+                scatterIndices.forEach(i => tilesToBreakInThisRound.add(i));
+                chainReaction = true;
+                updateFreeSpinDisplay();
+
+                // PENAMBAHAN UNTUK EFEK SUARA DAN BGM FREE SPIN
+                if (newFreeSpins > 0 && !isInFreeSpinMode) {
+                    freeSpinSound.currentTime = 0;
+                    freeSpinSound.play();
+                    bgm.pause();
+                    bgm.currentTime = 0; // Opsional: reset BGM utama agar mulai dari awal
+                    freeSpinBGM.volume = 0.3; // Sesuaikan volume
+                    freeSpinBGM.play();
+                    isInFreeSpinMode = true;
+                }
+            }
+
+            if (winningTiles.length > 0) {
+                multiplier = Math.min(multiplier + 1, 5);
+                multiplierDisplay.textContent = `x${multiplier}`;
+
+                let symbolWinCounts = {};
+                winningTiles.forEach(i => {
+                    const sym = currentSymbols[i];
+                    if (sym !== WILD_SYMBOL && sym !== SCATTER_SYMBOL) {
+                         symbolWinCounts[sym] = (symbolWinCounts[sym] || 0) + 1;
+                    }
+                });
+
+                for (let sym in symbolWinCounts) {
+                    const count = symbolWinCounts[sym];
+                    const payout = symbolPayouts[sym] || 1;
+                    currentRoundWin += count * payout * (bet / 100) * multiplier;
+                }
+                winningTiles.forEach(i => tilesToBreakInThisRound.add(i));
+                chainReaction = true;
+            }
+
+            totalWin += currentRoundWin;
+
+            if (tilesToBreakInThisRound.size > 0) {
+                await handleTileCollapse(Array.from(tilesToBreakInThisRound));
+                await new Promise(res => setTimeout(res, 300));
+            } else {
+                chainReaction = false;
+            }
+        }
+
+        multiplier = 0;
+        multiplierDisplay.textContent = `x${multiplier}`;
+        updateBalance(totalWin);
+
+        if (uid) {
+            await supabase
+                .from('users_data')
+                .update({ saldo: balance })
+                .eq('user_id', uid);
+        }
+
+        if (totalWin > 0) {
+            if (totalWin >= bet * 10) {
+                document.getElementById('winBigSound').play();
+            } else {
+                document.getElementById('winSmallSound').play();
+            }
+            showPopup(`Anda menang Rp.${totalWin}!`);
+        } else if (freeSpinCount === 0) {
+             showPopup('Coba lagi!');
+        }
+
+        if (freeSpinCount > 0) {
+            await new Promise(res => setTimeout(res, 1500));
+            spin();
+        } else {
+            spinButton.disabled = false;
+            updateFreeSpinDisplay();
+            // MENGEMBALIKAN BGM UTAMA JIKA FREE SPIN SELESAI
+            if (isInFreeSpinMode) {
+                freeSpinBGM.pause();
+                freeSpinBGM.currentTime = 0;
+                bgm.play();
+                isInFreeSpinMode = false;
+            }
+        }
     }
-    showPopup(`You won $${totalWin}!`);
-  }
-
-  spinButton.disabled = false;
-}
 
     betMinusBtn.onclick = () => {
       if (bet - 100 >= minBet) {
@@ -526,32 +745,35 @@ await supabase
       }
     };
     betPlusBtn.onclick = () => {
-      if (bet + 100 <= maxBet && bet + 100 <= balance) {
+      if (bet + 100 <= maxBet && (freeSpinCount > 0 || bet + 100 <= balance)) {
         bet += 100;
         updateBetDisplay();
+      } else if (freeSpinCount === 0 && bet + 100 > balance) {
+          showPopup('Saldo tidak cukup untuk bet ini!');
       }
     };
     spinButton.onclick = spin;
 
-  const bgm = document.getElementById('bgm');
-  bgm.volume = 0.1;
+    // Pastikan BGM utama diatur volumenya saat init
+    bgm.volume = 0.1;
 
-  function init() {
-  currentSymbols = generateRandomSymbols();
-  renderGrid(currentSymbols);
-  updateBalance(0);
-  updateBetDisplay();
+    function init() {
+      currentSymbols = generateRandomSymbols();
+      renderGrid(currentSymbols);
+      updateBalance(0);
+      updateBetDisplay();
+      updateFreeSpinDisplay();
 
-  const bgm = document.getElementById('bgm');
-  bgm.volume = 0.1;
-  bgm.play().catch(() => {
-    document.body.addEventListener('click', () => {
-      bgm.play();
-    }, { once: true });
-  });
-}
+      // Memainkan BGM utama saat game dimuat
+      bgm.play().catch(() => {
+        // Fallback jika autoplay diblokir
+        document.body.addEventListener('click', () => {
+          bgm.play();
+        }, { once: true });
+      });
+    }
 
-  init();
-</script>
+    init();
+  </script>
 </body>
-  </html>
+</html>
