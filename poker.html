@@ -340,13 +340,14 @@
 </head>
 <body>
 <div class="game-container">
-        <div class="main-content-area">
-            <h1>POKER GAME ZONE ONE</h1>
-            <div class="info-display">
-                <p> $: <span id="current-saldo">Rp0</span></p>
-                <p>Pot: <span id="current-pot">Rp0</span></p>
-            </div>
-        </div>
+<div class="main-content-area">
+    <h1>POKER GAME ZONE ONE </h1>
+    <div class="info-display">
+        <p>Saldo Anda: <span id="current-saldo">Rp0</span></p>
+        <p>Pot Saat Ini: <span id="current-pot">Rp0</span></p>
+    </div>
+    <p class="message" id="game-message"></p>
+</div>
 
         <div class="game-table">
             <div class="dealer-area">
@@ -537,7 +538,7 @@
                 }
             } else {
                 userSaldo = data.saldo || 0;
-                currentSaldoDisplay.textContent = `Rp${userSaldo.toLocaleString('id-ID')}`;
+                      currentSaldoDisplay.textContent = `Rp${userSaldo.toLocaleString('id-ID')}`;
                 startGameBtn.disabled = false;
             }
         }
@@ -780,8 +781,7 @@
             }
             playerCurrentBetInRound += currentBetAmount; // Taruhan awal pemain
             updatePot(currentBetAmount);
-
-            gameMessageDisplay.textContent = `Anda bertaruh Rp${currentBetAmount.toLocaleString('id-ID')}. Membagikan kartu...`;
+                        gameMessageDisplay.textContent = `Anda bertaruh Rp${currentBetAmount.toLocaleString('id-ID')}. Membagikan kartu...`;
 
             deck = createDeck();
             playerHoleCards = [];
@@ -1074,4 +1074,4 @@
 
     </script>
 </body>
-</html>
+</html>                                              
