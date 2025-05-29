@@ -136,6 +136,33 @@
     .popup-inner button:last-child {
       background: #888;
     }
+    
+        .btn.loading {
+      position: relative;
+      color: transparent; /* Sembunyikan teks tombol */
+      pointer-events: none; /* Nonaktifkan klik saat loading */
+      background: #ff9500; /* Warna tetap sama atau sedikit gelap */
+    }
+
+    .btn.loading::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 18px;
+      height: 18px;
+      margin-top: -9px;
+      margin-left: -9px;
+      border: 3px solid #fff;
+      border-top-color: transparent;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
   </style>
 </head>
 <body>
@@ -163,7 +190,7 @@
 
 <div id="popup-deposit" class="popup-form" style="display:none;">
   <div class="popup-inner">
-    <h2>Deposit</h2>
+    <h2>Deposit Via DANA</h2>
     <input type="text" id="dep-nama" placeholder="Nama" readonly />
     <input type="email" id="dep-email" placeholder="Email" readonly style="margin-bottom: 12px;" />
     <div style="display: flex; align-items: center; margin-bottom: 12px;">
@@ -222,14 +249,14 @@
 
   let uid = localStorage.getItem('uid'); // Menggunakan `let` agar bisa diubah
 
-  // Fungsi untuk mendapatkan detail pengguna yang sedang login
+  
   async function getCurrentUserEmail() {
     const { data: { user }, error } = await supabase.auth.getUser();
     if (error) {
       console.error('Error fetching user from Supabase auth:', error.message);
       return null;
     }
-    // Set uid dari Supabase auth jika belum ada atau berbeda
+    
     if (user && uid !== user.id) {
         uid = user.id;
         localStorage.setItem('uid', user.id);
@@ -238,14 +265,14 @@
   }
 
 document.addEventListener('DOMContentLoaded', () => {
-  // Panggil getCurrentUserEmail lebih awal untuk memastikan UID tersedia
+  
   getCurrentUserEmail().then(() => {
     loadProfile();
   }).catch(err => {
     console.error("Failed to initialize user session:", err);
-    // Mungkin redirect ke halaman login jika user belum terautentikasi sama sekali
+    
     alert("Sesi pengguna tidak valid. Silakan login kembali.");
-    window.location.href = 'login.html'; // Contoh redirect ke halaman login
+    window.location.href = 'login.html'; 
   });
 
   document.querySelectorAll('.btn-copy').forEach(button => {
@@ -280,7 +307,7 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('saldo-display').textContent = 'Saldo: Rp0 (Harap Login)';
         document.querySelector('#riwayat-deposit tbody').innerHTML = '<tr><td colspan="3" class="empty">Silakan login untuk melihat riwayat.</td></tr>'; // colspan 3
         document.querySelector('#riwayat-penarikan tbody').innerHTML = '<tr><td colspan="3" class="empty">Silakan login untuk melihat riwayat.</td></tr>'; // colspan 3
-        return; // Hentikan eksekusi jika UID tidak ada
+        return; 
     }
 
     const { data: userData, error: userError } = await supabase
@@ -295,11 +322,11 @@ document.addEventListener('DOMContentLoaded', () => {
       document.getElementById('saldo-display').textContent = `Saldo: Rp0 (Error)`;
       return;
     } else if (userError && userError.code === 'PGRST116') {
-        // User_id ada tapi tidak ada di tabel users_data (mungkin user baru)
+        
         console.warn('Pengguna baru, membuat entri saldo awal...');
         document.getElementById('saldo-display').textContent = `Saldo: Rp0 (Baru)`;
 
-        // --- Tambahkan logika ini untuk membuat entri users_data jika belum ada ---
+        
         const { error: insertError } = await supabase
             .from('users_data')
             .insert([{ user_id: uid, saldo: 0 }]);
@@ -309,12 +336,12 @@ document.addEventListener('DOMContentLoaded', () => {
             alert('Gagal membuat entri saldo awal. Cek log.');
             document.getElementById('saldo-display').textContent = `Saldo: Rp0 (Error Inisialisasi)`;
         }
-        // --- END: Logika ini ---
+        
     } else {
         document.getElementById('saldo-display').textContent = `Saldo: Rp${userData.saldo ?? 0}`;
     }
 
-    // Ambil riwayat deposit dengan status (dari deposit_requests)
+    
     const { data: depositData, error: depHistoryError } = await supabase
       .from('deposit_requests') 
       .select('created_at, amount, status') 
@@ -336,7 +363,7 @@ document.addEventListener('DOMContentLoaded', () => {
       });
     }
 
-    // Ambil riwayat penarikan dengan status (dari withdraw_requests)
+    
     const { data: withdrawData, error: withdrawHistoryError } = await supabase
       .from('withdraw_requests') 
       .select('created_at, amount, status') 
@@ -441,22 +468,22 @@ document.addEventListener('DOMContentLoaded', () => {
       return;
     }
 
-    // --- START: Tambahkan ini untuk menampilkan di riwayat SECARA INSTAN ---
+  
     const depositTableBody = document.querySelector('#riwayat-deposit tbody');
     const now = new Date();
-    const dateString = now.toLocaleString('id-ID'); // Format tanggal dan waktu saat ini
+    const dateString = now.toLocaleString('id-ID');
     const newRowHTML = `<tr class="pending-item" data-id="temp-${Date.now()}"><td>${dateString}</td><td>Rp${parseInt(jumlah).toLocaleString('id-ID')}</td><td class="status-pending">Pending</td></tr>`;
     
-    // Pastikan tidak ada pesan "Belum ada riwayat" jika ini entri pertama
+  
     if (depositTableBody.querySelector('.empty')) {
-      depositTableBody.innerHTML = ''; // Hapus pesan kosong
+      depositTableBody.innerHTML = ''; 
     }
     
-    // Tambahkan baris baru di PALING ATAS
+    
     depositTableBody.insertAdjacentHTML('afterbegin', newRowHTML);
-    // --- END: Tambahkan ini ---
+  
 
-    // Kirim permintaan ke Supabase (tetap seperti sebelumnya)
+  
     const { error } = await supabase.from('deposit_requests').insert([
       { user_id: uid, nama, metode, amount: parseInt(jumlah), status: 'pending', email: email }
     ]);
@@ -471,9 +498,9 @@ document.addEventListener('DOMContentLoaded', () => {
       }
       // --- END: Jika ada error ---
     } else {
-      alert("Permintaan deposit dikirim. Menunggu konfirmasi admin.");
+      alert("Permintaan deposit dikirim. ..");
       closePopup('popup-deposit');
-      loadProfile(); // Muat ulang profil untuk refresh data dari DB
+      loadProfile();
     }
   };
 
@@ -505,7 +532,7 @@ document.addEventListener('DOMContentLoaded', () => {
         return;
     }
 
-    // Ambil saldo pengguna saat ini dari database
+    
     const { data: userData, error: saldoError } = await supabase
         .from('users_data')
         .select('saldo')
@@ -528,11 +555,11 @@ document.addEventListener('DOMContentLoaded', () => {
         return; 
     }
 
-    // --- START: Tambahkan ini untuk menampilkan di riwayat SECARA INSTAN ---
+  
     const withdrawTableBody = document.querySelector('#riwayat-penarikan tbody');
     const now = new Date();
-    const dateString = now.toLocaleString('id-ID'); 
-
+    const dateString = now.toLocaleString('id-ID'); // Format ta
+    
     const newRowHTML = `<tr class="pending-item" data-id="temp-${Date.now()}"><td>${dateString}</td><td>Rp${jumlah.toLocaleString('id-ID')}</td><td class="status-pending">Pending</td></tr>`;
 
     if (withdrawTableBody.querySelector('.empty')) {
@@ -540,9 +567,9 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     
     withdrawTableBody.insertAdjacentHTML('afterbegin', newRowHTML);
-    // --- END: Tambahkan ini ---
+    
 
-    // **Langkah 1: Kurangi saldo terlebih dahulu di database**
+    
     const saldoBaru = currentSaldo - jumlah;
     
     const { error: updateSaldoError } = await supabase
@@ -562,7 +589,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     document.getElementById('saldo-display').textContent = `Saldo: Rp${saldoBaru.toLocaleString('id-ID')}`;
 
-    // **Langkah 2: Jika pengurangan saldo berhasil, baru kirim permintaan penarikan**
+    
     const { error: insertRequestError } = await supabase
         .from('withdraw_requests')
         .insert([
@@ -598,10 +625,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
   document.getElementById('btn-main-game').onclick = () => {
-    window.location.href = 'slot.html';
-  };
+  const mainGameBtn = document.getElementById('btn-main-game');
+  mainGameBtn.classList.add('loading');
 
-  // Tidak perlu window.onload = loadProfile lagi karena sudah dihandle DOMContentLoaded
+  
+  setTimeout(() => {
+    window.location.href = 'slot.html';
+    
+  }, 4000); 
+};
+
 </script>
 </body>
 </html>
