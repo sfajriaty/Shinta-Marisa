@@ -163,10 +163,97 @@
       to { transform: rotate(360deg); }
     }
 
+    /* --- NEW CSS for Game Popup --- */
+    #game-popup {
+      display: none; /* Sembunyikan secara default */
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.7);
+      justify-content: center;
+      align-items: center;
+      z-index: 1000; /* Lebih tinggi dari popup lainnya */
+    }
+
+    .game-popup-inner {
+      background: #fefefe;
+      color: #000;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 0 25px 5px rgba(255,165,0,0.7);
+      width: 90%;
+      max-width: 450px; /* Lebar maksimum popup game */
+      position: relative;
+      animation-name: animatetop;
+      animation-duration: 0.4s;
+    }
+
+    /* Re-use animatetop from previous example for smoother entry */
+    @keyframes animatetop {
+        from {top: -300px; opacity: 0}
+        to {top: 0; opacity: 1}
+    }
+
+    .game-popup-inner .close-button {
+      color: #aaa;
+      float: right;
+      font-size: 28px;
+      font-weight: bold;
+      position: absolute;
+      top: 10px;
+      right: 15px;
+      cursor: pointer;
+    }
+
+    .game-popup-inner .close-button:hover,
+    .game-popup-inner .close-button:focus {
+      color: black;
+      text-decoration: none;
+    }
+
+    .game-popup-inner h2 {
+      text-align: center;
+      color: #ff9500;
+      margin-bottom: 20px;
+      border-bottom: none; /* Override existing h2 border */
+      padding-bottom: 0;
+    }
+
+    .game-popup-inner table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 15px;
+    }
+
+    .game-popup-inner th, .game-popup-inner td {
+      border: 1px solid #ddd;
+      padding: 10px;
+      text-align: left;
+    }
+
+    .game-popup-inner th {
+      background-color: #f2f2f2;
+      color: #555;
+    }
+
+    .game-popup-inner td a {
+      text-decoration: none;
+      color: #007bff; /* Warna tautan game */
+      display: block; /* Membuat seluruh sel bisa diklik */
+      padding: 5px 0;
+    }
+
+    .game-popup-inner td a:hover {
+      color: #0056b3;
+      text-decoration: underline;
+    }
+
   </style>
 </head>
 <body>
-<div class="container">
+  <div class="container">
   <h1>Profil Pemain</h1>
   <div class="saldo" id="saldo-display">Saldo: Rp0</div>
   <div class="btn-group">
@@ -190,7 +277,7 @@
 
 <div id="popup-deposit" class="popup-form" style="display:none;">
   <div class="popup-inner">
-    <h2>Deposit Via DANA</h2>
+    <h2>Deposit</h2>
     <input type="text" id="dep-nama" placeholder="Nama" readonly />
     <input type="email" id="dep-email" placeholder="Email" readonly style="margin-bottom: 12px;" />
     <div style="display: flex; align-items: center; margin-bottom: 12px;">
@@ -240,6 +327,30 @@
   </div>
 </div>
 
+<div id="game-popup" class="popup-form">
+  <div class="game-popup-inner">
+    <span class="close-button">&times;</span>
+    <h2>Pilih Game Anda</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Nama Game</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><a href="slot.html">Slot Game</a></td>
+        </tr>
+        <tr>
+          <td><a href="poker.html">Poker Seru</a></td>
+        </tr>
+        <tr>
+          <td><a href="blackjack.html">Blackjack 21</a></td>
+        </tr>
+        </tbody>
+    </table>
+  </div>
+</div>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
   const supabase = window.supabase.createClient(
@@ -299,6 +410,33 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     });
   });
+
+  // --- NEW JAVASCRIPT for Game Popup ---
+  const gamePopup = document.getElementById('game-popup');
+  const closeGamePopupBtn = gamePopup.querySelector('.close-button');
+  const mainGameBtn = document.getElementById('btn-main-game'); // Ambil referensi tombol main game
+
+  // Event listener untuk tombol "Mainkan Game"
+  mainGameBtn.addEventListener('click', function() {
+    // Hapus class loading jika ada (dari kode Anda sebelumnya)
+    mainGameBtn.classList.remove('loading');
+    
+    // Tampilkan popup game
+    gamePopup.style.display = 'flex';
+  });
+
+  // Event listener untuk tombol tutup (X) di popup game
+  closeGamePopupBtn.addEventListener('click', function() {
+    gamePopup.style.display = 'none';
+  });
+
+  // Event listener untuk menutup popup game saat mengklik di luar area konten
+  window.addEventListener('click', function(event) {
+    if (event.target == gamePopup) {
+      gamePopup.style.display = 'none';
+    }
+  });
+  // --- END NEW JAVASCRIPT for Game Popup ---
 });
 
   async function loadProfile() {
@@ -325,8 +463,6 @@ document.addEventListener('DOMContentLoaded', () => {
         
         console.warn('Pengguna baru, membuat entri saldo awal...');
         document.getElementById('saldo-display').textContent = `Saldo: Rp0 (Baru)`;
-
-        
         const { error: insertError } = await supabase
             .from('users_data')
             .insert([{ user_id: uid, saldo: 0 }]);
@@ -472,7 +608,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const depositTableBody = document.querySelector('#riwayat-deposit tbody');
     const now = new Date();
     const dateString = now.toLocaleString('id-ID');
-    const newRowHTML = `<tr class="pending-item" data-id="temp-${Date.now()}"><td>${dateString}</td><td>Rp${parseInt(jumlah).toLocaleString('id-ID')}</td><td class="status-pending">Pending</td></tr>`;
+     const newRowHTML = `<tr class="pending-item" data-id="temp-${Date.now()}"><td>${dateString}</td><td>Rp${parseInt(jumlah).toLocaleString('id-ID')}</td><td class="status-pending">Pending</td></tr>`;
     
   
     if (depositTableBody.querySelector('.empty')) {
@@ -561,8 +697,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const dateString = now.toLocaleString('id-ID'); // Format ta
     
     const newRowHTML = `<tr class="pending-item" data-id="temp-${Date.now()}"><td>${dateString}</td><td>Rp${jumlah.toLocaleString('id-ID')}</td><td class="status-pending">Pending</td></tr>`;
-
-    if (withdrawTableBody.querySelector('.empty')) {
+     if (withdrawTableBody.querySelector('.empty')) {
       withdrawTableBody.innerHTML = ''; 
     }
     
@@ -574,7 +709,7 @@ document.addEventListener('DOMContentLoaded', () => {
     
     const { error: updateSaldoError } = await supabase
         .from('users_data')
-        .update({ saldo: saldoBaru })
+               .update({ saldo: saldoBaru })
         .eq('user_id', uid);
 
     if (updateSaldoError) {
@@ -624,16 +759,16 @@ document.addEventListener('DOMContentLoaded', () => {
   };
 
 
-  document.getElementById('btn-main-game').onclick = () => {
-  const mainGameBtn = document.getElementById('btn-main-game');
-  mainGameBtn.classList.add('loading');
+  // --- OLD btn-main-game handler, akan diganti oleh yang baru ---
+  // document.getElementById('btn-main-game').onclick = () => {
+  // const mainGameBtn = document.getElementById('btn-main-game');
+  // mainGameBtn.classList.add('loading');
 
-  
-  setTimeout(() => {
-    window.location.href = 'susunbalok.html';
-    
-  }, 4000); 
-};
+  // setTimeout(() => {
+  //   window.location.href = 'slot.html';
+  // }, 4000); 
+  // };
+  // --- END OLD btn-main-game handler ---
 
 </script>
 </body>
