@@ -71,8 +71,8 @@
       border: 1px solid red;
     }
     .tile {
-      background:  ;
-      border-radius: 100px;
+      background: #fff ;
+      border-radius: 5px;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -242,7 +242,7 @@
     }
 
     .win-animation-content {
-        background: linear-gradient(45deg, gold, yellow, gold);
+        background: linear-gradient(45deg, #fff, #fff, #fff);
         padding: 40px 60px;
         border-radius: 15px;
         box-shadow: 0 0 30px rgba(255, 215, 0, 0.8);
@@ -326,17 +326,17 @@
 
 
     const symbolPayouts = {
-      '🪁': 10,
-      '🎭': 10,
-      '🧸': 10,
-      '🪅': 10,
+      '🪁': 15,
+      '🎭': 13,
+      '🧸': 12,
+      '🪅': 11,
       '🏆': 10,
-      '🎏': 10,
-      '🪄': 10,
-      '🎱': 10,
-      '🀄': 10,
-      '🎎': 10,
-      '🎃': 10,
+      '🎏': 9,
+      '🪄': 6,
+      '🎱': 4,
+      '🀄': 7,
+      '🎎': 6,
+      '🎃': 5,
     };
 
     const width = 5;
@@ -736,7 +736,7 @@ window.onload = () => {
         document.getElementById('winBigSound').currentTime = 0;
         document.getElementById('winBigSound').play();
 
-        await new Promise(resolve => setTimeout(resolve, 3000)); // Tampilkan selama 3 detik
+        await new Promise(resolve => setTimeout(resolve, 5000)); // Tampilkan selama 3 detik
         freeSpinWinOverlay.style.opacity = '0';
         freeSpinWinOverlay.style.visibility = 'hidden';
     }
