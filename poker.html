@@ -432,630 +432,600 @@
     'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZxbWZhY2h4bmp5eHd1YXZwZ2RzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDg0MDYxNDAsImV4cCI6MjA2Mzk4MjE0MH0.Bzr8mUiEl8MzRWpVQ3_59eFxKk0EWZ3ca-4IEcpGLkk'
   );
 
-        let uid = localStorage.getItem('uid');
- 
- const backToProfileBtn = document.getElementById('back-to-profile-btn');
-const currentSaldoDisplay = document.getElementById('current-saldo');
-const currentPotDisplay = document.getElementById('current-pot');
-const betSlider = document.getElementById('bet-slider');
-const betDisplay = document.getElementById('bet-display');
-const betAmountInput = document.getElementById('bet-amount-input');
+    let user; // Objek pengguna Supabase
+    let userSaldo = 0;
+    let userId = null;
 
-const startGameBtn = document.getElementById('start-game-btn');
-const foldBtn = document.getElementById('fold-btn');
-const checkBtn = document.getElementById('check-btn');
-const callBtn = document.getElementById('call-btn');
-const betRaiseBtn = document.getElementById('bet-raise-btn');
-const nextRoundBtn = document.getElementById('next-round-btn');
-const showdownBtn = document.getElementById('showdown-btn');
-const playAgainBtn = document.getElementById('play-again-btn');
+    // --- REFERENSI ELEMEN HTML ---
+    const currentSaldoDisplay = document.getElementById('current-saldo');
+    const currentPotDisplay = document.getElementById('current-pot');
+    const betSlider = document.getElementById('bet-slider');
+    const betDisplay = document.getElementById('bet-display');
+    const betAmountInput = document.getElementById('bet-amount-input');
 
-const gameMessageDisplay = document.getElementById('game-message');
-const playerHandDiv = document.getElementById('player-hand');
-const dealerHandDiv = document.getElementById('dealer-hand');
-const communityCardsDiv = document.getElementById('community-cards');
-const betSliderGroup = document.getElementById('bet-slider-group');
+    const startGameBtn = document.getElementById('start-game-btn');
+    const foldBtn = document.getElementById('fold-btn');
+    const checkBtn = document.getElementById('check-btn');
+    const callBtn = document.getElementById('call-btn');
+    const betRaiseBtn = document.getElementById('bet-raise-btn');
+    const nextRoundBtn = document.getElementById('next-round-btn'); // Tombol ini akan dipakai secara internal
+    const showdownBtn = document.getElementById('showdown-btn'); // Tombol ini akan dipakai secara internal
+    const playAgainBtn = document.getElementById('play-again-btn'); // Tombol ini untuk memulai game baru
+    const backToProfileBtn = document.getElementById('back-to-profile-btn'); // Tombol kembali ke profil
 
-// Referensi elemen Audio
-const winSound = document.getElementById('winSound');
-const loseSound = document.getElementById('loseSound');
-const clickSound = document.getElementById('clickSound');
-const backgroundMusic = document.getElementById('backgroundMusic');
-const musicToggleBtn = document.getElementById('musicToggleBtn');
+    const gameMessageDisplay = document.getElementById('game-message');
+    const playerHandDiv = document.getElementById('player-hand');
+    const dealerHandDiv = document.getElementById('dealer-hand');
+    const communityCardsDiv = document.getElementById('community-cards');
+    const betSliderGroup = document.getElementById('bet-slider-group');
 
+    // Referensi elemen Audio
+    const winSound = document.getElementById('winSound');
+    const loseSound = document.getElementById('loseSound');
+    const clickSound = document.getElementById('clickSound');
+    const backgroundMusic = document.getElementById('backgroundMusic');
+    const musicToggleBtn = document.getElementById('musicToggleBtn');
 
-        let userSaldo = 0;
-        let currentPot = 0;
-        let currentBetAmount = 0;
-        let minBet = 100;
-        let bigBlind = 200;
-        let dealerCurrentBetInRound = 0;
-        let playerCurrentBetInRound = 0;
+    // --- VARIABEL GAME GLOBAL ---
+    let deck = [];
+    let playerHand = [];
+    let dealerHand = [];
+    let communityCards = [];
+    let pot = 0;
+    let currentBet = 0;
+    let minBet = 1000; // Taruhan minimum
+    let currentPhase = 'pre-flop'; // 'pre-flop', 'flop', 'turn', 'river', 'showdown'
+    let dealerTurn = false; // Untuk melacak giliran bandar
+    let gameActive = false; // Status game aktif
 
-        let gamePhase = 'preflop';
+    // Timer untuk giliran pemain
+    let turnTimer;
+    const turnTimeLimit = 20; // Detik
+    let timeLeft = turnTimeLimit;
 
-        // --- Data Kartu ---
+    // --- FUNGSI AUDIO ---
+    let isMusicPlaying = false; // Status musik
+
+    function playSound(audioElement) {
+        if (audioElement) {
+            audioElement.currentTime = 0; // Reset ke awal
+            audioElement.play().catch(e => console.error("Error playing sound:", e));
+        }
+    }
+
+    function toggleMusic() {
+        if (backgroundMusic.paused) {
+            backgroundMusic.play().then(() => {
+                isMusicPlaying = true;
+                musicToggleBtn.textContent = '🔊';
+            }).catch(e => console.error("Error playing background music:", e));
+        } else {
+            backgroundMusic.pause();
+            isMusicPlaying = false;
+            musicToggleBtn.textContent = '🔇';
+        }
+    }
+
+    // --- FUNGSI SUPABASE ---
+    async function fetchUserData() {
+        try {
+            const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+            if (sessionError) throw sessionError;
+
+            if (session) {
+                user = session.user;
+                userId = user.id;
+                console.log("User session:", user);
+
+                const { data, error } = await supabase
+                    .from('profiles')
+                    .select('saldo')
+                    .eq('id', userId)
+                    .single();
+
+                if (error) throw error;
+                userSaldo = data.saldo;
+                currentSaldoDisplay.textContent = `Rp${userSaldo.toLocaleString('id-ID')}`;
+                console.log("User saldo loaded:", userSaldo);
+                gameMessageDisplay.textContent = `Selamat datang! Saldo Anda: Rp${userSaldo.toLocaleString('id-ID')}.`;
+                resetGameUI(); // Panggil ini setelah saldo dimuat
+            } else {
+                console.log("No active session, redirecting to login.");
+                gameMessageDisplay.textContent = "Tidak ada sesi aktif. Silakan login.";
+                setTimeout(() => window.location.href = 'login.html', 2000);
+            }
+        } catch (error) {
+            console.error("Error fetching user from Supabase:", error.message);
+            gameMessageDisplay.textContent = `Error loading user saldo: ${error.message}`;
+            // Handle specific API key error if it occurs
+            if (error.message.includes('Invalid API key')) {
+                gameMessageDisplay.textContent = "Error: Kunci API Supabase tidak valid. Periksa konfigurasi.";
+            }
+        }
+    }
+
+    async function updateSaldo(amount) {
+        if (!userId) {
+            console.error("User ID not found, cannot update saldo.");
+            return;
+        }
+        try {
+            const newSaldo = userSaldo + amount;
+            const { data, error } = await supabase
+                .from('profiles')
+                .update({ saldo: newSaldo })
+                .eq('id', userId);
+
+            if (error) throw error;
+            userSaldo = newSaldo;
+            currentSaldoDisplay.textContent = `Rp${userSaldo.toLocaleString('id-ID')}`;
+            console.log(`Saldo updated by ${amount}. New saldo: ${userSaldo}`);
+            return true;
+        } catch (error) {
+            console.error("Error updating saldo:", error.message);
+            gameMessageDisplay.textContent = `Gagal memperbarui saldo: ${error.message}`;
+            return false;
+        }
+    }
+
+    // --- FUNGSI GAME LOGIC ---
+
+    function createDeck() {
         const suits = ['♠', '♥', '♦', '♣'];
         const ranks = ['2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K', 'A'];
-
-        let deck;
-        let playerHoleCards = [];
-        let dealerHoleCards = [];
-        let communityCards = [];
-
-        const rankValues = { '2': 2, '3': 3, '4': 4, '5': 5, '6': 6, '7': 7, '8': 8, '9': 9, '10': 10, 'J': 11, 'Q': 12, 'K': 13, 'A': 14 };
-
-        function createDeck() {
-            let deck = [];
-            for (let suit of suits) {
-                for (let rank of ranks) {
-                    deck.push({ rank, suit, value: rankValues[rank] });
-                }
+        deck = [];
+        for (const suit of suits) {
+            for (const rank of ranks) {
+                deck.push({ rank, suit });
             }
-            return shuffleDeck(deck);
         }
+        shuffleDeck();
+    }
 
-        function shuffleDeck(deck) {
-            for (let i = deck.length - 1; i > 0; i--) {
-                const j = Math.floor(Math.random() * (i + 1));
-                [deck[i], deck[j]] = [deck[j], deck[i]];
-            }
-            return deck;
+    function shuffleDeck() {
+        for (let i = deck.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [deck[i], deck[j]] = [deck[j], deck[i]]; // Swap
         }
+    }
 
-        function renderCard(card, targetDiv, isHidden = false) {
-            const cardDiv = document.createElement('div');
-            cardDiv.classList.add('card');
-            if (isHidden) {
-                cardDiv.classList.add('hidden');
-                cardDiv.textContent = '?';
+    function dealCard() {
+        if (deck.length === 0) {
+            console.error("Deck is empty!");
+            return null;
+        }
+        return deck.pop();
+    }
+
+    function displayCard(card, container, isHidden = false) {
+        const cardDiv = document.createElement('div');
+        cardDiv.classList.add('card');
+        if (isHidden) {
+            cardDiv.classList.add('hidden');
+            cardDiv.textContent = 'POKER'; // Teks untuk kartu tertutup
+        } else {
+            const rankSpan = document.createElement('span');
+            rankSpan.textContent = card.rank;
+
+            const suitSpanTop = document.createElement('span');
+            suitSpanTop.classList.add('suit');
+            suitSpanTop.textContent = card.suit;
+
+            const suitSpanBottom = document.createElement('span');
+            suitSpanBottom.classList.add('suit', 'bottom');
+            suitSpanBottom.textContent = card.suit;
+
+            if (card.suit === '♥' || card.suit === '♦') {
+                rankSpan.classList.add('red-suit');
+                suitSpanTop.classList.add('red-suit');
+                suitSpanBottom.classList.add('red-suit');
             } else {
-                cardDiv.innerHTML = `<span class="suit ${card.suit === '♥' || card.suit === '♦' ? 'red-suit' : 'black-suit'}">${card.suit}</span>` +
-                                    card.rank +
-                                    `<span class="suit bottom ${card.suit === '♥' || card.suit === '♦' ? 'red-suit' : 'black-suit'}">${card.suit}</span>`;
+                rankSpan.classList.add('black-suit');
+                suitSpanTop.classList.add('black-suit');
+                suitSpanBottom.classList.add('black-suit');
             }
-            targetDiv.appendChild(cardDiv);
+
+            cardDiv.appendChild(suitSpanTop);
+            cardDiv.appendChild(rankSpan);
+            cardDiv.appendChild(suitSpanBottom);
+        }
+        container.appendChild(cardDiv);
+    }
+
+    function clearHands() {
+        playerHandDiv.innerHTML = '';
+        dealerHandDiv.innerHTML = '';
+        communityCardsDiv.innerHTML = '';
+    }
+
+    function updatePotDisplay() {
+        currentPotDisplay.textContent = `Rp${pot.toLocaleString('id-ID')}`;
+    }
+
+    function hideAllActionButtons() {
+        const buttons = [foldBtn, checkBtn, callBtn, betRaiseBtn, startGameBtn, nextRoundBtn, showdownBtn, playAgainBtn];
+        buttons.forEach(btn => btn.classList.add('hidden'));
+    }
+
+    function enablePlayerActions(canCheck = true, canCall = true, canRaise = true) {
+        hideAllActionButtons();
+        foldBtn.classList.remove('hidden');
+        if (canCheck) checkBtn.classList.remove('hidden');
+        if (canCall) callBtn.classList.remove('hidden');
+        if (canRaise) betRaiseBtn.classList.remove('hidden');
+        betSliderGroup.classList.remove('hidden');
+        gameActive = true;
+        startTurnTimer(); // Mulai timer saat giliran pemain
+    }
+
+    function disablePlayerActions() {
+        hideAllActionButtons();
+        betSliderGroup.classList.add('hidden');
+        gameActive = false;
+        stopTurnTimer(); // Hentikan timer saat bukan giliran pemain
+    }
+
+    // --- FUNGSI TIMER GILIRAN ---
+    function startTurnTimer() {
+        clearInterval(turnTimer); // Pastikan tidak ada timer yang berjalan
+        timeLeft = turnTimeLimit;
+        gameMessageDisplay.textContent = `Giliran Anda (${timeLeft}s)`;
+
+        turnTimer = setInterval(() => {
+            timeLeft--;
+            gameMessageDisplay.textContent = `Giliran Anda (${timeLeft}s)`;
+            if (timeLeft <= 0) {
+                clearInterval(turnTimer);
+                gameMessageDisplay.textContent = "Waktu habis! Anda Fold.";
+                handleFold(); // Otomatis fold jika waktu habis
+            }
+        }, 1000);
+    }
+
+    function stopTurnTimer() {
+        clearInterval(turnTimer);
+    }
+
+    // --- ALUR GAME UTAMA ---
+
+    async function startGame() {
+        playSound(clickSound);
+        if (userSaldo < minBet) {
+            gameMessageDisplay.textContent = `Saldo Anda tidak cukup untuk memulai (min Rp${minBet.toLocaleString('id-ID')}).`;
+            return;
         }
 
-        // Fungsi untuk memainkan efek suara
-        function playSound(soundElement) {
-            if (soundElement) {
-                soundElement.currentTime = 0; // Mengatur ulang suara ke awal
-                soundElement.play().catch(e => console.warn("Error playing sound:", e.message)); // Warn, bukan error
-            }
+        disablePlayerActions(); // Nonaktifkan tombol saat memulai
+        clearHands();
+        createDeck();
+        pot = 0;
+        updatePotDisplay();
+        currentBet = minBet; // Taruhan awal
+        currentPhase = 'pre-flop';
+
+        // Kurangi taruhan awal dari saldo pemain
+        const success = await updateSaldo(-minBet);
+        if (!success) {
+            gameMessageDisplay.textContent = "Gagal mengurangi saldo untuk taruhan awal.";
+            return;
         }
+        pot += minBet;
+        updatePotDisplay();
 
-        // --- Supabase & Saldo Functions ---
-        async function getCurrentUserEmail() {
-            const { data: { user }, error } = await supabase.auth.getUser();
-            if (error) {
-                console.error('Error fetching user from Supabase auth:', error.message);
-                return null;
-            }
-            if (user && uid !== user.id) {
-                uid = user.id;
-                localStorage.setItem('uid', user.id);
-            }
-            return user ? user.email : null;
-        }
+        // Deal kartu tangan pemain dan bandar (tertutup)
+        playerHand = [dealCard(), dealCard()];
+        dealerHand = [dealCard(), dealCard()]; // Kartu bandar tetap tertutup
+        
+        displayCard(playerHand[0], playerHandDiv);
+        displayCard(playerHand[1], playerHandDiv);
+        displayCard(null, dealerHandDiv, true); // Kartu bandar tertutup
+        displayCard(null, dealerHandDiv, true); // Kartu bandar tertutup
 
- async function loadUserSaldo() {
-            if (!uid) {
-                gameMessageDisplay.textContent = 'Anda harus login untuk bermain.';
-                startGameBtn.disabled = true;
-                return;
-            }
+        gameMessageDisplay.textContent = `Anda bertaruh Rp${minBet.toLocaleString('id-ID')}. Giliran Anda!`;
+        betDisplay.textContent = currentBet.toLocaleString('id-ID'); // Update display taruhan
 
-            const { data, error } = await supabase
-                .from('users_data')
-                .select('saldo')
-                .eq('user_id', uid)
-                .single();
+        // Izinkan pemain untuk aksi pertama
+        enablePlayerActions(false, true, true); // Awalnya tidak bisa check, hanya call/raise
+        // Di pre-flop, karena ada taruhan awal, biasanya pemain bisa Fold, Call, atau Raise. Check tidak berlaku.
+        // Jika bandar sudah pasang blind, pemain harus Call/Raise/Fold
+        callBtn.textContent = `Call Rp${currentBet.toLocaleString('id-ID')}`;
+        betRaiseBtn.textContent = `Raise`;
+        // Atur slider min/max untuk raise
+        betSlider.min = currentBet + minBet; // Raise minimal dua kali lipat dari minBet
+        betSlider.max = userSaldo; // Max sesuai saldo pemain
+        betAmountInput.min = betSlider.min;
+        betAmountInput.max = betSlider.max;
+        betSlider.value = betSlider.min;
+        betAmountInput.value = betSlider.min;
+    }
 
-            if (error && error.code !== 'PGRST116') {
-                console.error('Error loading user saldo:', error.message);
-                gameMessageDisplay.textContent = 'Gagal memuat saldo.';
-                startGameBtn.disabled = true;
-            } else if (error && error.code === 'PGRST116') {
-                userSaldo = 0;
-                currentSaldoDisplay.textContent = `Rp${userSaldo.toLocaleString('id-ID')}`;
-                const { error: insertError } = await supabase
-                    .from('users_data')
-                    .insert([{ user_id: uid, saldo: 0 }]);
-                if (insertError) {
-                    console.error('Error creating initial saldo entry:', insertError.message);
-                }
-            } else {
-                userSaldo = data.saldo || 0;
-                currentSaldoDisplay.textContent = `Rp${userSaldo.toLocaleString('id-ID')}`;
-                startGameBtn.disabled = false;
-            }
-        }
+    async function handlePlayerAction(actionType) {
+        playSound(clickSound);
+        stopTurnTimer(); // Hentikan timer setelah aksi
+        disablePlayerActions(); // Nonaktifkan tombol setelah pemain beraksi
 
-        async function updateSaldo(amountChange) {
-            if (!uid) {
-                console.error('UID tidak ditemukan, tidak bisa update saldo.');
-                return false;
-            }
+        let playerActionTaken = false;
 
-            const newSaldo = userSaldo + amountChange;
-            
-            const { error } = await supabase
-                .from('users_data')
-                .update({ saldo: newSaldo })
-                .eq('user_id', uid);
-
-            if (error) {
-                console.error('Error updating saldo:', error.message);
-                gameMessageDisplay.textContent = 'Gagal update saldo di server.';
-                return false;
-            } else {
-                userSaldo = newSaldo;
-                currentSaldoDisplay.textContent = `Rp${userSaldo.toLocaleString('id-ID')}`;
-                return true;
-            }
-        }
-
-        function updatePot(amount) {
-            currentPot += amount;
-            currentPotDisplay.textContent = `Rp${currentPot.toLocaleString('id-ID')}`;
-        }
-
-        // --- Game Logic ---
-        function resetGameUI() {
-            playerHandDiv.innerHTML = '';
-            dealerHandDiv.innerHTML = '';
-            communityCardsDiv.innerHTML = '';
-            gameMessageDisplay.textContent = 'Siap untuk bermain?';
-            currentPot = 0;
-            currentPotDisplay.textContent = `Rp${currentPot.toLocaleString('id-ID')}`;
-            playerCurrentBetInRound = 0;
-            dealerCurrentBetInRound = 0;
-
-            betSlider.value = minBet;
-            betAmountInput.value = minBet;
-            betDisplay.textContent = minBet.toLocaleString('id-ID');
-            
-            betSliderGroup.classList.remove('hidden');
-
-            hideAllActionButtons();
-            startGameBtn.classList.remove('hidden');
-            startGameBtn.disabled = false;
-            startGameBtn.textContent = 'Mulai Taruhan';
-
-            betSlider.max = userSaldo;
-            betAmountInput.max = userSaldo;
-        }
-
-        function hideAllActionButtons() {
-            foldBtn.classList.add('hidden');
-            checkBtn.classList.add('hidden');
-            callBtn.classList.add('hidden');
-            betRaiseBtn.classList.add('hidden');
-            nextRoundBtn.classList.add('hidden');
-            showdownBtn.classList.add('hidden');
-            playAgainBtn.classList.add('hidden');
-            startGameBtn.classList.add('hidden');
-        }
-
-        function showPlayerActions() {
-            hideAllActionButtons();
-            foldBtn.classList.remove('hidden');
-            betSliderGroup.classList.remove('hidden');
-
-            let amountToCall = dealerCurrentBetInRound - playerCurrentBetInRound;
-
-            if (amountToCall <= 0) {
-                checkBtn.classList.remove('hidden');
-                betRaiseBtn.textContent = 'Bet';
-                betSlider.min = minBet;
-                betAmountInput.min = minBet;
-                betSlider.value = minBet;
-                betAmountInput.value = minBet;
-                betDisplay.textContent = minBet.toLocaleString('id-ID');
-
-            } else {
-                callBtn.classList.remove('hidden');
-                callBtn.textContent = `Call Rp${amountToCall.toLocaleString('id-ID')}`;
-                betRaiseBtn.textContent = 'Raise';
-                betSlider.min = amountToCall + minBet;
-                betAmountInput.min = amountToCall + minBet;
-
-                let defaultBet = Math.max(amountToCall, minBet);
-                if (betSlider.min > userSaldo) {
-                    betRaiseBtn.disabled = true;
-                    betSlider.value = 0;
-                    betAmountInput.value = 0;
-                } else {
-                    betRaiseBtn.disabled = false;
-                    betSlider.value = betSlider.min;
-                    betAmountInput.value = betSlider.min;
-                }
-                betDisplay.textContent = betSlider.value.toLocaleString('id-ID');
-            }
-            betRaiseBtn.classList.remove('hidden');
-
-            betSlider.max = userSaldo;
-            betAmountInput.max = userSaldo;
-        }
-
-        function dealerTurn() {
-            gameMessageDisplay.textContent = 'Bandar sedang beraksi...';
-            hideAllActionButtons();
-            betSliderGroup.classList.add('hidden');
-
-            setTimeout(async () => {
-                let dealerAction = '';
-                let amountToCall = playerCurrentBetInRound - dealerCurrentBetInRound;
-                
-                if (playerCurrentBetInRound > dealerCurrentBetInRound) {
-                    if (dealerHoleCards[0].value + dealerHoleCards[1].value > 18 || Math.random() > 0.7) {
-                        if (Math.random() > 0.5 && userSaldo >= amountToCall + minBet) {
-                            let raiseAmount = amountToCall + minBet;
-                            if (userSaldo < raiseAmount) raiseAmount = userSaldo;
-                            
-                            updatePot(raiseAmount); // Bandar tidak punya saldo, langsung update pot
-                            dealerCurrentBetInRound += raiseAmount;
-                            dealerAction = `Bandar Raise Rp${raiseAmount.toLocaleString('id-ID')}.`;
-                        } else {
-                            updatePot(amountToCall); // Bandar tidak punya saldo, langsung update pot
-                            dealerCurrentBetInRound += amountToCall;
-                            dealerAction = `Bandar Call Rp${amountToCall.toLocaleString('id-ID')}.`;
-                        }
-                    } else {
-                        dealerAction = 'Bandar Fold!';
-                        gameMessageDisplay.textContent = 'Anda Menang! Bandar Fold.';
-                        endGame('player');
-                        return;
-                    }
-                } else {
-                    if (Math.random() > 0.6 && userSaldo >= minBet) {
-                        let betAmount = minBet;
-                        if (userSaldo < betAmount) betAmount = userSaldo;
-                        
-                        updatePot(betAmount); // Bandar tidak punya saldo, langsung update pot
-                        dealerCurrentBetInRound += betAmount;
-                        dealerAction = `Bandar Bet Rp${betAmount.toLocaleString('id-ID')}.`;
-                    } else {
-                        dealerAction = 'Bandar Check.';
-                    }
-                }
-                gameMessageDisplay.textContent = dealerAction;
-                
-                if (dealerCurrentBetInRound > playerCurrentBetInRound) {
-                    gameMessageDisplay.textContent = 'Bandar bertaruh. Giliran Anda.';
-                    showPlayerActions();
-                } else {
-                    if (gamePhase === 'river') {
-                        showdownBtn.classList.remove('hidden');
-                    } else {
-                        if (gamePhase === 'preflop') nextRoundBtn.textContent = 'Deal Flop (3 Kartu)';
-                        else if (gamePhase === 'flop') nextRoundBtn.textContent = 'Deal Turn (1 Kartu)';
-                        else if (gamePhase === 'turn') nextRoundBtn.textContent = 'Deal River (1 Kartu)';
-                        hideAllActionButtons();
-                        nextRoundBtn.classList.remove('hidden');
-                    }
-                }
-            }, 1500);
-        }
-
-        // --- MAIN GAME FLOW ---
-        startGameBtn.addEventListener('click', async () => {
-            playSound(clickSound); // Suara klik
-            currentBetAmount = parseInt(betAmountInput.value);
-            if (isNaN(currentBetAmount) || currentBetAmount <= 0) {
-                gameMessageDisplay.textContent = 'Taruhan awal harus angka positif.';
-                return;
-            }
-            if (userSaldo < currentBetAmount) {
-                gameMessageDisplay.textContent = 'Saldo tidak cukup untuk taruhan ini.';
-                return;
-            }
-
-            startGameBtn.disabled = true;
-            gameMessageDisplay.textContent = 'Memproses taruhan awal...';
-
-            const success = await updateSaldo(-currentBetAmount);
-            if (!success) {
-                startGameBtn.disabled = false;
-                gameMessageDisplay.textContent = 'Gagal mengurangi saldo untuk taruhan.';
-                return;
-            }
-            playerCurrentBetInRound += currentBetAmount;
-            updatePot(currentBetAmount);
-
-            gameMessageDisplay.textContent = `Anda bertaruh Rp${currentBetAmount.toLocaleString('id-ID')}. Membagikan kartu...`;
-            
-            deck = createDeck();
-            playerHoleCards = [];
-            dealerHoleCards = [];
-            communityCards = [];
-
-            playerHandDiv.innerHTML = '';
-            dealerHandDiv.innerHTML = '';
-            communityCardsDiv.innerHTML = '';
-
-            playerHoleCards.push(deck.pop(), deck.pop());
-            dealerHoleCards.push(deck.pop(), deck.pop());
-
-            playerHoleCards.forEach(card => renderCard(card, playerHandDiv));
-            renderCard(dealerHoleCards[0], dealerHandDiv);
-            renderCard(dealerHoleCards[1], dealerHandDiv, true);
-
-            gamePhase = 'preflop';
-            gameMessageDisplay.textContent = 'Kartu dibagikan. Giliran Anda.';
-            showPlayerActions();
-            
-            betSlider.value = minBet;
-            betAmountInput.value = minBet;
-            betDisplay.textContent = minBet.toLocaleString('id-ID');
-            betSlider.min = minBet;
-            betAmountInput.min = minBet;
-            betSlider.max = userSaldo;
-            betAmountInput.max = userSaldo;
-
-            // Mulai putar musik latar belakang saat game dimulai (interaksi pertama)
-            if (backgroundMusic.paused) {
-                backgroundMusic.play().catch(e => console.warn("Error playing background music:", e.message));
-            }
-        });
-
-        foldBtn.addEventListener('click', async () => {
-            playSound(clickSound); // Suara klik
-            gameMessageDisplay.textContent = 'Anda memilih Fold. Permainan berakhir.';
-            endGame('dealer');
-        });
-
-        checkBtn.addEventListener('click', () => {
-            playSound(clickSound); // Suara klik
-            gameMessageDisplay.textContent = 'Anda Check.';
-            dealerTurn();
-        });
-
-        callBtn.addEventListener('click', async () => {
-            playSound(clickSound); // Suara klik
-            let amountToCall = dealerCurrentBetInRound - playerCurrentBetInRound;
+        if (actionType === 'fold') {
+            gameMessageDisplay.textContent = "Anda Fold! Bandar menang.";
+            handleFold();
+            playerActionTaken = true;
+        } else if (actionType === 'check') {
+            gameMessageDisplay.textContent = "Anda Check.";
+            playerActionTaken = true;
+            // Jika bandar juga check, lanjutkan ke fase berikutnya
+            await proceedToNextPhase();
+        } else if (actionType === 'call') {
+            const amountToCall = currentBet - (pot - minBet); // Jumlah yang perlu di-call
             if (userSaldo < amountToCall) {
-                gameMessageDisplay.textContent = 'Saldo Anda tidak cukup untuk Call!';
+                gameMessageDisplay.textContent = "Saldo tidak cukup untuk Call!";
+                enablePlayerActions(false, true, true); // Re-enable actions
+                startTurnTimer(); // Restart timer
                 return;
             }
-            const success = await updateSaldo(-amountToCall);
-            if (!success) {
-                gameMessageDisplay.textContent = 'Gagal melakukan Call.';
-                return;
-            }
-            playerCurrentBetInRound += amountToCall;
-            updatePot(amountToCall);
+            await updateSaldo(-amountToCall);
+            pot += amountToCall;
+            updatePotDisplay();
             gameMessageDisplay.textContent = `Anda Call Rp${amountToCall.toLocaleString('id-ID')}.`;
+            playerActionTaken = true;
+            await proceedToNextPhase();
+        } else if (actionType === 'raise') {
+            const raiseAmount = parseInt(betAmountInput.value);
+            const totalBet = currentBet + raiseAmount; // Jumlah total taruhan setelah raise
             
-            if (dealerCurrentBetInRound === playerCurrentBetInRound) {
-                if (gamePhase === 'river') {
-                    showdownBtn.classList.remove('hidden');
-                } else {
-                    if (gamePhase === 'preflop') nextRoundBtn.textContent = 'Deal Flop (3 Kartu)';
-                    else if (gamePhase === 'flop') nextRoundBtn.textContent = 'Deal Turn (1 Kartu)';
-                    else if (gamePhase === 'turn') nextRoundBtn.textContent = 'Deal River (1 Kartu)';
-                    hideAllActionButtons();
-                    nextRoundBtn.classList.remove('hidden');
-                }
-            } else {
-                dealerTurn();
-            }
-        });
-
-        betRaiseBtn.addEventListener('click', async () => {
-            playSound(clickSound); // Suara klik
-            let betAmount = parseInt(betAmountInput.value);
-            let amountToPay = betAmount - playerCurrentBetInRound; 
-
-            if (isNaN(betAmount) || betAmount <= dealerCurrentBetInRound) {
-                gameMessageDisplay.textContent = `Taruhan/Raise harus lebih besar dari taruhan bandar (Rp${dealerCurrentBetInRound.toLocaleString('id-ID')}).`;
-                return;
-            }
-            if (userSaldo < amountToPay) {
-                gameMessageDisplay.textContent = 'Saldo tidak cukup untuk taruhan/raise ini.';
-                return;
-            }
-            if (amountToPay < minBet && dealerCurrentBetInRound > 0) {
-                gameMessageDisplay.textContent = `Raise harus minimal Rp${minBet.toLocaleString('id-ID')} di atas taruhan bandar.`;
+            if (raiseAmount <= 0 || raiseAmount < minBet) { // Pastikan raise lebih besar dari minBet
+                gameMessageDisplay.textContent = `Raise minimal Rp${minBet.toLocaleString('id-ID')}.`;
+                enablePlayerActions(true, true, true); // Re-enable actions
+                startTurnTimer(); // Restart timer
                 return;
             }
 
-            const success = await updateSaldo(-amountToPay);
-            if (!success) {
-                gameMessageDisplay.textContent = 'Gagal melakukan taruhan/raise.';
+            if (userSaldo < raiseAmount) {
+                gameMessageDisplay.textContent = "Saldo tidak cukup untuk Raise!";
+                enablePlayerActions(true, true, true); // Re-enable actions
+                startTurnTimer(); // Restart timer
                 return;
-            }
-            playerCurrentBetInRound = betAmount;
-            updatePot(amountToPay);
-
-            gameMessageDisplay.textContent = `Anda ${dealerCurrentBetInRound === 0 ? 'Bet' : 'Raise'} menjadi Rp${betAmount.toLocaleString('id-ID')}.`;
-            dealerTurn();
-        });
-
-        nextRoundBtn.addEventListener('click', () => {
-            playSound(clickSound); // Suara klik
-            hideAllActionButtons();
-            playerCurrentBetInRound = 0;
-            dealerCurrentBetInRound = 0;
-            
-            betSlider.min = minBet;
-            betAmountInput.min = minBet;
-            betSlider.value = minBet;
-            betAmountInput.value = minBet;
-            betDisplay.textContent = minBet.toLocaleString('id-ID');
-            betSlider.max = userSaldo;
-            betAmountInput.max = userSaldo;
-
-            if (gamePhase === 'preflop') {
-                const flopCards = [deck.pop(), deck.pop(), deck.pop()];
-                flopCards.forEach(card => {
-                    communityCards.push(card);
-                    renderCard(card, communityCardsDiv);
-                });
-                gamePhase = 'flop';
-                gameMessageDisplay.textContent = 'Flop sudah dibagikan. Giliran Anda.';
-                showPlayerActions();
-            } else if (gamePhase === 'flop') {
-                const turnCard = deck.pop();
-                communityCards.push(turnCard);
-                renderCard(turnCard, communityCardsDiv);
-                gamePhase = 'turn';
-                gameMessageDisplay.textContent = 'Turn sudah dibagikan. Giliran Anda.';
-                showPlayerActions();
-            } else if (gamePhase === 'turn') {
-                const riverCard = deck.pop();
-                communityCards.push(riverCard);
-                renderCard(riverCard, communityCardsDiv);
-                gamePhase = 'river';
-                gameMessageDisplay.textContent = 'River sudah dibagikan. Giliran Anda.';
-                showPlayerActions();
-            }
-        });
-
-        function getBestHand(holeCards, communityCards) {
-            const allCards = [...holeCards, ...communityCards];
-            let cardsToEvaluate = allCards;
-            if (allCards.length > 5) {
-                cardsToEvaluate.sort((a,b) => b.value - a.value);
-                cardsToEvaluate = cardsToEvaluate.slice(0, 5);
-            } else if (allCards.length < 5) {
-                cardsToEvaluate.sort((a,b) => b.value - a.value);
             }
             
-            const totalValue = cardsToEvaluate.reduce((sum, card) => sum + card.value, 0);
-            return { hand: cardsToEvaluate, totalValue: totalValue };
+            await updateSaldo(-raiseAmount);
+            pot += raiseAmount;
+            currentBet = totalBet; // Update taruhan saat ini
+            updatePotDisplay();
+            gameMessageDisplay.textContent = `Anda Raise menjadi Rp${currentBet.toLocaleString('id-ID')}.`;
+            playerActionTaken = true;
+            // Setelah raise, giliran bandar untuk Call/Fold/Raise
+            await handleDealerAction();
         }
 
-        showdownBtn.addEventListener('click', () => {
-            playSound(clickSound); // Suara klik
-            showdown();
-        });
-
-        async function showdown() {
-            hideAllActionButtons();
-            gameMessageDisplay.textContent = 'Showdown! Mengungkap kartu bandar...';
-            betSliderGroup.classList.add('hidden');
-
-            dealerHandDiv.innerHTML = '';
-            dealerHoleCards.forEach(card => renderCard(card, dealerHandDiv));
-
-            const playerEvaluatedHand = getBestHand(playerHoleCards, communityCards);
-            const dealerEvaluatedHand = getBestHand(dealerHoleCards, communityCards);
-
-            let outcomeMessage = '';
-            let winner = '';
-
-            if (playerEvaluatedHand.totalValue > dealerEvaluatedHand.totalValue) {
-                winner = 'player';
-                outcomeMessage = 'Anda memiliki tangan yang lebih tinggi!';
-            } else if (dealerEvaluatedHand.totalValue > playerEvaluatedHand.totalValue) {
-                winner = 'dealer';
-                outcomeMessage = 'Bandar memiliki tangan yang lebih tinggi!';
-            } else {
-                winner = 'push';
-                outcomeMessage = 'Seri!';
-            }
-
-            gameMessageDisplay.textContent = `Hasil: ${outcomeMessage}`;
-            endGame(winner);
+        // Jika pemain sudah beraksi, nonaktifkan tombol dan siapkan untuk giliran bandar atau fase berikutnya
+        if (playerActionTaken) {
+            disablePlayerActions();
         }
+    }
 
-        async function endGame(winner) {
-            hideAllActionButtons();
-            playAgainBtn.classList.remove('hidden');
-            betSliderGroup.classList.remove('hidden');
 
-            let winnings = 0;
-            if (winner === 'player') {
-                winnings = currentPot;
-                gameMessageDisplay.textContent += ` Selamat! Anda memenangkan Rp${winnings.toLocaleString('id-ID')}.`;
-                await updateSaldo(winnings);
-                playSound(winSound); // Panggil suara menang
-            } else if (winner === 'dealer') {
-                gameMessageDisplay.textContent += ` Anda kalah Rp${currentPot.toLocaleString('id-ID')}.`;
-                playSound(loseSound); // Panggil suara kalah
-            } else if (winner === 'push') {
-                winnings = currentPot / 2;
-                gameMessageDisplay.textContent += ` Seri! Taruhan Anda Rp${winnings.toLocaleString('id-ID')} dikembalikan.`;
-                await updateSaldo(winnings);
+    async function handleDealerAction() {
+        gameMessageDisplay.textContent = "Giliran Bandar...";
+        await new Promise(resolve => setTimeout(resolve, 1500)); // Delay untuk "berpikir"
+
+        // Logika sederhana untuk bandar
+        const dealerCurrentBet = 0; // Asumsi bandar belum bertaruh atau taruhan awal sudah di pot
+        const amountToCall = currentBet - dealerCurrentBet;
+
+        if (amountToCall > (pot * 0.5) || Math.random() < 0.3) { // Dealer mungkin fold jika taruhan terlalu besar atau acak
+            gameMessageDisplay.textContent = "Bandar Fold! Anda menang!";
+            await settleGame(true); // Pemain menang
+        } else {
+            // Bandar Call
+            if (userSaldo >= amountToCall) { // Jika pemain punya cukup saldo untuk dealer call (agar game tidak stuck)
+                gameMessageDisplay.textContent = `Bandar Call Rp${amountToCall.toLocaleString('id-ID')}.`;
+                pot += amountToCall; // Tambahkan taruhan bandar ke pot (simulasi)
+                updatePotDisplay();
+                await proceedToNextPhase();
+            } else {
+                 gameMessageDisplay.textContent = "Bandar tidak bisa Call (saldo pemain tidak cukup). Game berakhir.";
+                 await settleGame(false); // Game berakhir tanpa pemenang jelas (atau pemain menang default)
             }
-            currentPot = 0;
-            currentPotDisplay.textContent = `Rp${currentPot.toLocaleString('id-ID')}`;
         }
+    }
 
-        playAgainBtn.addEventListener('click', () => {
-            playSound(clickSound); // Suara klik
-            resetGameUI();
-            loadUserSaldo();
-        });
+    async function proceedToNextPhase() {
+        await new Promise(resolve => setTimeout(resolve, 1000)); // Delay antar fase
 
-        // --- Bet Slider Logic ---
-        betSlider.oninput = function() {
-            let val = parseInt(this.value);
-            if (val < parseInt(this.min)) val = parseInt(this.min); 
-            betDisplay.textContent = val.toLocaleString('id-ID');
-            betAmountInput.value = val;
-        };
-        betAmountInput.oninput = function() {
-            let value = parseInt(this.value);
-            if (isNaN(value)) value = 0;
-            if (value > userSaldo) value = userSaldo;
-            if (value < parseInt(betSlider.min) && value !== 0) value = parseInt(betSlider.min);
-            if (value > parseInt(betSlider.max)) value = parseInt(betSlider.max);
+        switch (currentPhase) {
+            case 'pre-flop':
+                currentPhase = 'flop';
+                gameMessageDisplay.textContent = "Flop!";
+                dealCommunityCards(3); // Deal 3 kartu flop
+                break;
+            case 'flop':
+                currentPhase = 'turn';
+                gameMessageDisplay.textContent = "Turn!";
+                dealCommunityCards(1); // Deal 1 kartu turn
+                break;
+            case 'turn':
+                currentPhase = 'river';
+                gameMessageDisplay.textContent = "River!";
+                dealCommunityCards(1); // Deal 1 kartu river
+                break;
+            case 'river':
+                currentPhase = 'showdown';
+                gameMessageDisplay.textContent = "Showdown!";
+                await new Promise(resolve => setTimeout(resolve, 1500)); // Delay sebelum showdown
+                revealDealerHand(); // Tampilkan kartu bandar
+                await new Promise(resolve => setTimeout(resolve, 1500));
+                await determineWinner(); // Tentukan pemenang
+                return; // Langsung ke showdown, tidak perlu enable player actions lagi
+        }
+        // Setelah setiap fase, berikan giliran lagi kepada pemain
+        enablePlayerActions(true, true, true); // Pemain bisa Check/Call/Raise di fase berikutnya
+        callBtn.textContent = `Call Rp${currentBet.toLocaleString('id-ID')}`; // Update teks call
+        betSlider.min = currentBet + minBet; // Raise minimal tetap dari minBet
+        betSlider.max = userSaldo;
+        betAmountInput.min = betSlider.min;
+        betAmountInput.max = betSlider.max;
+        betSlider.value = betSlider.min;
+        betAmountInput.value = betSlider.min;
+    }
 
-            this.value = value;
-            betSlider.value = value;
-            betDisplay.textContent = value.toLocaleString('id-ID');
-        };
 
-        // --- Musik Latar Belakang & Tombol ---
-        musicToggleBtn.addEventListener('click', () => {
-            playSound(clickSound); // Suara klik
-            if (backgroundMusic.paused) {
-                backgroundMusic.play().then(() => {
-                    musicToggleBtn.textContent = '🔊 Musik';
-                }).catch(e => console.warn("Error playing background music from toggle:", e.message));
-            } else {
-                backgroundMusic.pause();
-                musicToggleBtn.textContent = '🔇 Musik';
-            }
-        });
+    function dealCommunityCards(count) {
+        for (let i = 0; i < count; i++) {
+            const card = dealCard();
+            communityCards.push(card);
+            displayCard(card, communityCardsDiv);
+        }
+    }
 
-        // Update teks tombol saat musik berstatus play/pause
-        backgroundMusic.addEventListener('play', () => {
-            musicToggleBtn.textContent = '🔊 Musik';
-        });
-        backgroundMusic.addEventListener('pause', () => {
-            musicToggleBtn.textContent = '🔇 Musik';
-        });
+    function revealDealerHand() {
+        dealerHandDiv.innerHTML = ''; // Hapus kartu tertutup
+        displayCard(dealerHand[0], dealerHandDiv);
+        displayCard(dealerHand[1], dealerHandDiv);
+    }
 
-        // Panggil saat halaman dimuat
-        document.addEventListener('DOMContentLoaded', () => {
-            getCurrentUserEmail().then(() => {
-                loadUserSaldo();
-                resetGameUI();
-            }).catch(err => {
-                console.error("Failed to initialize user session for game:", err);
-                gameMessageDisplay.textContent = "Sesi pengguna tidak valid. Silakan login kembali.";
-                startGameBtn.disabled = true;
-                setTimeout(() => {
-                    window.location.href = 'login.html';
-                }, 3000);
-            });
+    // --- WINNING HAND LOGIC (INI HANYA SKELETON, LOGIKA ASLI SANGAT KOMPLEKS) ---
+    // Di game poker asli, Anda akan membandingkan tangan pemain dan dealer
+    // menggunakan 5 kartu terbaik dari 7 kartu (2 tangan + 5 community).
+    // Implementasi lengkap untuk poker hand evaluation (High Card, Pair, Two Pair, etc.)
+    // sangat kompleks dan di luar cakupan contoh ini.
+    // Untuk demo ini, kita akan menggunakan logika pemenang yang sangat sederhana
+    // atau acak.
 
-            // Inisialisasi status tombol musik saat DOMContentLoaded
-            if (backgroundMusic.paused) {
-                musicToggleBtn.textContent = '🔇 Musik';
-            } else {
-                musicToggleBtn.textContent = '🔊 Musik';
-            }
-        });
-            backToProfileBtn.addEventListener('click', () => {
-        playSound(clickSound); // Efek suara klik
-        window.location.href = 'index.html'; // Kembali ke index.html
+    async function determineWinner() {
+                // Logika penentuan pemenang poker sangat kompleks.
+        // Untuk tujuan demo ini, kita akan buat sederhana/acak.
+        // Dalam game nyata, Anda akan menggunakan algoritma untuk mengevaluasi
+        // tangan pemain dan bandar (misalnya, mencari Royal Flush, Straight Flush,
+        // Four of a Kind, Full House, Flush, Straight, Three of a Kind, Two Pair, Pair, High Card).
+
+        await new Promise(resolve => setTimeout(resolve, 2000)); // Delay
+
+        const playerWins = Math.random() < 0.5; // 50% kesempatan pemain menang
+
+        if (playerWins) {
+            gameMessageDisplay.textContent = "Anda menang! Selamat!";
+            playSound(winSound);
+            await updateSaldo(pot); // Pemain mendapatkan pot
+        } else {
+            gameMessageDisplay.textContent = "Bandar menang! Anda kalah.";
+            playSound(loseSound);
+            // Pot tetap di bandar (tidak ada update saldo untuk pemain)
+        }
+        pot = 0; // Reset pot setelah game selesai
+        updatePotDisplay();
+        endGame();
+    }
+
+    // --- FUNGSI AKHIR GAME ---
+
+    async function settleGame(playerWon) {
+        disablePlayerActions();
+        if (playerWon) {
+            gameMessageDisplay.textContent = "Anda menang! Selamat!";
+            playSound(winSound);
+            await updateSaldo(pot); // Pemain mendapatkan pot
+        } else {
+            gameMessageDisplay.textContent = "Bandar menang! Anda kalah.";
+            playSound(loseSound);
+            // Pot tetap di bandar
+        }
+        pot = 0;
+        updatePotDisplay();
+        endGame();
+    }
+
+    function handleFold() {
+        gameMessageDisplay.textContent = "Anda Fold. Bandar menang!";
+        playSound(loseSound);
+        pot = 0; // Pot hilang
+        updatePotDisplay();
+        endGame();
+    }
+
+    function endGame() {
+        gameActive = false;
+        hideAllActionButtons();
+        playAgainBtn.classList.remove('hidden'); // Tampilkan tombol main lagi
+        gameMessageDisplay.textContent += " Main lagi?";
+    }
+
+    function resetGameUI() {
+        gameMessageDisplay.textContent = 'Siap untuk bermain?';
+        clearHands();
+        pot = 0;
+        updatePotDisplay();
+        currentBet = minBet;
+
+        betSlider.value = minBet;
+        betAmountInput.value = minBet;
+        betDisplay.textContent = minBet.toLocaleString('id-ID');
+
+        betSliderGroup.classList.remove('hidden'); // Pastikan slider terlihat
+
+        hideAllActionButtons();
+        startGameBtn.classList.remove('hidden');
+        startGameBtn.disabled = false;
+        startGameBtn.textContent = 'Mulai Taruhan';
+
+        // Atur ulang max slider ke saldo pemain saat UI reset
+        betSlider.max = userSaldo;
+        betAmountInput.max = userSaldo;
+
+        console.log("resetGameUI: betSlider.min =", betSlider.min);
+        console.log("resetGameUI: betSlider.max =", betSlider.max);
+        console.log("resetGameUI: userSaldo =", userSaldo);
+    }
+
+    // --- EVENT LISTENERS ---
+    startGameBtn.addEventListener('click', startGame);
+    foldBtn.addEventListener('click', () => handlePlayerAction('fold'));
+    checkBtn.addEventListener('click', () => handlePlayerAction('check'));
+    callBtn.addEventListener('click', () => handlePlayerAction('call'));
+    betRaiseBtn.addEventListener('click', () => handlePlayerAction('raise'));
+    playAgainBtn.addEventListener('click', () => {
+        playSound(clickSound);
+        resetGameUI();
     });
 
-  </script>
+    backToProfileBtn.addEventListener('click', () => {
+        playSound(clickSound);
+        window.location.href = 'index.html';
+    });
+
+    musicToggleBtn.addEventListener('click', () => {
+        playSound(clickSound);
+        toggleMusic();
+    });
+
+    betSlider.oninput = function() {
+        let val = parseInt(this.value);
+        if (val < parseInt(this.min)) val = parseInt(this.min);
+        if (val > parseInt(this.max)) val = parseInt(this.max); // Batasi berdasarkan max
+        betDisplay.textContent = val.toLocaleString('id-ID');
+        betAmountInput.value = val;
+    };
+    betAmountInput.oninput = function() {
+        let value = parseInt(this.value);
+        if (isNaN(value) || value < 0) value = 0;
+
+        // Batasi input berdasarkan saldo pemain
+        if (value > userSaldo) value = userSaldo;
+        
+        // Batasi berdasarkan min/max slider
+        if (value < parseInt(betSlider.min) && value !== 0) value = parseInt(betSlider.min);
+        if (value > parseInt(betSlider.max)) value = parseInt(betSlider.max);
+
+        this.value = value;
+        betSlider.value = value;
+        betDisplay.textContent = value.toLocaleString('id-ID');
+    };
+
+
+    // --- INISIALISASI ---
+    document.addEventListener('DOMContentLoaded', () => {
+        fetchUserData();
+    });
+
+</script>
 </body>
 </html>
