@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Poker Seru (Player vs. Dealer) - GameZone</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap');
+        body {
+            margin: 0; padding: 0; min-height: 100vh;
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #2c3e50, #34495e);
+            color: #ecf0f1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            box-sizing: border-box;
+            padding: 20px;
+        }
+        .game-container {
+            background: rgba(0, 0, 0, 0.7);
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 0 30px rgba(0, 255, 0, 0.4);
+            text-align: center;
+            max-width: 700px;
+            width: 100%;
+            position: relative; /* Penting untuk positioning avatar */
+        }
+        h1 {
+            color: #27ae60;
+            text-shadow: 0 0 15px rgba(0, 255, 0, 0.7);
+            margin-bottom: 25px;
+        }
+        .info-display {
+            font-size: 1.2em;
+            margin-bottom: 20px;
+            color: #90ee90;
+        }
+        .bet-input-group {
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+        }
+        .bet-input {
+            padding: 10px 15px;
+            border-radius: 8px;
+            border: 1px solid #555;
+            background-color: #333;
+            color: #fff;
+            font-size: 1em;
+            width: 120px;
+            text-align: center;
+        }
+        .game-button {
+            background: #27ae60;
+            border: none;
+            border-radius: 30px;
+            padding: 12px 25px;
+            font-size: 1.1em;
+            font-weight: 700;
+            cursor: pointer;
+            color: #fff;
+            box-shadow: 0 0 15px rgba(0, 255, 0, 0.5);
+            transition: background 0.3s ease, transform 0.2s ease;
+            margin: 0 10px;
+        }
+        .game-button:hover {
+            background: #2ecc71;
+            transform: translateY(-2px);
+        }
+        .game-button:active {
+            transform: translateY(0);
+        }
+        .game-area {
+            background: #1a1a1a;
+            border: 2px solid #555;
+            border-radius: 10px;
+            min-height: 200px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            font-size: 1.5em;
+            color: #bbb;
+            margin-bottom: 30px;
+            padding: 20px;
+            text-align: center;
+        }
+        .card-hand {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin: 15px 0;
+            min-height: 110px; /* Untuk menjaga ruang saat kartu belum ada */
+        }
+        .card {
+            width: 80px;
+            height: 110px;
+            background-color: #fff;
+            border: 1px solid #777;
+            border-radius: 8px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 2em;
+            font-weight: bold;
+            color: #333;
+            box-shadow: 2px 2px 5px rgba(0,0,0,0.3);
+            position: relative;
+        }
+        .card.hidden {
+            background-color: #a00;
+            color: #fff;
+            font-size: 1.5em;
+        }
+        .card .suit {
+            font-size: 0.5em;
+            position: absolute;
+            top: 5px;
+            left: 5px;
+        }
+        .card .suit.bottom {
+            top: auto;
+            bottom: 5px;
+            left: auto;
+            right: 5px;
+            transform: rotate(180deg);
+        }
+        .red-suit { color: red; }
+        .black-suit { color: black; }
+
+        .message {
+            margin-top: 20px;
+            font-weight: bold;
+            color: yellow;
+        }
+        .back-button {
+            background: #e74c3c;
+            margin-top: 30px;
+            padding: 10px 20px;
+            border-radius: 8px;
+            border: none;
+            color: #fff;
+            cursor: pointer;
+            font-size: 1em;
+            transition: background 0.3s ease;
+        }
+        .back-button:hover {
+            background: #c0392b;
+        }
+        .hidden {
+            display: none !important;
+        }
+
+        /* --- NEW CSS for Player/Dealer Avatars --- */
+        .avatar-label {
+            display: flex;
+            align-items: center;
+            justify-content: center; /* Pusatkan teks dan emoji */
+            gap: 8px; /* Jarak antara emoji dan teks */
+            font-size: 1.1em;
+            font-weight: bold;
+            color: #ecf0f1;
+            margin-bottom: 5px; /* Jarak dari kartu */
+        }
+        .avatar-label .emoji {
+            font-size: 1.8em; /* Ukuran emoji */
+            line-height: 1; /* Menghilangkan spasi ekstra di sekitar emoji */
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <h1>Poker ♠️♥️♣️♦️</h1>
+        <div class="info-display">
+            <p>Saldo Anda: <span id="current-saldo">Rp0</span></p>
+        </div>
+
+        <div class="bet-input-group">
+            <label for="bet-amount">Jumlah Taruhan (Rp):</label>
+            <input type="number" id="bet-amount" class="bet-input" value="1000" min="100">
+        </div>
+
+        <div class="game-area">
+            <div class="avatar-label">
+                <span class="emoji">🤖</span>
+                <span id="dealer-label-text">Bandar</span>
+            </div>
+            <div class="card-hand" id="dealer-hand">
+                </div>
+            
+            <div class="avatar-label">
+                <span class="emoji">🧑</span>
+                <span id="player-label-text">Anda</span>
+            </div>
+            <div class="card-hand" id="player-hand">
+                </div>
+            
+            <p id="game-status">Siap untuk bermain?</p>
+        </div>
+
+        <div>
+            <button class="game-button" id="start-game-btn">Mulai Taruhan</button>
+            <button class="game-button" id="reveal-cards-btn" class="hidden">Lihat Kartu</button>
+            <button class="game-button" id="play-again-btn" class="hidden">Main Lagi</button>
+        </div>
+
+        <p class="message" id="game-message"></p>
+    </div>
+
+    <button class="back-button" onclick="window.location.href='index.html'">Kembali ke Profil</button>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+        // Inisialisasi Supabase client (PASTIKAN URL dan ANON_KEY SAMA DENGAN index.html ANDA)
+        const supabase = window.supabase.createClient(
+            'https://vqmfachxnjyxwuavpgds.supabase.co',
+            'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZxbWZhY2h4bmp5eHd1YXZwZ2RzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDg0MDYxNDAsImexZCI6MjA2Mzk4MjE0MH0.Bzr8mUiEl8MzRWpVQ3_59eFxKk0EWZ3ca-4IEcpGLkk'
+        );
+
+        let uid = localStorage.getItem('uid'); // Ambil UID dari localStorage
+
+        const currentSaldoDisplay = document.getElementById('current-saldo');
+        const betAmountInput = document.getElementById('bet-amount');
+        const startGameBtn = document.getElementById('start-game-btn');
+        const revealCardsBtn = document.getElementById('reveal-cards-btn');
+        const playAgainBtn = document.getElementById('play-again-btn');
+        const gameStatusDisplay = document.getElementById('game-status');
+        const gameMessageDisplay = document.getElementById('game-message');
+        const playerHandDiv = document.getElementById('player-hand');
+        const dealerHandDiv = document.getElementById('dealer-hand');
+
+        let userSaldo = 0;
+        let currentBet = 0;
+
+        // --- Data Kartu ---
+        const suits = ['♠', '♥', '♦', '♣']; // Spade, Heart, Diamond, Club
+        const ranks = ['2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K', 'A'];
+
+        function createDeck() {
+            let deck = [];
+            for (let suit of suits) {
+                for (let rank of ranks) {
+                    deck.push({ rank, suit });
+                }
+            }
+            return shuffleDeck(deck);
+        }
+
+        function shuffleDeck(deck) {
+            for (let i = deck.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [deck[i], deck[j]] = [deck[j], deck[i]]; // Swap
+            }
+            return deck;
+        }
+
+        function getCardValue(card) {
+            if (card.rank === 'A') return 14; // Ace high for simplicity
+            if (card.rank === 'K') return 13;
+            if (card.rank === 'Q') return 12;
+            if (card.rank === 'J') return 11;
+            return parseInt(card.rank);
+        }
+
+        // Fungsi untuk membandingkan dua kartu (untuk menentukan tangan)
+        function compareHands(hand1, hand2) {
+            const sortedHand1 = hand1.map(getCardValue).sort((a, b) => a - b);
+            const sortedHand2 = hand2.map(getCardValue).sort((a, b) => a - b);
+
+            const val1_1 = sortedHand1[1];
+            const val1_0 = sortedHand1[0];
+            const val2_1 = sortedHand2[1];
+            const val2_0 = sortedHand2[0];
+
+            if (val1_1 > val2_1) return 'player';
+            if (val2_1 > val1_1) return 'dealer';
+
+            if (val1_0 > val2_0) return 'player';
+            if (val2_0 > val1_0) return 'dealer';
+
+            return 'push'; // Seri
+        }
+
+        function renderCard(card, isHidden = false) {
+            const cardDiv = document.createElement('div');
+            cardDiv.classList.add('card');
+            if (isHidden) {
+                cardDiv.classList.add('hidden');
+                cardDiv.textContent = '?';
+            } else {
+                cardDiv.innerHTML = `<span class="suit ${card.suit === '♥' || card.suit === '♦' ? 'red-suit' : 'black-suit'}">${card.suit}</span>` +
+                                    card.rank +
+                                    `<span class="suit bottom ${card.suit === '♥' || card.suit === '♦' ? 'red-suit' : 'black-suit'}">${card.suit}</span>`;
+            }
+            return cardDiv;
+        }
+
+        // --- Supabase & Saldo Functions ---
+        async function getCurrentUserEmail() {
+            const { data: { user }, error } = await supabase.auth.getUser();
+            if (error) {
+                console.error('Error fetching user from Supabase auth:', error.message);
+                return null;
+            }
+            if (user && uid !== user.id) {
+                uid = user.id;
+                localStorage.setItem('uid', user.id);
+            }
+            return user ? user.email : null;
+        }
+
+        async function loadUserSaldo() {
+            if (!uid) {
+                gameMessageDisplay.textContent = 'Anda harus login untuk bermain.';
+                startGameBtn.disabled = true;
+                return;
+            }
+
+            const { data, error } = await supabase
+                .from('users_data')
+                .select('saldo')
+                .eq('user_id', uid)
+                .single();
+
+            if (error && error.code !== 'PGRST116') {
+                console.error('Error loading user saldo:', error.message);
+                gameMessageDisplay.textContent = 'Gagal memuat saldo.';
+                startGameBtn.disabled = true;
+            } else if (error && error.code === 'PGRST116') {
+                userSaldo = 0;
+                currentSaldoDisplay.textContent = `Rp${userSaldo.toLocaleString('id-ID')}`;
+                const { error: insertError } = await supabase
+                    .from('users_data')
+                    .insert([{ user_id: uid, saldo: 0 }]);
+                if (insertError) {
+                    console.error('Error creating initial saldo entry:', insertError.message);
+                }
+            } else {
+                userSaldo = data.saldo || 0;
+                currentSaldoDisplay.textContent = `Rp${userSaldo.toLocaleString('id-ID')}`;
+                startGameBtn.disabled = false;
+            }
+        }
+
+        async function updateSaldo(amountChange) {
+            if (!uid) {
+                console.error('UID tidak ditemukan, tidak bisa update saldo.');
+                return false;
+            }
+
+            const newSaldo = userSaldo + amountChange;
+            
+            const { error } = await supabase
+                .from('users_data')
+                .update({ saldo: newSaldo })
+                .eq('user_id', uid);
+
+            if (error) {
+                console.error('Error updating saldo:', error.message);
+                gameMessageDisplay.textContent = 'Gagal update saldo di server.';
+                return false;
+            } else {
+                userSaldo = newSaldo;
+                currentSaldoDisplay.textContent = `Rp${userSaldo.toLocaleString('id-ID')}`;
+                return true;
+            }
+        }
+
+        // --- Game Logic ---
+        let deck;
+        let playerHand = [];
+        let dealerHand = [];
+
+        function resetGameUI() {
+            playerHandDiv.innerHTML = '';
+            dealerHandDiv.innerHTML = '';
+            gameStatusDisplay.textContent = 'Siap untuk bermain?';
+            gameMessageDisplay.textContent = '';
+            betAmountInput.disabled = false;
+            startGameBtn.classList.remove('hidden');
+            revealCardsBtn.classList.add('hidden');
+            playAgainBtn.classList.add('hidden');
+            startGameBtn.textContent = 'Mulai Taruhan';
+            startGameBtn.disabled = false;
+        }
+
+        startGameBtn.addEventListener('click', async () => {
+            currentBet = parseInt(betAmountInput.value);
+
+            if (isNaN(currentBet) || currentBet <= 0) {
+                gameMessageDisplay.textContent = 'Taruhan harus angka positif.';
+                return;
+            }
+            if (userSaldo < currentBet) {
+                gameMessageDisplay.textContent = 'Saldo tidak cukup untuk taruhan ini.';
+                return;
+            }
+
+            startGameBtn.disabled = true;
+            gameMessageDisplay.textContent = 'Memproses taruhan...';
+
+            const success = await updateSaldo(-currentBet);
+            if (!success) {
+                startGameBtn.disabled = false;
+                gameMessageDisplay.textContent = 'Gagal mengurangi saldo untuk taruhan.';
+                return;
+            }
+
+            gameMessageDisplay.textContent = `Anda bertaruh Rp${currentBet.toLocaleString('id-ID')}. Membagikan kartu...`;
+            betAmountInput.disabled = true;
+
+            deck = createDeck();
+            playerHand = [];
+            dealerHand = [];
+
+            // Bagikan kartu
+            playerHand.push(deck.pop(), deck.pop());
+            dealerHand.push(deck.pop(), deck.pop());
+
+            playerHandDiv.innerHTML = '';
+            playerHand.forEach(card => playerHandDiv.appendChild(renderCard(card)));
+
+            dealerHandDiv.innerHTML = '';
+            dealerHandDiv.appendChild(renderCard(dealerHand[0]));
+            dealerHandDiv.appendChild(renderCard(dealerHand[1], true)); // Kartu kedua bandar tersembunyi
+
+            gameStatusDisplay.textContent = 'Kartu sudah dibagikan. Tekan "Lihat Kartu"';
+            startGameBtn.classList.add('hidden');
+            revealCardsBtn.classList.remove('hidden');
+        });
+
+        revealCardsBtn.addEventListener('click', async () => {
+            revealCardsBtn.disabled = true;
+            gameMessageDisplay.textContent = 'Mengungkap kartu...';
+
+            dealerHandDiv.innerHTML = '';
+            dealerHand.forEach(card => dealerHandDiv.appendChild(renderCard(card)));
+
+            const winner = compareHands(playerHand, dealerHand);
+            let outcomeMessage = '';
+            let winnings = 0;
+
+            if (winner === 'player') {
+                winnings = currentBet * 2;
+                outcomeMessage = `Selamat! Anda menang! Anda mendapatkan Rp${winnings.toLocaleString('id-ID')}.`;
+                await updateSaldo(winnings);
+            } else if (winner === 'dealer') {
+                outcomeMessage = `Bandar menang. Anda kalah Rp${currentBet.toLocaleString('id-ID')}.`;
+            } else { // push
+                winnings = currentBet;
+                outcomeMessage = `Seri! Taruhan Anda Rp${winnings.toLocaleString('id-ID')} dikembalikan.`;
+                await updateSaldo(winnings);
+            }
+            
+            gameStatusDisplay.textContent = `Pemenang: ${winner.toUpperCase()}!`;
+            gameMessageDisplay.textContent = outcomeMessage;
+            
+            revealCardsBtn.classList.add('hidden');
+            playAgainBtn.classList.remove('hidden');
+            playAgainBtn.disabled = false;
+        });
+
+        playAgainBtn.addEventListener('click', () => {
+            resetGameUI();
+            loadUserSaldo();
+        });
+
+
+        // Panggil saat halaman dimuat
+        document.addEventListener('DOMContentLoaded', () => {
+            getCurrentUserEmail().then(() => {
+                loadUserSaldo();
+                resetGameUI();
+            }).catch(err => {
+                console.error("Failed to initialize user session for game:", err);
+                gameMessageDisplay.textContent = "Sesi pengguna tidak valid. Silakan login kembali.";
+                startGameBtn.disabled = true;
+                setTimeout(() => {
+                    window.location.href = 'login.html';
+                }, 3000);
+            });
+        });
+    </script>
+</body>
+</html>
