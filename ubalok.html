@@ -1,0 +1,864 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Susun Balok Super Saldo</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+    <style>
+        /* style.css content goes here */
+        :root {
+            --primary-color: #FF6B6B; /* Merah untuk Saldo & Error */
+            --secondary-color: #5E6BFF; /* Biru untuk Background Gradien */
+            --tertiary-color: #6BFF6B; /* Hijau untuk Sukses & Skor */
+            --accent-color: #00FFFF; /* Cyan untuk Judul & Border */
+            --text-light: #fff;
+            --text-dark: #000;
+            --canvas-bg: #1a1a1a; /* Background area permainan */
+            --border-glow: #00FFFF; /* Border luar game container */
+            --button-bg: #00FFFF; /* Warna tombol default */
+            --button-active: #00BFFF; /* Warna tombol saat ditekan */
+        }
+
+        body {
+            margin: 0;
+            overflow: hidden; /* Sembunyikan scrollbar jika canvas melebihi viewport */
+            font-family: 'Press Start 2P', cursive; /* Gunakan font Press Start 2P */
+            color: var(--text-light);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            /* Background gradien animasi */
+            background: linear-gradient(45deg, var(--primary-color), var(--secondary-color), var(--tertiary-color), var(--primary-color));
+            background-size: 400% 400%;
+            animation: gradientAnimation 15s ease infinite;
+            padding: 10px;
+            box-sizing: border-box;
+            user-select: none; /* Mencegah seleksi teks */
+            -webkit-touch-callout: none; /* iOS Safari */
+            -webkit-user-select: none; /* Safari */
+            -khtml-user-select: none; /* Konqueror HTML */
+            -moz-user-select: none; /* Old versions of Firefox */
+            -ms-user-select: none; /* Internet Explorer/Edge */
+        }
+
+        @keyframes gradientAnimation {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* Animasi untuk perubahan saldo */
+        @keyframes balance-gain {
+            0% { transform: scale(1); color: var(--primary-color); }
+            50% { transform: scale(1.3); color: var(--tertiary-color); text-shadow: 0 0 10px var(--tertiary-color); }
+            100% { transform: scale(1); color: var(--primary-color); text-shadow: none; }
+        }
+
+        @keyframes balance-loss {
+            0% { transform: scale(1); color: var(--primary-color); }
+            50% { transform: scale(1.3); color: #FF4444; text-shadow: 0 0 10px #FF4444; } /* Merah yang lebih menonjol */
+            100% { transform: scale(1); color: var(--primary-color); text-shadow: none; }
+        }
+
+        .game-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background-color: rgba(0, 0, 0, 0.7); /* Background transparan */
+            padding: 0px;
+            border-radius: 15px;
+            box-shadow: 0 0 30px rgba(0, 255, 255, 0.7); /* Efek glow */
+            border: 3px solid var(--border-glow);
+            width: 100%;
+            max-width: 400px;
+            box-sizing: border-box;
+        }
+
+        .game-info {
+            text-align: center;
+            margin-bottom: 20px;
+            width: 100%;
+        }
+
+        h1 {
+            color: var(--accent-color);
+            text-shadow: 0 0 10px var(--accent-color);
+            font-size: 1.8em;
+            margin-bottom: 10px;
+        }
+
+        .info-item {
+            font-size: 1em;
+            margin: 5px 0;
+            white-space: nowrap; /* Mencegah teks pecah baris */
+        }
+        .info-item #score {
+            color: var(--tertiary-color);
+            font-weight: bold;
+        }
+        .info-item #balance {
+            color: var(--primary-color); /* Warna default saldo */
+            font-weight: bold;
+            font-size: 1.2em;
+            display: inline-block; /* Penting untuk animasi scale */
+            transition: color 0.1s ease-out; /* Transisi warna lebih halus */
+        }
+        /* Class untuk mengaktifkan animasi saldo */
+        .info-item #balance.animate-gain {
+            animation: balance-gain 0.5s ease-out;
+        }
+        .info-item #balance.animate-loss {
+            animation: balance-loss 0.5s ease-out;
+        }
+
+
+        canvas {
+            background-color: var(--canvas-bg);
+            border: 5px solid var(--accent-color);
+            border-radius: 8px;
+            box-shadow: 0 0 20px rgba(0, 255, 255, 0.5);
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        .controls {
+            display: grid;
+            grid-template-areas:
+                ". rotate ."
+                "left softdrop right"
+            ;
+            grid-template-columns: 1fr 1fr 1fr; /* Lebar kolom yang sama */
+            gap: 10px; /* Jarak antar tombol */
+            width: 100%;
+            margin-top: 20px;
+        }
+
+        .controls button {
+            background-color: var(--button-bg);
+            color: var(--text-dark);
+            border: none;
+            padding: 15px 0;
+            font-size: 1.5em;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.1s ease, box-shadow 0.1s ease;
+            font-weight: bold;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 60px; /* Tinggi tetap untuk tombol */
+            box-shadow: 0 4px 0 var(--button-active); /* Efek 3D */
+            -webkit-tap-highlight-color: transparent; /* Hilangkan highlight di Android saat tap */
+        }
+
+        .controls button:active {
+            background-color: var(--button-active);
+            transform: translateY(2px); /* Tombol sedikit ke bawah */
+            box-shadow: 0 2px 0 var(--button-active); /* Shadow berkurang */
+        }
+
+        /* Penempatan tombol di grid */
+        #moveLeftBtn { grid-area: left; }
+        #rotateBtn { grid-area: rotate; }
+        #moveRightBtn { grid-area: right; }
+        #softDropBtn { grid-area: softdrop; }
+
+        #backToProfileBtn {
+            margin-top: 20px;
+            width: 100%;
+            background-color: #FFD700; /* Warna emas/kuning untuk tombol profil */
+            color: #333;
+            font-size: 1.2em;
+            padding: 15px 25px;
+            border-radius: 8px;
+            cursor: pointer;
+            border: none;
+            box-shadow: 0 4px 0 #CCAA00;
+            transition: background-color 0.3s ease, transform 0.1s ease, box-shadow 0.1s ease;
+        }
+
+        #backToProfileBtn:active {
+            background-color: #CCAA00;
+            transform: translateY(2px);
+            box-shadow: 0 2px 0 #997A00;
+        }
+
+
+        .message-area {
+            margin-top: 15px;
+            font-size: 1em;
+            font-weight: bold;
+            color: var(--text-light);
+            min-height: 25px; /* Agar tidak 'meloncat' saat pesan muncul/hilang */
+            text-shadow: 0 0 5px rgba(0,0,0,0.5);
+        }
+        .message-area.info {
+            color: var(--accent-color);
+        }
+        .message-area.success {
+            color: var(--tertiary-color);
+        }
+        .message-area.error {
+            color: var(--primary-color);
+        }
+
+        /* Media Queries untuk Layar Ponsel */
+        @media (max-width: 600px) {
+            .game-container {
+                width: 98%;
+                padding: 10px;
+                border-radius: 10px;
+            }
+
+            h1 {
+                font-size: 1.3em;
+            }
+
+            .info-item {
+                font-size: 0.9em;
+            }
+            .info-item #balance {
+                font-size: 1.1em;
+            }
+
+            .controls button {
+                padding: 10px 0;
+                font-size: 1.2em;
+                height: 50px;
+                border-radius: 6px;
+            }
+            .message-area {
+                font-size: 0.9em;
+            }
+            #backToProfileBtn {
+                font-size: 1em;
+                padding: 12px 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <div class="game-info">
+            <h1>Susun Balok Ajaib</h1>
+            <p class="info-item">Skor: <span id="score">0</span></p>
+            <p class="info-item">Saldo: <span id="balance">Memuat...</span></p>
+        </div>
+        <canvas id="gameCanvas"></canvas>
+        <div class="controls">
+            <button id="moveLeftBtn" class="control-btn">←</button>
+            <button id="rotateBtn" class="control-btn">↻</button>
+            <button id="moveRightBtn" class="control-btn">→</button>
+            <button id="softDropBtn" class="control-btn">↓</button>
+        </div>
+        <button id="backToProfileBtn" style="display:none;">Kembali ke Profil</button>
+        <div id="message-area" class="message-area"></div>
+    </div>
+
+    <audio id="clickSound" src="https://vqmfachxnjyxwuavpgds.supabase.co/storage/v1/object/public/music//mixkit-game-ball-tap-2073.mp3" preload="auto"></audio>
+    <audio id="lineClearSound" src="https://vqmfachxnjyxwuavpgds.supabase.co/storage/v1/object/public/music//mixkit-mechanical-crate-pick-up-3154%20(1).mp3" preload="auto"></audio>
+    <audio id="backgroundMusic" src="https://vqmfachxnjyxwuavpgds.supabase.co/storage/v1/object/public/music//dj-background-music-background-music-free-music-music-free-for-use-221916%20(1).mp3" preload="auto" loop></audio>
+
+    <script>
+      
+        const SUPABASE_URL = 'https://vqmfachxnjyxwuavpgds.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZxbWZhY2h4bmp5eHd1YXZwZ2RzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDg0MDYxNDAsImV4cCI6MjA2Mzk4MjE0MH0.Bzr8mUiEl8MzRWpVQ3_59eFxKk0EWZ3ca-4IEcpGLkk';
+        const supabase = Supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+      
+
+        // Dapatkan elemen-elemen DOM
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        const scoreDisplay = document.getElementById('score');
+        const balanceDisplay = document.getElementById('balance');
+        const messageArea = document.getElementById('message-area');
+
+        // Dapatkan tombol kontrol
+        const moveLeftBtn = document.getElementById('moveLeftBtn');
+        const rotateBtn = document.getElementById('rotateBtn');
+        const moveRightBtn = document.getElementById('moveRightBtn');
+        const softDropBtn = document.getElementById('softDropBtn');
+        const backToProfileBtn = document.getElementById('backToProfileBtn'); // Tombol kembali ke profil
+
+        // Konfigurasi Game Board
+        const TILE_SIZE = 25; // Ukuran setiap "kotak" balok (piksel)
+        const BOARD_WIDTH = 10; // Lebar papan (jumlah kotak)
+        const BOARD_HEIGHT = 20; // Tinggi papan (jumlah kotak)
+
+        
+        canvas.width = BOARD_WIDTH * TILE_SIZE;
+        canvas.height = BOARD_HEIGHT * TILE_SIZE;
+
+        // Variabel Game State
+        let score = 0; // Skor internal game
+        let currentBalance = 0; // Saldo pemain, akan disinkronkan dengan Supabase
+        let currentUser = null; // Objek user Supabase yang sedang login
+        let board = Array(BOARD_HEIGHT).fill(null).map(() => Array(BOARD_WIDTH).fill(0)); // Papan permainan
+        let currentPiece = null; // Balok yang sedang jatuh
+        let currentX = 0; // Posisi X balok saat ini
+        let currentY = 0; // Posisi Y balok saat ini
+
+        // Dapatkan elemen audio
+        const clickSound = document.getElementById('clickSound');
+        const lineClearSound = document.getElementById('lineClearSound');
+        const backgroundMusic = document.getElementById('backgroundMusic');
+
+        // Fungsi untuk memutar suara
+        function playSound(audioElement) {
+            if (audioElement) {
+                audioElement.currentTime = 0; // Mengatur ulang suara ke awal
+                audioElement.play().catch(e => console.error("Error playing sound:", e));
+            }
+        }
+
+        // Fungsi untuk memulai musik latar
+        function playBackgroundMusic() {
+            if (backgroundMusic && backgroundMusic.paused) {
+                backgroundMusic.play().catch(e => {
+                    console.warn("Autoplay of background music blocked. User interaction required.");
+                });
+            }
+        }
+
+        // Definisi bentuk balok (Tetromino) dan propertinya
+        const TETROMINOS = [
+            {
+                shape: [[0, 1, 0], [1, 1, 1], [0, 0, 0]], // T
+                color: '#FF00FF', // Magenta
+                cost: 5, // Biaya saat balok ini muncul
+                clear_value_per_block: 1 // Saldo per kotak saat baris pecah
+            },
+            {
+                shape: [[1, 1, 0], [0, 1, 1], [0, 0, 0]], // S
+                color: '#00FF00', // Hijau
+                cost: 4,
+                clear_value_per_block: 1
+            },
+            {
+                shape: [[0, 1, 1], [1, 1, 0], [0, 0, 0]], // Z
+                color: '#FF0000', // Merah
+                cost: 4,
+                clear_value_per_block: 1
+            },
+            {
+                shape: [[1, 1], [1, 1]], // O
+                color: '#FFFF00', // Kuning
+                cost: 3,
+                clear_value_per_block: 1
+            },
+            {
+                shape: [[1, 0, 0], [1, 1, 1], [0, 0, 0]], // L
+                color: '#FFA500', // Oranye
+                cost: 5,
+                clear_value_per_block: 1
+            },
+            {
+                shape: [[0, 0, 1], [1, 1, 1], [0, 0, 0]], // J
+                color: '#0000FF', // Biru
+                cost: 5,
+                clear_value_per_block: 1
+            },
+            {
+                shape: [[1], [1], [1], [1]], // I
+                color: '#00FFFF', // Cyan
+                cost: 6,
+                clear_value_per_block: 1
+            }
+        ];
+
+        // --- Fungsi Helper UI ---
+        function showMessage(msg, type = 'info') {
+            messageArea.textContent = msg;
+            messageArea.className = `message-area ${type}`;
+            setTimeout(() => {
+                messageArea.textContent = '';
+                messageArea.className = `message-area`;
+            }, 3000);
+        }
+
+        // Fungsi untuk mengaktifkan animasi pada saldo display
+        function addBalanceAnimation(type) {
+            balanceDisplay.classList.remove('animate-gain', 'animate-loss'); // Hapus class sebelumnya
+            // Trick untuk me-trigger reflow agar animasi bisa diulang
+            void balanceDisplay.offsetWidth;
+            balanceDisplay.classList.add(`animate-${type}`);
+        }
+
+        // --- Supabase Integration Functions ---
+
+        // Mendapatkan informasi user yang sedang login
+        async function getUser() {
+            try {
+                const { data: { user } } = await supabase.auth.getUser();
+                currentUser = user;
+                if (currentUser) {
+                    console.log('User logged in:', currentUser.id);
+                    fetchSaldo(); // Ambil saldo setelah user teridentifikasi
+                } else {
+                    console.warn('No user logged in. Playing as guest.');
+                    // Untuk mode tamu, set saldo default dan langsung mulai game
+                    currentBalance = 500; // Saldo awal default untuk user tamu
+                    balanceDisplay.textContent = currentBalance;
+                    showMessage('Bermain dalam mode tamu (saldo default).', 'info');
+                    startGame(); // Mulai game untuk user tamu
+                }
+            } catch (error) {
+                console.error('Error getting user:', error.message);
+                showMessage('Gagal mendapatkan user info. Bermain dengan saldo default.', 'error');
+                currentBalance = 500;
+                balanceDisplay.textContent = currentBalance;
+                startGame(); // Mulai game meskipun ada error di fetch user
+            }
+        }
+          // Mengambil saldo dari Supabase
+        async function fetchSaldo() {
+            if (!currentUser) {
+                showMessage('Error: User tidak ditemukan untuk mengambil saldo.', 'error');
+                return;
+            }
+            showMessage('Memuat saldo...', 'info');
+            try {
+                const { data, error } = await supabase
+                    .from('users_data') // Nama tabel Anda di Supabase
+                    .select('saldo')
+                    .eq('user_id', currentUser.id)
+                    .single();
+
+                if (error) {
+                    console.error('Error fetching saldo:', error.message);
+                    if (error.code === 'PGRST116') { // Kode untuk "No rows found"
+                         console.log('User entry not found in users_data. Creating new entry...');
+                         await createNewUserEntryWithDefaultSaldo(currentUser.id, currentUser.email || currentUser.phone || 'Guest');
+                         await fetchSaldo(); // Coba fetch lagi setelah membuat entry baru
+                    } else {
+                        showMessage(`Gagal memuat saldo: ${error.message}`, 'error');
+                    }
+                    return;
+                }
+
+                if (data) {
+                    currentBalance = data.saldo || 0;
+                    balanceDisplay.textContent = currentBalance;
+                    showMessage('Saldo dimuat!', 'success');
+                    console.log('Saldo fetched:', currentBalance);
+                    if (currentBalance > 0) {
+                        startGame();
+                    } else {
+                        showMessage('Saldo Anda 0. Top up untuk bermain!', 'error');
+                        gameOver(); // Game Over jika saldo 0 saat dimuat
+                    }
+                } else {
+                    showMessage('Saldo tidak ditemukan untuk user ini. Mungkin user baru.', 'info');
+                    await createNewUserEntryWithDefaultSaldo(currentUser.id, currentUser.email || currentUser.phone || 'Guest');
+                    await fetchSaldo(); // Coba fetch lagi
+                }
+
+            } catch (err) {
+                console.error('Unexpected error in fetchSaldo:', err);
+                showMessage('Terjadi kesalahan tak terduga saat memuat saldo.', 'error');
+            }
+        }
+
+        // Membuat entry user baru di tabel 'users_data' jika belum ada
+        async function createNewUserEntryWithDefaultSaldo(userId, email, username) {
+            const DEFAULT_STARTING_SALDO = 500; // Saldo awal untuk user baru
+
+            try {
+                const { data, error } = await supabase
+                    .from('users_data')
+                    .insert([
+                        { user_id: userId, saldo: DEFAULT_STARTING_SALDO, email: email, username: username, peran: 'Players_Guest' }
+                    ]);
+
+                if (error) {
+                    console.error('Error creating new user entry:', error.message);
+                    showMessage(`Gagal membuat entry user baru: ${error.message}`, 'error');
+                    return false;
+                }
+                console.log('New user entry created with default saldo:', DEFAULT_STARTING_SALDO);
+                currentBalance = DEFAULT_STARTING_SALDO;
+                balanceDisplay.textContent = currentBalance;
+                showMessage('User baru dibuat dengan saldo awal!', 'success');
+                return true;
+            } catch (err) {
+                console.error('Unexpected error in createNewUserEntryWithDefaultSaldo:', err);
+                showMessage('Terjadi kesalahan tak terduga saat membuat user baru.', 'error');
+                return false;
+            }
+        }
+
+        // Memperbarui saldo di Supabase (dengan debounce)
+        let updateSaldoTimeout;
+        async function updateSaldo() {
+            if (!currentUser) { // Jangan update jika tidak ada user login
+                console.warn('Cannot update saldo: No user logged in (guest mode).');
+                return;
+            }
+
+            clearTimeout(updateSaldoTimeout); // Hapus timer sebelumnya
+            updateSaldoTimeout = setTimeout(async () => {
+                try {
+                    const { data, error } = await supabase
+                        .from('users_data')
+                        .update({ saldo: currentBalance })
+                        .eq('user_id', currentUser.id);
+
+                    if (error) {
+                        console.error('Error updating saldo:', error.message);
+                        showMessage(`Gagal update saldo: ${error.message}`, 'error');
+                        return;
+                    }
+                    console.log('Saldo updated successfully to DB:', currentBalance);
+                } catch (err) {
+                    console.error('Unexpected error in updateSaldo:', err);
+                    showMessage('Terjadi kesalahan tak terduga saat update saldo.', 'error');
+                }
+            }, 500); // Tunggu 500ms sebelum mengirim update ke DB
+        }
+
+        // --- Fungsi Game Logic ---
+
+        function getRandomPiece() {
+            const randomIndex = Math.floor(Math.random() * TETROMINOS.length);
+            return JSON.parse(JSON.stringify(TETROMINOS[randomIndex])); // Deep copy agar tidak mengubah objek asli
+        }
+
+        // Menggambar papan permainan
+        function drawBoard() {
+            for (let row = 0; row < BOARD_HEIGHT; row++) {
+                for (let col = 0; col < BOARD_WIDTH; col++) {
+                    if (board[row][col] !== 0) {
+                        ctx.fillStyle = board[row][col].color;
+                        ctx.fillRect(col * TILE_SIZE, row * TILE_SIZE, TILE_SIZE, TILE_SIZE);
+                        ctx.strokeStyle = '#333';
+                        ctx.strokeRect(col * TILE_SIZE, row * TILE_SIZE, TILE_SIZE, TILE_SIZE);
+                    } else {
+                        ctx.fillStyle = '#1a1a1a'; // Warna latar belakang sel kosong
+                        ctx.fillRect(col * TILE_SIZE, row * TILE_SIZE, TILE_SIZE, TILE_SIZE);
+                        ctx.strokeStyle = '#222';
+                        ctx.strokeRect(col * TILE_SIZE, row * TILE_SIZE, TILE_SIZE, TILE_SIZE);
+                    }
+                }
+            }
+        }
+        // Menggambar balok yang sedang jatuh
+        function drawPiece(piece, x, y) {
+            if (!piece) return;
+            for (let row = 0; row < piece.shape.length; row++) {
+                for (let col = 0; col < piece.shape[row].length; col++) {
+                    if (piece.shape[row][col]) {
+                        ctx.fillStyle = piece.color;
+                        ctx.fillRect((x + col) * TILE_SIZE, (y + row) * TILE_SIZE, TILE_SIZE, TILE_SIZE);
+                        ctx.strokeStyle = '#333';
+                        ctx.strokeRect((x + col) * TILE_SIZE, (y + row) * TILE_SIZE, TILE_SIZE, TILE_SIZE);
+                    }
+                }
+            }
+        }
+
+        // Mengecek apakah gerakan valid (tidak keluar batas atau menabrak balok lain)
+        function isValidMove(piece, newX, newY) {
+            for (let row = 0; row < piece.shape.length; row++) {
+                for (let col = 0; col < piece.shape[row].length; col++) {
+                    if (piece.shape[row][col]) {
+                        const boardX = newX + col;
+                        const boardY = newY + row;
+
+                        // Cek batas samping dan bawah
+                        if (boardX < 0 || boardX >= BOARD_WIDTH || boardY >= BOARD_HEIGHT) {
+                            return false;
+                        }
+                        // Cek tabrakan dengan balok yang sudah menempel di papan
+                        // Pastikan tidak mengecek di luar batas atas board (boardY < 0)
+                        if (boardY >= 0 && board[boardY][boardX] !== 0) {
+                            return false;
+                        }
+                    }
+                }
+            }
+            return true;
+        }
+
+        // Menempatkan balok ke papan setelah tidak bisa bergerak lagi
+        function placePiece() {
+            for (let row = 0; row < currentPiece.shape.length; row++) {
+                for (let col = 0; col < currentPiece.shape[row].length; col++) {
+                    if (currentPiece.shape[row][col]) {
+                        // Game Over jika balok menumpuk di atas (melebihi batas atas)
+                        if (currentY + row < 0) {
+                            gameOver();
+                            return;
+                        }
+                        // Simpan properti balok (warna dan nilai) ke papan
+                        board[currentY + row][currentX + col] = {
+                            color: currentPiece.color,
+                            clear_value_per_block: currentPiece.clear_value_per_block
+                        };
+                    }
+                }
+            }
+            clearLines(); // Cek dan bersihkan baris penuh
+            createNewPiece(); // Buat balok baru
+        }
+
+        // Memutar bentuk balok
+        function rotatePiece(piece) {
+            const newShape = Array(piece.shape[0].length).fill(null).map(() => Array(piece.shape.length).fill(0));
+            for (let row = 0; row < piece.shape.length; row++) {
+                for (let col = 0; col < piece.shape[row].length; col++) {
+                    newShape[col][piece.shape.length - 1 - row] = piece.shape[row][col];
+                }
+            }
+            return { ...piece, shape: newShape };
+        }
+
+        // Membersihkan baris yang penuh dan menghitung saldo
+        function clearLines() {
+            let linesCleared = 0;
+            let coinsEarned = 0;
+
+            for (let row = BOARD_HEIGHT - 1; row >= 0; row--) {
+                if (board[row].every(cell => cell !== 0)) { // Jika baris penuh (semua sel tidak 0)
+                    linesCleared++;
+                    // Hitung koin dari setiap kotak yang pecah di baris ini
+                    for (let col = 0; col < BOARD_WIDTH; col++) {
+                        coinsEarned += board[row][col].clear_value_per_block || 1; // Default 1 jika tidak ada
+                    }
+
+                    // Hapus baris dan geser baris di atasnya ke bawah
+                    for (let r = row; r > 0; r--) {
+                        board[r] = [...board[r - 1]]; // Salin baris di atasnya
+                    }
+                    board[0] = Array(BOARD_WIDTH).fill(0); // Buat baris kosong di paling atas
+                    row++; // Cek baris yang sama lagi karena ada baris baru yang turun
+                }
+            }
+
+            if (linesCleared > 0) {
+                playSound(lineClearSound); // Putar suara baris pecah
+                currentBalance += coinsEarned; // Tambahkan koin ke saldo
+                updateBalanceDisplay(); // Update tampilan saldo
+                addBalanceAnimation('gain'); // Aktifkan animasi gain
+                showMessage(`+${coinsEarned} Saldo dari ${linesCleared} baris!`, 'success');
+                updateSaldo(); // Perbarui saldo di Supabase
+            }
+        }
+
+        // Memperbarui tampilan skor (internal)
+        function updateScoreDisplay() {
+            scoreDisplay.textContent = score;
+        }
+
+        // Memperbarui tampilan saldo
+        function updateBalanceDisplay() {
+            balanceDisplay.textContent = currentBalance;
+        }
+
+        // Membuat balok baru dan mengurangi saldo
+        function createNewPiece() {
+            currentPiece = getRandomPiece();
+            currentY = 0; // Mulai balok dari paling atas
+            currentX = Math.floor(BOARD_WIDTH / 2) - Math.floor(currentPiece.shape[0].length / 2); // Tengah
+
+            // --- PENGURANGAN SALDO SAAT BALOK MUNCUL ---
+            if (currentBalance < currentPiece.cost) {
+                showMessage('Saldo tidak cukup untuk balok ini!', 'error');
+                gameOver();
+                return;
+            }
+            currentBalance -= currentPiece.cost; // Kurangi saldo sesuai biaya balok
+            updateBalanceDisplay(); // Update tampilan saldo
+            addBalanceAnimation('loss'); // Aktifkan animasi loss
+            showMessage(`-${currentPiece.cost} Saldo. Sisa: ${currentBalance}`, 'info');
+            updateSaldo(); // Perbarui saldo di Supabase
+
+            // Game Over jika balok baru langsung bertabrakan (tidak ada tempat)
+            if (!isValidMove(currentPiece, currentX, currentY)) {
+                gameOver();
+            }
+        }
+
+        // --- Game Loop Management ---
+        let dropInterval = 800; // Balok jatuh setiap 0.8 detik
+        let lastDropTime = 0; // Waktu terakhir balok jatuh
+        let gameRunning = false; // Status game
+        let animationFrameId = null; // ID untuk requestAnimationFrame
+
+        // Fungsi utama game loop (animasi)
+        function gameLoop(timestamp) {
+            if (!gameRunning) {
+                cancelAnimationFrame(animationFrameId); // Hentikan animasi jika game tidak berjalan
+                return;
+            }
+
+            if (!lastDropTime) lastDropTime = timestamp;
+            const deltaTime = timestamp - lastDropTime;
+
+            // Jika sudah waktunya balok jatuh
+            if (deltaTime > dropInterval) {
+                if (isValidMove(currentPiece, currentX, currentY + 1)) {
+                    currentY++; // Jatuhkan balok satu kotak
+                } else {
+                    placePiece(); // Jika tidak bisa jatuh lagi, kunci balok
+                }
+                lastDropTime = timestamp; // Reset waktu jatuh
+            }
+
+            ctx.clearRect(0, 0, canvas.width, canvas.height); // Bersihkan canvas
+            drawBoard(); // Gambar papan
+            drawPiece(currentPiece, currentX, currentY); // Gambar balok yang sedang jatuh
+
+            animationFrameId = requestAnimationFrame(gameLoop); // Lanjutkan loop
+        }
+
+        // Memulai permainan
+        function startGame() {
+            gameRunning = true;
+            board = Array(BOARD_HEIGHT).fill(null).map(() => Array(BOARD_WIDTH).fill(0)); // Reset papan
+            score = 0; // Reset skor internal
+            updateScoreDisplay();
+            messageArea.textContent = ''; // Hapus pesan sebelumnya
+            backToProfileBtn.style.display = 'none'; // Sembunyikan tombol kembali ke profil
+
+            createNewPiece(); // Buat balok pertama
+            if (animationFrameId) cancelAnimationFrame(animationFrameId); // Pastikan tidak ada loop ganda
+            animationFrameId = requestAnimationFrame(gameLoop); // Mulai loop animasi
+
+            // Mulai musik latar setelah interaksi pertama (ditangani oleh event listener di body)
+        }
+
+        // Mengakhiri permainan
+        function gameOver() {
+            gameRunning = false;
+            if (animationFrameId) cancelAnimationFrame(animationFrameId); // Hentikan loop animasi
+            currentPiece = null; // Hentikan gambar balok jatuh
+
+            showMessage('GAME OVER! Saldo habis atau tidak ada tempat.', 'error');
+            console.log('Game Over! Saldo Akhir: ' + currentBalance);
+
+            // Tampilkan tombol "Kembali ke Profil" setelah game over
+            backToProfileBtn.style.display = 'block';
+        }
+
+        // --- Event Listeners untuk Kontrol Pemain ---
+
+        // Kontrol Keyboard (untuk pengujian di desktop)
+        document.addEventListener('keydown', e => {
+            if (!gameRunning || !currentPiece) return;
+
+            let moved = false;
+            let newX = currentX;
+            let newY = currentY;
+            let newPiece = currentPiece;
+
+            if (e.key === 'ArrowLeft') {
+                newX--;
+                moved = true;
+            } else if (e.key === 'ArrowRight') {
+                newX++;
+                moved = true;
+            } else if (e.key === 'ArrowDown') { // Soft drop
+                newY++;
+                moved = true;
+                lastDropTime = performance.now(); // Reset waktu jatuh untuk soft drop
+            } else if (e.key === 'ArrowUp' || e.key === ' ') { // Rotate (ArrowUp atau Spasi)
+                newPiece = rotatePiece(currentPiece);
+                moved = true;
+            } else if (e.key === 'Control' || e.key === 'Enter') { // Hard drop (Contoh: Ctrl atau Enter)
+                // Ini akan menjatuhkan balok ke bawah secara instan
+                while (isValidMove(currentPiece, currentX, currentY + 1)) {
+                    currentY++;
+                }
+                placePiece(); // Kunci balok setelah hard drop
+                playSound(clickSound);
+                // Setelah hard drop, placePiece sudah memanggil createNewPiece,
+                // jadi tidak perlu update posisi lagi di sini.
+                return; // Keluar dari fungsi agar tidak ada render ganda
+            }
+
+            if (moved && isValidMove(newPiece, newX, newY)) {
+                currentX = newX;
+                currentY = newY;
+                currentPiece = newPiece;
+                playSound(clickSound);
+            }
+
+            // Update tampilan setelah setiap gerakan
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            drawBoard();
+            drawPiece(currentPiece, currentX, currentY);
+        });
+
+        // Kontrol Tombol di Layar (untuk ponsel)
+        moveLeftBtn.addEventListener('click', () => {
+            if (!gameRunning || !currentPiece) return;
+            if (isValidMove(currentPiece, currentX - 1, currentY)) {
+                currentX--;
+                playSound(clickSound);
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                drawBoard();
+                drawPiece(currentPiece, currentX, currentY);
+            }
+        });
+
+        rotateBtn.addEventListener('click', () => {
+            if (!gameRunning || !currentPiece) return;
+            const newPiece = rotatePiece(currentPiece);
+            if (isValidMove(newPiece, currentX, currentY)) {
+                currentPiece = newPiece;
+                playSound(clickSound);
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                drawBoard();
+                drawPiece(currentPiece, currentX, currentY);
+            }
+        });
+
+        moveRightBtn.addEventListener('click', () => {
+            if (!gameRunning || !currentPiece) return;
+            if (isValidMove(currentPiece, currentX + 1, currentY)) {
+                currentX++;
+                playSound(clickSound);
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                drawBoard();
+                drawPiece(currentPiece, currentX, currentY);
+            }
+        });
+
+        softDropBtn.addEventListener('click', () => {
+            if (!gameRunning || !currentPiece) return;
+            if (isValidMove(currentPiece, currentX, currentY + 1)) {
+                currentY++;
+                lastDropTime = performance.now(); // Reset waktu jatuh untuk soft drop
+            } else {
+                placePiece(); // Jika tidak bisa turun lagi, kunci
+            }
+            playSound(clickSound);
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            drawBoard();
+            drawPiece(currentPiece, currentX, currentY);
+        });
+
+        // Event listener untuk tombol "Kembali ke Profil"
+        backToProfileBtn.addEventListener('click', () => {
+            window.location.href = 'profil.html'; // Arahkan ke halaman profil.html
+        });
+
+
+        // --- Inisialisasi ---
+        // Jalankan fungsi getUser() saat DOM selesai dimuat
+        document.addEventListener('DOMContentLoaded', () => {
+            getUser();
+        });
+
+        // Pastikan musik latar mulai berputar setelah ada interaksi user
+        document.body.addEventListener('click', () => {
+            playBackgroundMusic();
+        }, { once: true }); // Hanya jalankan sekali
+
+    </script>
+</body>
+</html>
