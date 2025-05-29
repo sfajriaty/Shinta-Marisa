@@ -244,7 +244,7 @@
     .win-animation-content {
         background: linear-gradient(45deg, #fff, #fff, #fff);
         padding: 40px 60px;
-        border-radius: 15px;
+        border-radius: 50px;
         box-shadow: 0 0 30px rgba(255, 215, 0, 0.8);
         text-align: center;
         transform: scale(0.8);
@@ -341,8 +341,8 @@
 
     const width = 5;
     const height = 5;
-   const symbols = ['🎃', '🎎', '🀄', '🎱', '🪄', '🎏', '🏆', '🪅', '🧸', '🎭', '🪁', '🃏', '🐉'];
-    const WILD_SYMBOL = '🃏';
+   const symbols = ['🎃', '🎎', '🀄', '🎱', '🪄', '🎏', '🏆', '🪅', '🧸', '🎭', '🪁', '🌟', '🐉'];
+    const WILD_SYMBOL = '🌟';
     const SCATTER_SYMBOL = '🐉';
 
     let currentSymbols = [];
@@ -375,7 +375,7 @@ async function loadSaldo() {
     .single();
 
   if (error || !data) {
-    alert("Gagal mengambil saldo user!");
+    alert("Gagal mengambil saldo!");
     return;
   }
 
