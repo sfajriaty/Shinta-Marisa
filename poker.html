@@ -515,13 +515,12 @@
                 user = session.user;
                 userId = user.id;
                 console.log("User session:", user);
-                
-    const { data: userData, error: userError } = await supabase
-      .from('users_data')
-      .select('saldo')
-      .eq('user_id', uid)
-      .single();
 
+   const { data, error } = await supabase
+    .from('users_data')
+    .select('saldo')
+    .eq('id', userId)
+    .single();
 
 
                 if (error) throw error;
@@ -552,13 +551,13 @@
         }
         try {
             const newSaldo = userSaldo + amount;
-           const { data: userData, error: userError } = await supabase
-            .from('users_data')
-            .select('saldo')
-            .eq('user_id', ui)
-            .single();
+            const { data, error } = await supabase
+             .from('users_data')
+            .update({ saldo: newSaldo })
+              .eq('id', userId);
 
-        if (error) throw error;
+
+            if (error) throw error;
             userSaldo = newSaldo;
             currentSaldoDisplay.textContent = `Rp${userSaldo.toLocaleString('id-ID')}`;
             console.log(`Saldo updated by ${amount}. New saldo: ${userSaldo}`);
@@ -877,7 +876,8 @@
             communityCards.push(card);
             displayCard(card, communityCardsDiv);
         }
-        }
+    }
+
     function revealDealerHand() {
         dealerHandDiv.innerHTML = ''; // Hapus kartu tertutup
         displayCard(dealerHand[0], dealerHandDiv);
@@ -1008,7 +1008,6 @@
     betAmountInput.oninput = function() {
         let value = parseInt(this.value);
         if (isNaN(value) || value < 0) value = 0;
-
         // Batasi input berdasarkan saldo pemain
         if (value > userSaldo) value = userSaldo;
         
