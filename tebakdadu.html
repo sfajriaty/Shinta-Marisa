@@ -19,7 +19,7 @@
       display: flex;
       justify-content: center;
       align-items: center;
-      padding: 10px; /* Reduced padding */
+      padding: -1px; /* Reduced padding */
       overflow-y: auto; /* Allow vertical scroll if content overflows */
       overflow-x: hidden; /* Prevent horizontal scroll */
     }
@@ -75,7 +75,7 @@
     h1 {
       font-family: 'Luckiest Guy', cursive;
       color: #ffd700;
-      text-shadow: 0 0 10px #ffeb3b, 0 0 20px #ffc107;
+      text-shadow: 0 0 10px red, 0 0 20px #ffc107;
       margin-bottom: 15px; /* Reduced margin */
       font-size: 2.5em; /* Smaller title */
     }
@@ -115,7 +115,7 @@
     /* Dice dots */
     .dice .dot, .guess-box .dot {
         position: absolute;
-        background: #333;
+        background: red;
         width: 10px; /* Smaller dots */
         height: 10px; /* Smaller dots */
         border-radius: 50%;
@@ -181,7 +181,7 @@
     /* Animal Dice Specific Styling (for emojis) */
     .dice.animal, .guess-box.animal {
       font-size: 32px; /* Emoji size */
-      background: #c3e6cb;
+      background: #fff;
       color: #28a745; /* This color might not affect emojis, which have their own rendering */
       border-color: red;
       line-height: 1; /* Adjust line height for better emoji centering */
@@ -232,7 +232,6 @@
     .guess-options-grid {
         display: grid;
         grid-template-columns: repeat(3, 1fr); /* Tetapkan 3 kolom per baris */
-        /* justify-content: center; <-- Ini tidak lagi dibutuhkan jika max-width dan margin auto digunakan pada grid container itu sendiri */
         gap: 8px; /* Reduced gap */
         margin-bottom: 15px; /* Reduced margin */
         
@@ -266,7 +265,7 @@
         transform: translateY(-2px);
     }
     .guess-options-grid input[type="radio"]:checked + label.guess-box {
-        background: red;
+        background: black;
         border-color: #ffd700;
         color: #222;
         font-weight: 700;
@@ -276,7 +275,7 @@
 
     /* Specific styling for guess number boxes */
     .guess-options-grid label.guess-box.number-guess-box .dot {
-        background: #333;
+        background: red;
     }
 
     /* Specific styling for guess animal boxes */
@@ -284,11 +283,11 @@
       background: #fff;
       /* color: #28a745; This color might not affect emojis */
       border-color: gold;
-      font-size: 35px; /* Emoji size */
+      font-size: 32px; /* Emoji size */
       line-height: 1; /* Adjust line height for better emoji centering */
     }
     .guess-options-grid input[type="radio"]:checked + label.guess-box.animal-guess-box {
-        background: red;
+        background: black;
         border-color: gold;
         color: #fff; /* This color might not affect emojis */
         box-shadow: 0 0 10px rgba(40,167,69,0.7); /* Smaller shadow */
@@ -424,7 +423,7 @@
 </head>
 <body>
   <div class="game-container" id="game-container">
-    <h1>Tebak Dadu Fantasi</h1>
+    <h1>Tebak Dadu Fantasi Game Zone One</h1>
     <div class="saldo" id="saldo-display">Saldo: Rp0</div>
 
     <div class="dice-area">
@@ -501,30 +500,35 @@
   </div>
 
   <audio id="bg-music" loop>
-    <source src="https://vqmfachxnjyxwuavpgds.supabase.co/storage/v1/object/public/music//dj-background-music-background-music-free-music-music-free-for-use-221916%20(1).mp3" type="audio/mp3">
+    <source src="https://assets.mixkit.co/sfx/preview/mixkit-game-ambience-1935.mp3" type="audio/mp3">
+    Your browser does not support the audio element.
   </audio>
   <audio id="click-sound">
-    <source src="https://vqmfachxnjyxwuavpgds.supabase.co/storage/v1/object/public/music//mixkit-game-ball-tap-2073.mp3" type="audio/mp3">
+    <source src="https://assets.mixkit.co/sfx/preview/mixkit-game-click-1114.mp3" type="audio/mp3">
+    Your browser does not support the audio element.
   </audio>
   <audio id="win-sound">
-    <source src="https://vqmfachxnjyxwuavpgds.supabase.co/storage/v1/object/public/music//mixkit-final-level-bonus-2061.mp3" type="audio/mp3">
+    <source src="https://assets.mixkit.co/sfx/preview/mixkit-bonus-earned-in-game-2059.mp3" type="audio/mp3">
+    Your browser does not support the audio element.
   </audio>
   <audio id="lose-sound">
-    <source src="https://vqmfachxnjyxwuavpgds.supabase.co/storage/v1/object/public/music//mixkit-mechanical-crate-pick-up-3154%20(1).mp3" type="audio/mp3">
+    <source src="https://assets.mixkit.co/sfx/preview/mixkit-losing-bleeps-2026.mp3" type="audio/mp3">
+    Your browser does not support the audio element.
   </audio>
   <audio id="dice-roll-sound">
-    <source src="___.mp3" type="audio/mp3">
+    <source src="https://assets.mixkit.co/sfx/preview/mixkit-shaking-dice-672.mp3" type="audio/mp3">
+    Your browser does not support the audio element.
   </audio>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script>
-  const supabase = window.supabase.createClient(
-    'https://vqmfachxnjyxwuavpgds.supabase.co',
-    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZxbWZhY2h4bmp5eHd1YXZwZ2RzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDg0MDYxNDAsImV4cCI6MjA2Mzk4MjE0MH0.Bzr8mUiEl8MzRWpVQ3_59eFxKk0EWZ3ca-4IEcpGLkk'
-  );
+    const supabase = window.supabase.createClient(
+      'https://vqmfachxnjyxwuavpgds.supabase.co',
+      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZxbWZhY2h4bmp5eHd1YXZwZ2RzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDg0MDYxNDAsImV4cCI6MjA2Mzk4MjE0MH0.Bzr8mUiEl8MzRWpVQ3_59eFxKk0EWZ3ca-4IEcpGLkk'
+    );
 
     let uid = localStorage.getItem('uid');
-    let currentSaldo = 0;
+    let currentSaldo = 0; // Deklarasi dan inisialisasi currentSaldo
 
     const saldoDisplay = document.getElementById('saldo-display');
     const betAmountInput = document.getElementById('bet-amount');
@@ -542,7 +546,7 @@
     const clickSound = document.getElementById('click-sound');
     const winSound = document.getElementById('win-sound');
     const loseSound = document.getElementById('lose-sound');
-    const diceRollSound = document.getElementById('dice-roll-sound'); // New dice roll sound
+    const diceRollSound = document.getElementById('dice-roll-sound');
 
     // Animal mapping using EMOJIS
     const animals = {
@@ -568,6 +572,7 @@
 
       createParticles(); // Add particles to background
     });
+
     // Particle effect
     function createParticles() {
         const container = document.getElementById('game-container');
@@ -632,7 +637,6 @@
       }
       return true;
     }
-
     // Function to render dots on a dice element
     function renderDiceDots(element, value) {
         element.innerHTML = ''; // Clear existing dots
@@ -751,14 +755,14 @@
 
         let totalWinAmount = 0;
         let finalMessage = "Anda kalah!";
-        let isOverallWin = false;
+        // let isOverallWin = false; // Variabel ini tidak benar-benar digunakan, bisa dihapus
 
         // Check Animal Guess
         if (selectedAnimalGuess) {
             if (selectedAnimalGuess === animalResultKey) {
                 const winMultiplier = 4; // 4x payout for correct animal guess
                 totalWinAmount += betAmount * winMultiplier;
-                isOverallWin = true;
+                // isOverallWin = true; // Tidak perlu
                 finalMessage = `Selamat! Anda menebak hewan dengan benar (${animalResultKey.charAt(0).toUpperCase() + animalResultKey.slice(1)})! Anda menang Rp${(betAmount * winMultiplier).toLocaleString('id-ID')}. `;
             } else {
                 finalMessage += `Tebakan hewan salah (${selectedAnimalGuess.charAt(0).toUpperCase() + selectedAnimalGuess.slice(1)}), hasil: ${animalResultKey.charAt(0).toUpperCase() + animalResultKey.slice(1)}. `;
@@ -775,9 +779,9 @@
             if (die3 === guessedNumber) { numberMatches++; }
             
             if (numberMatches > 0) {
-                const multiplier = numberMatches; // Multiplier is exactly the number of matches
+                const multiplier = numberMatches; // Multiplier is exactly the number of matches (x1, x2, or x3)
                 totalWinAmount += betAmount * multiplier;
-                isOverallWin = true;
+                // isOverallWin = true; // Tidak perlu
                 if (finalMessage.includes("Selamat!")) {
                     finalMessage += `Dan Anda menebak angka ${guessedNumber} dengan benar (${numberMatches} kali)! Total kemenangan angka: Rp${(betAmount * multiplier).toLocaleString('id-ID')}!`;
                 } else {
@@ -797,10 +801,13 @@
             gameMessage.classList.add('win');
             winSound.play();
         } else {
-            gameSaldo.textContent = `Saldo: Rp${currentSaldo.toLocaleString('id-ID')}`; // Update saldo display for loss
+            // Jika totalWinAmount 0, berarti kalah, pastikan pesan kalah muncul.
+            // Pastikan pesan kalah tidak menimpa pesan lain jika sudah ada (misal dari tebakan hewan yang salah tapi tebakan angka juga salah)
+            if (!finalMessage.includes("Selamat!")) { // Hanya tambahkan "Anda kalah kali ini" jika belum ada kemenangan
+                finalMessage = "Anda kalah kali ini. Coba lagi! " + finalMessage;
+            }
             gameMessage.classList.add('lose');
             loseSound.play();
-            finalMessage = "Anda kalah kali ini. Coba lagi! " + finalMessage; // Combine messages for clarity
         }
 
         await updateSaldoInSupabase(currentSaldo);
@@ -817,4 +824,4 @@
     }
   </script>
 </body>
-</html>
+  </html>
