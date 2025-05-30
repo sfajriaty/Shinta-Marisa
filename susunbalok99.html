@@ -305,8 +305,6 @@
       'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZxbWZhY2h4bmp5eHd1YXZwZ2RzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDg0MDYxNDAsImV4cCI6MjA2Mzk4MjE0MH0.Bzr8mUiEl8MzRWpVQ3_59eFxKk0EWZ3ca-4IEcpGLkk'
     );
     
-        const supabase = Supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-      
         const canvas = document.getElementById('gameCanvas');
         const ctx = canvas.getContext('2d');
         const scoreDisplay = document.getElementById('score');
@@ -324,7 +322,7 @@
 
         // Konfigurasi Game Board
         const TILE_SIZE = 20; // Ukuran setiap "kotak" balok dalam piksel
-        const BOARD_WIDTH = 0; // Lebar papan (jumlah kotak)
+        const BOARD_WIDTH = 40; // Lebar papan (jumlah kotak)
         const BOARD_HEIGHT = 30; // Tinggi papan (jumlah kotak)
 
         // Sesuaikan ukuran canvas berdasarkan TILE_SIZE dan BOARD_DIMENSIONS
