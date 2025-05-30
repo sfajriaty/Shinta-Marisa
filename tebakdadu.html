@@ -1,0 +1,799 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Tebak Dadu Fantasi - GameZone</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Luckiest+Guy&family=Poppins:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    /* Global Styles */
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap');
+    * { box-sizing: border-box; }
+    body, html {
+      margin: 0; padding: 0; min-height: 100vh;
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(135deg, #1a2a6c, #b21f1f, #fdbb2d); /* Animated gradient */
+      background-size: 300% 300%;
+      animation: gradientAnimation 15s ease infinite;
+      color: #fff;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 10px; /* Reduced padding */
+      overflow-y: auto; /* Allow vertical scroll if content overflows */
+      overflow-x: hidden; /* Prevent horizontal scroll */
+    }
+
+    @keyframes gradientAnimation {
+      0% {background-position: 0% 50%;}
+      50% {background-position: 100% 50%;}
+      100% {background-position: 0% 50%;}
+    }
+
+    /* Game Container */
+    .game-container {
+      max-width: 600px; /* Slightly narrower */
+      width: 100%;
+      background: rgba(0,0,0,0.7);
+      border-radius: 20px; /* Slightly less rounded */
+      padding: 25px 30px; /* Reduced padding */
+      box-shadow: 0 0 30px 6px rgba(255,215,0,0.7); /* Gold-like glow */
+      text-align: center;
+      position: relative;
+      overflow: hidden; /* For particles */
+      animation: pulsateGlow 2s infinite alternate;
+      /* Ensure it doesn't take full height if content is small, but grows if needed */
+      min-height: 50vh; /* Minimum height for better appearance */
+      display: flex; /* Use flex for internal layout */
+      flex-direction: column;
+      justify-content: space-between; /* Push elements apart */
+    }
+
+    @keyframes pulsateGlow {
+        from { box-shadow: 0 0 25px 5px rgba(255,215,0,0.7); }
+        to { box-shadow: 0 0 40px 8px rgba(255,215,0,0.9); }
+    }
+
+    /* Particles Effect */
+    .particle {
+        position: absolute;
+        background-color: rgba(255, 255, 255, 0.8);
+        border-radius: 50%;
+        animation: floatAndFade 5s infinite ease-out;
+        opacity: 0;
+        pointer-events: none;
+        z-index: -1; /* Behind content */
+    }
+
+    @keyframes floatAndFade {
+        0% { transform: translateY(0) translateX(0); opacity: 0; }
+        10% { opacity: 0.8; }
+        100% { transform: translateY(-150px) translateX(var(--x-offset)); opacity: 0; } /* Shorter float */
+    }
+
+    /* Titles and Saldo */
+    h1 {
+      font-family: 'Luckiest Guy', cursive;
+      color: #ffd700;
+      text-shadow: 0 0 10px #ffeb3b, 0 0 20px #ffc107;
+      margin-bottom: 15px; /* Reduced margin */
+      font-size: 2.5em; /* Smaller title */
+    }
+    .saldo {
+      font-size: 24px; /* Smaller saldo display */
+      font-weight: 700;
+      margin-bottom: 20px; /* Reduced margin */
+      color: #ffeb3b;
+      text-shadow: 0 0 8px rgba(255,255,0,0.5);
+    }
+
+    /* Dice Area */
+    .dice-area {
+      display: flex;
+      justify-content: center;
+      gap: 10px; /* Reduced gap */
+      margin-bottom: 25px; /* Reduced margin */
+      min-height: 80px; /* Reduced min-height */
+      align-items: center;
+    }
+    /* Base Dice Styling */
+    .dice, .guess-box {
+        width: 70px; /* Smaller dice */
+        height: 70px; /* Smaller dice */
+        background: #fefefe;
+        border-radius: 15px; /* Slightly less rounded */
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        box-shadow: inset 0 0 10px rgba(0,0,0,0.4), 0 3px 10px rgba(0,0,0,0.3); /* Smaller shadow */
+        border: 2px solid #ff9500; /* Thinner border */
+        transition: transform 0.1s ease-out;
+        position: relative; /* For dots */
+        flex-shrink: 0;
+    }
+
+    /* Dice dots */
+    .dice .dot, .guess-box .dot {
+        position: absolute;
+        background: #333;
+        width: 10px; /* Smaller dots */
+        height: 10px; /* Smaller dots */
+        border-radius: 50%;
+    }
+    /* Dot positioning (remains the same relative to size) */
+    .dice[data-value="1"] .dot:nth-child(1),
+    .guess-box[data-value="1"] .dot:nth-child(1) { top: 50%; left: 50%; transform: translate(-50%, -50%); }
+    .dice[data-value="2"] .dot:nth-child(1),
+    .guess-box[data-value="2"] .dot:nth-child(1) { top: 15%; left: 15%; }
+    .dice[data-value="2"] .dot:nth-child(2),
+    .guess-box[data-value="2"] .dot:nth-child(2) { bottom: 15%; right: 15%; }
+    .dice[data-value="3"] .dot:nth-child(1),
+    .guess-box[data-value="3"] .dot:nth-child(1) { top: 15%; left: 15%; }
+    .dice[data-value="3"] .dot:nth-child(2),
+    .guess-box[data-value="3"] .dot:nth-child(2) { top: 50%; left: 50%; transform: translate(-50%, -50%); }
+    .dice[data-value="3"] .dot:nth-child(3),
+    .guess-box[data-value="3"] .dot:nth-child(3) { bottom: 15%; right: 15%; }
+    .dice[data-value="4"] .dot:nth-child(1),
+    .guess-box[data-value="4"] .dot:nth-child(1) { top: 15%; left: 15%; }
+    .dice[data-value="4"] .dot:nth-child(2),
+    .guess-box[data-value="4"] .dot:nth-child(2) { top: 15%; right: 15%; }
+    .dice[data-value="4"] .dot:nth-child(3),
+    .guess-box[data-value="4"] .dot:nth-child(3) { bottom: 15%; left: 15%; }
+    .dice[data-value="4"] .dot:nth-child(4),
+    .guess-box[data-value="4"] .dot:nth-child(4) { bottom: 15%; right: 15%; }
+    .dice[data-value="5"] .dot:nth-child(1),
+    .guess-box[data-value="5"] .dot:nth-child(1) { top: 15%; left: 15%; }
+    .dice[data-value="5"] .dot:nth-child(2),
+    .guess-box[data-value="5"] .dot:nth-child(2) { top: 15%; right: 15%; }
+    .dice[data-value="5"] .dot:nth-child(3),
+    .guess-box[data-value="5"] .dot:nth-child(3) { top: 50%; left: 50%; transform: translate(-50%, -50%); }
+    .dice[data-value="5"] .dot:nth-child(4),
+    .guess-box[data-value="5"] .dot:nth-child(4) { bottom: 15%; left: 15%; }
+    .dice[data-value="5"] .dot:nth-child(5),
+    .guess-box[data-value="5"] .dot:nth-child(5) { bottom: 15%; right: 15%; }
+    .dice[data-value="6"] .dot:nth-child(1),
+    .guess-box[data-value="6"] .dot:nth-child(1) { top: 15%; left: 15%; }
+    .dice[data-value="6"] .dot:nth-child(2),
+    .guess-box[data-value="6"] .dot:nth-child(2) { top: 15%; right: 15%; }
+    .dice[data-value="6"] .dot:nth-child(3),
+    .guess-box[data-value="6"] .dot:nth-child(3) { top: 50%; left: 15%; }
+    .dice[data-value="6"] .dot:nth-child(4),
+    .guess-box[data-value="6"] .dot:nth-child(4) { top: 50%; right: 15%; }
+    .dice[data-value="6"] .dot:nth-child(5),
+    .guess-box[data-value="6"] .dot:nth-child(5) { bottom: 15%; left: 15%; }
+    .dice[data-value="6"] .dot:nth-child(6),
+    .guess-box[data-value="6"] .dot:nth-child(6) { bottom: 15%; right: 15%; }
+
+    /* Dice rolling animation */
+    .dice.rolling {
+        animation: shakeDice 0.2s infinite alternate; /* Rapid shaking */
+        transform-style: preserve-3d;
+    }
+    @keyframes shakeDice {
+        0% { transform: translate(0px, 0px) rotateX(0deg) rotateY(0deg) rotateZ(0deg); }
+        25% { transform: translate(5px, -5px) rotateX(10deg) rotateY(-10deg) rotateZ(5deg); }
+        50% { transform: translate(-5px, 5px) rotateX(-10deg) rotateY(10deg) rotateZ(-5deg); }
+        75% { transform: translate(5px, 5px) rotateX(10deg) rotateY(10deg) rotateZ(5deg); }
+        100% { transform: translate(-5px, -5px) rotateX(-10deg) rotateY(-10deg) rotateZ(-5deg); }
+    }
+
+
+    /* Animal Dice Specific Styling */
+    .dice.animal, .guess-box.animal {
+      font-size: 32px; /* Smaller icon */
+      background: #c3e6cb;
+      color: #28a745;
+      border-color: #28a745;
+    }
+
+    /* Sections */
+    .bet-section, .guess-section {
+      margin-bottom: 15px; /* Reduced margin */
+      text-align: left;
+    }
+    label {
+      display: block;
+      margin-bottom: 5px; /* Reduced margin */
+      font-weight: 700;
+      font-size: 1em; /* Smaller font */
+      color: #eee;
+    }
+    input[type="number"] {
+      width: calc(100% - 10px); /* Slightly less width for padding */
+      padding: 8px; /* Reduced padding */
+      margin-bottom: 10px; /* Reduced margin */
+      border-radius: 8px;
+      border: 1px solid #ff9500; /* Thinner border */
+      background: rgba(255, 255, 255, 0.15);
+      color: #fff;
+      font-size: 16px; /* Smaller font */
+      outline: none;
+      transition: border-color 0.3s, box-shadow 0.3s;
+    }
+    input[type="number"]:focus {
+      border-color: #ffd700;
+      box-shadow: 0 0 8px rgba(255,215,0,0.5);
+    }
+    input[type="number"]::placeholder {
+      color: #ccc;
+    }
+
+    /* Guess Options - Boxes (for number and animal) */
+    .guess-options-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(70px, 1fr)); /* Auto-fit, 70px min */
+        gap: 8px; /* Reduced gap */
+        justify-content: center;
+        margin-bottom: 15px; /* Reduced margin */
+    }
+    .guess-options-grid input[type="radio"] {
+        display: none;
+    }
+    .guess-options-grid label.guess-box {
+        cursor: pointer;
+        background: #34495e;
+        border: 2px solid transparent; /* Thinner border */
+        transition: background 0.3s, border-color 0.3s, transform 0.2s, box-shadow 0.3s;
+        font-weight: 600;
+        font-size: 0.9em; /* Smaller font */
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        user-select: none;
+        height: 70px; /* Same height as dice */
+        color: #eee;
+        position: relative;
+        border-radius: 15px; /* Match dice border-radius */
+    }
+
+    .guess-options-grid label.guess-box:hover {
+        transform: translateY(-2px);
+    }
+    .guess-options-grid input[type="radio"]:checked + label.guess-box {
+        background: #ff9500;
+        border-color: #ffd700;
+        color: #222;
+        font-weight: 700;
+        transform: scale(1.03); /* Smaller scale effect */
+        box-shadow: 0 0 10px rgba(255,215,0,0.5); /* Smaller shadow */
+    }
+
+    /* Specific styling for guess number boxes */
+    .guess-options-grid label.guess-box.number-guess-box .dot {
+        background: #333;
+    }
+
+    /* Specific styling for guess animal boxes */
+    .guess-options-grid label.guess-box.animal-guess-box {
+      background: #c3e6cb;
+      color: #28a745;
+      border-color: #28a745;
+    }
+    .guess-options-grid input[type="radio"]:checked + label.guess-box.animal-guess-box {
+        background: #28a745;
+        border-color: #1a6d2b;
+        color: #fff;
+        box-shadow: 0 0 10px rgba(40,167,69,0.7); /* Smaller shadow */
+    }
+
+
+    /* Roll Button */
+    .btn {
+      background: #ff9500;
+      border: none;
+      border-radius: 30px; /* Slightly less rounded */
+      padding: 12px 25px; /* Reduced padding */
+      font-size: 18px; /* Smaller font */
+      font-weight: 700;
+      cursor: pointer;
+      color: #fff;
+      box-shadow: 0 0 15px #ffb347; /* Smaller glow */
+      transition: background 0.3s, transform 0.2s, box-shadow 0.3s;
+      width: 100%;
+      margin-top: 20px; /* Reduced margin */
+    }
+    .btn:hover:not(:disabled) {
+        background: #ffb347;
+        transform: translateY(-2px); /* Smaller lift */
+        box-shadow: 0 0 20px #ffb347;
+    }
+    .btn:disabled {
+        background: #666;
+        cursor: not-allowed;
+        box-shadow: none;
+        transform: none;
+    }
+     /* Message Display */
+    .message {
+      margin-top: 20px; /* Reduced margin */
+      font-size: 20px; /* Smaller message font */
+      font-weight: 700;
+      color: #fff;
+      text-shadow: 0 0 8px rgba(255,255,255,0.8);
+      min-height: 25px; /* Reduced min-height */
+    }
+    .message.win {
+        color: #aaffaa;
+        text-shadow: 0 0 12px #aaffaa, 0 0 20px rgba(170,255,170,0.8);
+    }
+    .message.lose {
+        color: #ffaaaa;
+        text-shadow: 0 0 12px #ffaaaa, 0 0 20px rgba(255,170,170,0.8);
+    }
+
+    /* Responsive adjustments for even smaller screens */
+    @media (max-width: 550px) {
+        .game-container {
+            padding: 20px 25px;
+            border-radius: 15px;
+        }
+        h1 { font-size: 2.2em; margin-bottom: 10px; }
+        .saldo { font-size: 20px; margin-bottom: 15px; }
+        .dice-area { gap: 8px; margin-bottom: 20px; min-height: 70px; }
+        .dice, .guess-box {
+            width: 60px;
+            height: 60px;
+            border-radius: 12px;
+        }
+        .dice .dot, .guess-box .dot {
+            width: 8px;
+            height: 8px;
+        }
+        .dice.animal, .guess-box.animal {
+            font-size: 28px;
+        }
+        label { font-size: 0.9em; margin-bottom: 5px; }
+        input[type="number"] { font-size: 14px; padding: 7px; margin-bottom: 8px; }
+        .guess-options-grid {
+            grid-template-columns: repeat(3, 1fr); /* Force 3 columns on smaller mobiles */
+            gap: 6px;
+        }
+        .guess-options-grid label.guess-box {
+            height: 60px;
+            font-size: 0.85em;
+            border-radius: 12px;
+        }
+        .btn { padding: 10px 20px; font-size: 16px; margin-top: 15px; border-radius: 25px; }
+        .message { font-size: 18px; margin-top: 15px; }
+    }
+
+    @media (max-width: 400px) {
+        .game-container {
+            padding: 15px 20px;
+            border-radius: 10px;
+        }
+        h1 { font-size: 1.8em; margin-bottom: 8px; }
+        .saldo { font-size: 18px; margin-bottom: 12px; }
+        .dice-area { gap: 6px; margin-bottom: 15px; min-height: 60px; }
+        .dice, .guess-box {
+            width: 50px;
+            height: 50px;
+            border-radius: 10px;
+        }
+        .dice .dot, .guess-box .dot {
+            width: 7px;
+            height: 7px;
+        }
+        .dice.animal, .guess-box.animal {
+            font-size: 24px;
+        }
+        label { font-size: 0.85em; margin-bottom: 3px; }
+        input[type="number"] { font-size: 12px; padding: 5px; margin-bottom: 5px; }
+        .guess-options-grid {
+            grid-template-columns: repeat(2, 1fr); /* Maybe 2 columns on very small screens? */
+            gap: 5px;
+        }
+        .guess-options-grid label.guess-box {
+            height: 50px;
+            font-size: 0.8em;
+            border-radius: 10px;
+        }
+        .btn { padding: 8px 15px; font-size: 14px; margin-top: 10px; border-radius: 20px; }
+        .message { font-size: 16px; margin-top: 10px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="game-container" id="game-container">
+    <h1>Tebak Dadu Fantasi</h1>
+    <div class="saldo" id="saldo-display">Saldo: Rp0</div>
+
+    <div class="dice-area">
+      <div class="dice" id="die1" data-value="?">
+        <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+        <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+      </div>
+      <div class="dice" id="die2" data-value="?">
+        <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+        <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+      </div>
+      <div class="dice" id="die3" data-value="?">
+        <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+        <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+      </div>
+      <div class="dice animal" id="animal-die">?</div>
+    </div>
+
+    <div class="bet-section">
+      <label for="bet-amount">Jumlah Taruhan (Rp):</label>
+      <input type="number" id="bet-amount" placeholder="Minimal Rp1000" min="1000" step="1000" value="1000">
+    </div>
+
+    <div class="guess-section">
+      <label>Tebakan Angka (Pilih 1-6 pada Dadu):</label>
+      <div class="guess-options-grid">
+        <input type="radio" id="guess-num-1" name="number-guess" value="1">
+        <label for="guess-num-1" class="guess-box number-guess-box" data-value="1">
+            <span class="dot"></span>
+        </label>
+        <input type="radio" id="guess-num-2" name="number-guess" value="2">
+        <label for="guess-num-2" class="guess-box number-guess-box" data-value="2">
+            <span class="dot"></span><span class="dot"></span>
+        </label>
+        <input type="radio" id="guess-num-3" name="number-guess" value="3">
+        <label for="guess-num-3" class="guess-box number-guess-box" data-value="3">
+            <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+        </label>
+        <input type="radio" id="guess-num-4" name="number-guess" value="4">
+        <label for="guess-num-4" class="guess-box number-guess-box" data-value="4">
+            <span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="dot"></span>
+        </label>
+        <input type="radio" id="guess-num-5" name="number-guess" value="5">
+        <label for="guess-num-5" class="guess-box number-guess-box" data-value="5">
+            <span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="dot"></span>
+        </label>
+        <input type="radio" id="guess-num-6" name="number-guess" value="6">
+        <label for="guess-num-6" class="guess-box number-guess-box" data-value="6">
+            <span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="dot"></span>
+        </label>
+      </div>
+    </div>
+
+    <div class="guess-section">
+      <label>Tebakan Simbol Hewan:</label>
+      <div class="guess-options-grid">
+        <input type="radio" id="guess-gajah" name="animal-guess" value="gajah">
+        <label for="guess-gajah" class="guess-box animal-guess-box"><i class="fas fa-elephant"></i></label>
+        <input type="radio" id="guess-singa" name="animal-guess" value="singa">
+        <label for="guess-singa" class="guess-box animal-guess-box"><i class="fas fa-lion"></i></label>
+        <input type="radio" id="guess-monyet" name="animal-guess" value="monyet">
+        <label for="guess-monyet" class="guess-box animal-guess-box"><i class="fas fa-monkey"></i></label>
+        <input type="radio" id="guess-ular" name="animal-guess" value="ular">
+        <label for="guess-ular" class="guess-box animal-guess-box"><i class="fas fa-snake"></i></label>
+        <input type="radio" id="guess-burung" name="animal-guess" value="burung">
+        <label for="guess-burung" class="guess-box animal-guess-box"><i class="fas fa-dove"></i></label>
+        <input type="radio" id="guess-ikan" name="animal-guess" value="ikan">
+        <label for="guess-ikan" class="guess-box animal-guess-box"><i class="fas fa-fish"></i></label>
+      </div>
+    </div>
+
+    <button class="btn" id="roll-dice-btn">Gulirkan Dadu!</button>
+
+    <div class="message" id="game-message"></div>
+  </div>
+
+  <audio id="bg-music" loop>
+    <source src="https://assets.mixkit.co/sfx/preview/mixkit-game-ambience-1935.mp3" type="audio/mp3">
+    Your browser does not support the audio element.
+  </audio>
+  <audio id="click-sound">
+    <source src="https://assets.mixkit.co/sfx/preview/mixkit-game-click-1114.mp3" type="audio/mp3">
+    Your browser does not support the audio element.
+  </audio>
+  <audio id="win-sound">
+    <source src="https://assets.mixkit.co/sfx/preview/mixkit-bonus-earned-in-game-2059.mp3" type="audio/mp3">
+    Your browser does not support the audio element.
+  </audio>
+  <audio id="lose-sound">
+    <source src="https://assets.mixkit.co/sfx/preview/mixkit-losing-bleeps-2026.mp3" type="audio/mp3">
+    Your browser does not support the audio element.
+  </audio>
+  <audio id="dice-roll-sound">
+    <source src="https://assets.mixkit.co/sfx/preview/mixkit-shaking-dice-672.mp3" type="audio/mp3">
+    Your browser does not support the audio element.
+  </audio>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script>
+    const supabase = window.supabase.createClient(
+      'https://vqmfachxnjyxwuavpgds.supabase.co',
+      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZxbWZhY2h4bmp5eHd1YXZwZ2RzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDg0MDYxNDAsImV4cCI6MjA2Mzk4MjE0MH0.Bzr8mUiEl8MzRWpVQ3_59eFxKk0EWZ3ca-4IEcpGLkk'
+    );
+
+    let uid = localStorage.getItem('uid');
+    let currentSaldo = 0;
+
+    const saldoDisplay = document.getElementById('saldo-display');
+    const betAmountInput = document.getElementById('bet-amount');
+    const numberGuessOptions = document.querySelectorAll('input[name="number-guess"]');
+    const animalGuessOptions = document.querySelectorAll('input[name="animal-guess"]');
+    const rollDiceBtn = document.getElementById('roll-dice-btn');
+    const die1Display = document.getElementById('die1');
+    const die2Display = document.getElementById('die2');
+    const die3Display = document.getElementById('die3');
+    const animalDieDisplay = document.getElementById('animal-die');
+    const gameMessage = document.getElementById('game-message');
+
+    // Audio Elements
+    const bgMusic = document.getElementById('bg-music');
+    const clickSound = document.getElementById('click-sound');
+    const winSound = document.getElementById('win-sound');
+    const loseSound = document.getElementById('lose-sound');
+    const diceRollSound = document.getElementById('dice-roll-sound'); // New dice roll sound
+
+    // Animal mapping (using FontAwesome icons for simplicity)
+    const animals = {
+      gajah: '<i class="fas fa-elephant"></i>',
+      singa: '<i class="fas fa-lion"></i>',
+      monyet: '<i class="fas fa-monkey"></i>',
+      ular: '<i class="fas fa-snake"></i>',
+      burung: '<i class="fas fa-dove"></i>',
+      ikan: '<i class="fas fa-fish"></i>',
+    };
+    const animalKeys = Object.keys(animals);
+
+    document.addEventListener('DOMContentLoaded', async () => {
+      await loadUserProfile();
+      rollDiceBtn.addEventListener('click', playDiceGame);
+      // Play background music on user interaction (e.g., first click)
+      document.body.addEventListener('click', () => {
+        if (bgMusic.paused) {
+          bgMusic.play().catch(e => console.warn("Failed to play background music:", e));
+          bgMusic.volume = 0.3; // Lower volume for background music
+        }
+      }, { once: true }); // Only run once
+
+      createParticles(); // Add particles to background
+    });
+
+    // Particle effect
+    function createParticles() {
+        const container = document.getElementById('game-container');
+        for (let i = 0; i < 20; i++) { // Create 20 particles
+            const particle = document.createElement('div');
+            particle.className = 'particle';
+            const size = Math.random() * 8 + 4; // Size between 4px and 12px
+            particle.style.width = `${size}px`;
+            particle.style.height = `${size}px`;
+            particle.style.left = `${Math.random() * 100}%`;
+            particle.style.animationDelay = `${Math.random() * 5}s`;
+            particle.style.setProperty('--x-offset', `${(Math.random() - 0.5) * 100}px`); // Random horizontal drift
+            container.appendChild(particle);
+        }
+    }
+
+    async function loadUserProfile() {
+      if (!uid) {
+        alert('Anda harus login untuk bermain game ini.');
+        window.location.href = 'login.html'; // Redirect to login page
+        return;
+      }
+
+      const { data: userData, error: userError } = await supabase
+        .from('users_data')
+        .select('saldo')
+        .eq('user_id', uid)
+        .single();
+
+      if (userError && userError.code === 'PGRST116') { // No rows found
+        console.warn('Pengguna baru, membuat entri saldo awal...');
+        const { error: insertError } = await supabase
+            .from('users_data')
+            .insert([{ user_id: uid, saldo: 0 }]);
+        if (insertError) {
+            console.error('Error saat membuat entri saldo awal:', insertError.message);
+            alert('Gagal membuat entri saldo awal. Cek log.');
+            currentSaldo = 0;
+        } else {
+            currentSaldo = 0;
+        }
+      } else if (userError) {
+        console.error('Error memuat data saldo:', userError.message);
+        alert('Gagal memuat saldo: ' + userError.message);
+        currentSaldo = 0; // Default to 0 on error
+      } else {
+        currentSaldo = userData.saldo ?? 0;
+      }
+      saldoDisplay.textContent = `Saldo: Rp${currentSaldo.toLocaleString('id-ID')}`;
+    }
+
+    async function updateSaldoInSupabase(amount) {
+      const { data, error } = await supabase
+        .from('users_data')
+        .update({ saldo: amount })
+        .eq('user_id', uid);
+
+      if (error) {
+        console.error('Error memperbarui saldo:', error.message);
+        alert('Gagal memperbarui saldo di database. Harap hubungi admin.');
+        return false;
+      }
+      return true;
+    }
+
+    // Function to render dots on a dice element
+    function renderDiceDots(element, value) {
+        element.innerHTML = ''; // Clear existing dots
+        element.setAttribute('data-value', value); // Set data-value for CSS styling
+        if (value === '?') return;
+
+        const numDots = value;
+        for (let i = 0; i < numDots; i++) {
+            const dot = document.createElement('span');
+            dot.className = 'dot';
+            element.appendChild(dot);
+        }
+    }
+
+    function getRandomDiceRoll() {
+      return Math.floor(Math.random() * 6) + 1; // Random number between 1 and 6
+    }
+
+    function getRandomAnimal() {
+      const randomIndex = Math.floor(Math.random() * animalKeys.length);
+      return animalKeys[randomIndex];
+    }
+    async function playDiceGame() {
+      clickSound.play();
+      gameMessage.textContent = '';
+      gameMessage.className = 'message';
+
+      const betAmount = parseInt(betAmountInput.value);
+      let selectedNumberGuess = null;
+      for (const radio of numberGuessOptions) {
+        if (radio.checked) {
+          selectedNumberGuess = radio.value;
+          break;
+        }
+      }
+
+      let selectedAnimalGuess = null;
+      for (const radio of animalGuessOptions) {
+        if (radio.checked) {
+          selectedAnimalGuess = radio.value;
+          break;
+        }
+      }
+
+      if (isNaN(betAmount) || betAmount < 1000) {
+        alert('Jumlah taruhan minimal Rp1000.');
+        return;
+      }
+
+      if (betAmount % 1000 !== 0) {
+        alert('Jumlah taruhan harus kelipatan Rp1000.');
+        return;
+      }
+
+      if (!selectedNumberGuess && !selectedAnimalGuess) {
+        alert('Pilih tebakan Angka (1-6) atau tebakan Simbol Hewan.');
+        return;
+      }
+
+      if (currentSaldo < betAmount) {
+        alert('Saldo Anda tidak cukup untuk taruhan ini!');
+        return;
+      }
+
+      // Disable buttons and inputs
+      rollDiceBtn.disabled = true;
+      betAmountInput.disabled = true;
+      numberGuessOptions.forEach(radio => radio.disabled = true);
+      animalGuessOptions.forEach(radio => radio.disabled = true);
+
+      // Deduct bet immediately
+      currentSaldo -= betAmount;
+      const successDeduct = await updateSaldoInSupabase(currentSaldo);
+      if (!successDeduct) {
+        currentSaldo += betAmount; // Revert saldo if update failed
+        saldoDisplay.textContent = `Saldo: Rp${currentSaldo.toLocaleString('id-ID')}`;
+        rollDiceBtn.disabled = false;
+        betAmountInput.disabled = false;
+        numberGuessOptions.forEach(radio => radio.disabled = false);
+        animalGuessOptions.forEach(radio => radio.disabled = false);
+        return;
+      }
+      saldoDisplay.textContent = `Saldo: Rp${currentSaldo.toLocaleString('id-ID')}`;
+
+      // Animate dice rolling
+      die1Display.classList.add('rolling');
+      die2Display.classList.add('rolling');
+      die3Display.classList.add('rolling');
+      animalDieDisplay.classList.add('rolling');
+      
+      // Initial "?" state for dice
+      renderDiceDots(die1Display, '?');
+      renderDiceDots(die2Display, '?');
+      renderDiceDots(die3Display, '?');
+      animalDieDisplay.innerHTML = '<i class="fas fa-question"></i>'; 
+
+      diceRollSound.play(); // Play dice roll sound
+
+      setTimeout(async () => {
+        die1Display.classList.remove('rolling');
+        die2Display.classList.remove('rolling');
+        die3Display.classList.remove('rolling');
+        animalDieDisplay.classList.remove('rolling');
+
+        const die1 = getRandomDiceRoll();
+        const die2 = getRandomDiceRoll();
+        const die3 = getRandomDiceRoll();
+        const animalResultKey = getRandomAnimal();
+        const animalResultHTML = animals[animalResultKey];
+
+        renderDiceDots(die1Display, die1);
+        renderDiceDots(die2Display, die2);
+        renderDiceDots(die3Display, die3);
+        animalDieDisplay.innerHTML = animalResultHTML;
+
+        let totalWinAmount = 0;
+        let finalMessage = "Anda kalah!";
+        let isOverallWin = false;
+
+        // Check Animal Guess
+        if (selectedAnimalGuess) {
+            if (selectedAnimalGuess === animalResultKey) {
+                const winMultiplier = 4; // 4x payout for correct animal guess
+                totalWinAmount += betAmount * winMultiplier;
+                isOverallWin = true;
+                finalMessage = `Selamat! Anda menebak hewan dengan benar (${animalResultKey.charAt(0).toUpperCase() + animalResultKey.slice(1)})! Anda menang Rp${(betAmount * winMultiplier).toLocaleString('id-ID')}. `;
+            } else {
+                finalMessage += `Tebakan hewan salah (${selectedAnimalGuess.charAt(0).toUpperCase() + selectedAnimalGuess.slice(1)}), hasil: ${animalResultKey.charAt(0).toUpperCase() + animalResultKey.slice(1)}. `;
+            }
+        }
+
+        // Check Number Guess (if any of the three number dice matches)
+        if (selectedNumberGuess) {
+            const guessedNumber = parseInt(selectedNumberGuess);
+            let numberGuessWin = false;
+            let winningDiceValues = [];
+
+            if (die1 === guessedNumber) { numberGuessWin = true; winningDiceValues.push(die1); }
+            if (die2 === guessedNumber) { numberGuessWin = true; winningDiceValues.push(die2); }
+            if (die3 === guessedNumber) { numberGuessWin = true; winningDiceValues.push(die3); }
+            
+            if (numberGuessWin) {
+                // Payout is sum of all instances of the guessed number on the dice
+                const multiplier = winningDiceValues.reduce((sum, val) => sum + val, 0); 
+                totalWinAmount += betAmount * multiplier;
+                isOverallWin = true;
+                if (finalMessage.includes("Selamat!")) {
+                    finalMessage += `Dan Anda menebak angka ${guessedNumber} dengan benar! Total kemenangan angka: Rp${(betAmount * multiplier).toLocaleString('id-ID')}!`;
+                } else {
+                    finalMessage = `Selamat! Anda menebak angka ${guessedNumber} dengan benar! Anda menang Rp${(betAmount * multiplier).toLocaleString('id-ID')}.`;
+                }
+            } else {
+                if (finalMessage.includes("Anda kalah!")) {
+                    finalMessage += `Tebakan angka ${guessedNumber} salah.`;
+                } else {
+                    finalMessage += ` Namun, tebakan angka ${guessedNumber} salah.`;
+                }
+            }
+        }
+        
+        if (totalWinAmount > 0) {
+            currentSaldo += totalWinAmount;
+            gameMessage.classList.add('win');
+            winSound.play();
+        } else {
+            gameMessage.classList.add('lose');
+            loseSound.play();
+            finalMessage = "Anda kalah kali ini. Coba lagi! " + finalMessage; // Combine messages for clarity
+        }
+
+        await updateSaldoInSupabase(currentSaldo);
+        saldoDisplay.textContent = `Saldo: Rp${currentSaldo.toLocaleString('id-ID')}`;
+        gameMessage.textContent = finalMessage;
+
+        // Re-enable buttons and inputs
+        rollDiceBtn.disabled = false;
+        betAmountInput.disabled = false;
+        numberGuessOptions.forEach(radio => radio.disabled = false);
+        animalGuessOptions.forEach(radio => radio.disabled = false);
+
+      }, 2500); // Animation time
+    }
+  </script>
+</body>
+</html>
