@@ -355,8 +355,13 @@
         </tr>
         </tbody>
     </table>
+  <div id="successModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.7); z-index:9999; display:flex; justify-content:center; align-items:center;">
+  <div style="background:#2a5298; padding:30px; border-radius:10px; text-align:center; box-shadow:0 0 20px rgba(255,165,0,0.7); color:#fff;">
+    <h2 id="modalMessage"></h2>
+    <button onclick="document.getElementById('successModal').style.display='none'" style="background:#ff9500; border:none; padding:10px 20px; border-radius:5px; color:#fff; font-weight:bold; margin-top:20px; cursor:pointer;">Tutup</button>
   </div>
-</div>
+  </div>
+  
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
   const supabase = window.supabase.createClient(
@@ -388,7 +393,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }).catch(err => {
     console.error("Failed to initialize user session:", err);
     
-    alert("Sesi pengguna tidak valid. Silakan login kembali.");
+    showSuccessModal("Sesi pengguna tidak valid. Silakan login kembali.");
     window.location.href = 'login.html'; 
   });
 
@@ -402,16 +407,16 @@ document.addEventListener('DOMContentLoaded', () => {
         try {
           navigator.clipboard.writeText(inputElement.value)
             .then(() => {
-              alert('Nomor berhasil disalin: ' + inputElement.value);
+              showSuccessModal('Nomor berhasil disalin: ' + inputElement.value);
             })
             .catch(err => {
               console.error('Gagal menyalin teks: ', err);
-              alert('Gagal menyalin nomor. Silakan salin manual.');
+              showSuccessModal('Gagal menyalin nomor. Silakan salin manual.');
             });
         } catch (err) {
           // Fallback for older browsers
           document.execCommand('copy');
-          alert('Nomor berhasil disalin: ' + inputElement.value);
+          showSuccessModal('Nomor berhasil disalin: ' + inputElement.value);
         }
       }
     });
@@ -533,7 +538,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   document.getElementById('btn-deposit').onclick = async () => {
-    if (!uid) { alert("Anda harus login untuk melakukan deposit."); return; }
+    if (!uid) { showSuccessModal("Anda harus login untuk melakukan deposit."); return; }
     document.getElementById('popup-deposit').style.display = 'flex';
     const userEmail = await getCurrentUserEmail();
     if (userEmail) {
@@ -548,7 +553,7 @@ document.addEventListener('DOMContentLoaded', () => {
       .single();
 
     if (error || !data) {
-      alert('Gagal ambil data eWallet.');
+      showSuccessModal('Gagal ambil data eWallet.');
       return;
     }
 
@@ -565,7 +570,7 @@ document.addEventListener('DOMContentLoaded', () => {
       .single();
 
     if (error || !data) {
-      alert('Gagal ambil data QRIS.');
+      showSuccessModal('Gagal ambil data QRIS.');
       return;
     }
 
@@ -585,7 +590,7 @@ document.addEventListener('DOMContentLoaded', () => {
       .single();
 
     if (error || !data) {
-      alert('Gagal ambil data eWallet.');
+      showSuccessModal('Gagal ambil data eWallet.');
       return;
     }
 
@@ -598,7 +603,7 @@ document.addEventListener('DOMContentLoaded', () => {
   };
 
   document.getElementById('dep-submit').onclick = async () => {
-    if (!uid) { alert("Anda harus login untuk melakukan deposit."); return; }
+    if (!uid) { showSuccessModal("Anda harus login untuk melakukan deposit."); return; }
     const nama = document.getElementById('dep-nama').value;
     const email = document.getElementById('dep-email').value;
     const nomor = document.getElementById('dep-nomor').value;
@@ -606,7 +611,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const metode = 'eWallet'; 
 
     if (!nama || !nomor || !jumlah || !email) {
-      alert("Lengkapi semua kolom.");
+      showSuccessModal("Lengkapi semua kolom.");
       return;
     }
 
@@ -632,7 +637,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (error) {
       console.error(error);
-      alert("Gagal kirim deposit. Silakan coba lagi.");
+      showSuccessModal("Gagal kirim deposit. Silakan coba lagi.");
       // --- START: Jika ada error, hapus atau ubah status "pending" yang instan tadi ---
       const tempRow = depositTableBody.querySelector(`[data-id="temp-${now.getTime()}"]`); 
       if (tempRow) {
@@ -640,14 +645,14 @@ document.addEventListener('DOMContentLoaded', () => {
       }
       // --- END: Jika ada error ---
     } else {
-      alert("Permintaan deposit dikirim. ..");
+      showSuccessModal("Permintaan deposit dikirim. ..");
       closePopup('popup-deposit');
       loadProfile();
     }
   };
 
   document.getElementById('btn-withdraw').onclick = async () => { 
-    if (!uid) { alert("Anda harus login untuk melakukan penarikan."); return; }
+    if (!uid) { showSuccessModal("Anda harus login untuk melakukan penarikan."); return; }
     document.getElementById('popup-withdraw').style.display = 'flex';
     const userEmail = await getCurrentUserEmail(); 
     if (userEmail) {
@@ -656,7 +661,7 @@ document.addEventListener('DOMContentLoaded', () => {
   };
 
   document.getElementById('with-submit').onclick = async () => {
-    if (!uid) { alert("Anda harus login untuk melakukan penarikan."); return; }
+    if (!uid) { showSuccessModal("Anda harus login untuk melakukan penarikan."); return; }
 
     const nama = document.getElementById('with-nama').value;
     const email = document.getElementById('with-email').value;
@@ -665,12 +670,12 @@ document.addEventListener('DOMContentLoaded', () => {
     const jumlah = parseInt(document.getElementById('with-jumlah').value); 
 
     if (!nama || !metode || !nomor || !jumlah || !email) {
-      alert("Lengkapi semua kolom.");
+      showSuccessModal("Lengkapi semua kolom.");
       return;
     }
 
     if (isNaN(jumlah) || jumlah <= 0) { 
-        alert("Jumlah penarikan harus angka positif.");
+        showSuccessModal("Jumlah penarikan harus angka positif.");
         return;
     }
 
@@ -683,17 +688,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (saldoError && saldoError.code !== 'PGRST116') { 
         console.error('Error fetching user saldo for withdraw:', saldoError);
-        alert('Gagal mengambil saldo user untuk penarikan. Silakan coba lagi.');
+        showSuccessModal('Gagal mengambil saldo user untuk penarikan. Silakan coba lagi.');
         return;
     } else if (saldoError && saldoError.code === 'PGRST116' || (userData && userData.saldo === null)) {
-        alert('Saldo Anda 0. Tidak bisa melakukan penarikan.');
+        showSuccessModal('Saldo Anda 0. Tidak bisa melakukan penarikan.');
         return;
     }
     
     const currentSaldo = userData.saldo;
 
     if (jumlah > currentSaldo) {
-        alert(`Saldo tidak mencukupi. Saldo Anda saat ini adalah Rp${currentSaldo.toLocaleString('id-ID')}.`);
+        showSuccessModal(`Saldo tidak mencukupi. Saldo Anda saat ini adalah Rp${currentSaldo.toLocaleString('id-ID')}.`);
         return; 
     }
 
@@ -720,7 +725,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (updateSaldoError) {
         console.error('Error updating saldo during withdraw request:', updateSaldoError);
-        alert('Gagal mengurangi saldo. Silakan coba lagi. Saldo Anda tidak berkurang.');
+        showSuccessModal('Gagal mengurangi saldo. Silakan coba lagi. Saldo Anda tidak berkurang.');
         const tempRow = withdrawTableBody.querySelector(`[data-id="temp-${now.getTime()}"]`);
         if (tempRow) {
             tempRow.remove(); 
@@ -739,7 +744,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (insertRequestError) {
         console.error('Error inserting withdraw request:', insertRequestError);
-        alert('Gagal mencatat permintaan penarikan. Saldo Anda akan dikembalikan. Silakan coba lagi.');
+        showSuccessModal('Gagal mencatat permintaan penarikan. Saldo Anda akan dikembalikan. Silakan coba lagi.');
         
         const { error: refundError } = await supabase
             .from('users_data')
@@ -748,7 +753,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (refundError) {
             console.error('CRITICAL ERROR: Gagal mengembalikan saldo setelah permintaan penarikan gagal dicatat:', refundError);
-            alert('KRITIS: Saldo gagal dikembalikan setelah permintaan penarikan gagal dicatat. MOHON SEGERA HUBUNGI ADMIN!');
+            showSuccessModal('KRITIS: Saldo gagal dikembalikan setelah permintaan penarikan gagal dicatat. MOHON SEGERA HUBUNGI ADMIN!');
         } else {
             document.getElementById('saldo-display').textContent = `Saldo: Rp${currentSaldo.toLocaleString('id-ID')}`;
         }
@@ -758,24 +763,17 @@ document.addEventListener('DOMContentLoaded', () => {
             tempRow.remove();
         }
     } else {
-        alert('Permintaan penarikan dikirim dan saldo berhasil dikurangi. Menunggu proses admin.');
+        showSuccessModal('Permintaan penarikan dikirim dan saldo berhasil dikurangi. Menunggu proses admin.');
         closePopup('popup-withdraw');
         loadProfile(); 
     }
   };
 
-
-  // --- OLD btn-main-game handler, akan diganti oleh yang baru ---
-  // document.getElementById('btn-main-game').onclick = () => {
-  // const mainGameBtn = document.getElementById('btn-main-game');
-  // mainGameBtn.classList.add('loading');
-
-  // setTimeout(() => {
-  //   window.location.href = 'slot.html';
-  // }, 4000); 
-  // };
-  // --- END OLD btn-main-game handler ---
-
+function showSuccessModal(message) {
+  document.getElementById('modalMessage').innerText = message;
+  document.getElementById('successModal').style.display = 'flex';
+  }
+  
 </script>
 </body>
 </html>
