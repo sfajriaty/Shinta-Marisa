@@ -530,6 +530,7 @@
     let uid = localStorage.getItem('uid');
     let currentSaldo = 0; // Deklarasi dan inisialisasi currentSaldo
 
+
     const saldoDisplay = document.getElementById('saldo-display');
     const betAmountInput = document.getElementById('bet-amount');
     const numberGuessOptions = document.querySelectorAll('input[name="number-guess"]');
@@ -637,6 +638,7 @@
       }
       return true;
     }
+
     // Function to render dots on a dice element
     function renderDiceDots(element, value) {
         element.innerHTML = ''; // Clear existing dots
@@ -753,19 +755,17 @@
         renderDiceDots(die3Display, die3);
         animalDieDisplay.innerHTML = animalResultEmoji;
 
-        let totalWinAmount = 0;
+        let totalWinAmount = 0; // Ini akan menjadi keuntungan murni
         let finalMessage = "Anda kalah!";
-        // let isOverallWin = false; // Variabel ini tidak benar-benar digunakan, bisa dihapus
-
+        
         // Check Animal Guess
         if (selectedAnimalGuess) {
             if (selectedAnimalGuess === animalResultKey) {
-                const winMultiplier = 4; // 4x payout for correct animal guess
-                totalWinAmount += betAmount * winMultiplier;
-                // isOverallWin = true; // Tidak perlu
-                finalMessage = `Selamat! Anda menebak hewan dengan benar (${animalResultKey.charAt(0).toUpperCase() + animalResultKey.slice(1)})! Anda menang Rp${(betAmount * winMultiplier).toLocaleString('id-ID')}. `;
+                const winMultiplier = 4; // 4x payout
+                totalWinAmount += betAmount * (winMultiplier - 1); // KEUNTUNGAN: (4x - 1x modal) = 3x betAmount
+                finalMessage = `Selamat! (${animalResultKey.charAt(0).toUpperCase() + animalResultKey.slice(1)})! Rp${(betAmount * winMultiplier).toLocaleString('id-ID')}. `;
             } else {
-                finalMessage += `Tebakan hewan salah (${selectedAnimalGuess.charAt(0).toUpperCase() + selectedAnimalGuess.slice(1)}), hasil: ${animalResultKey.charAt(0).toUpperCase() + animalResultKey.slice(1)}. `;
+                finalMessage += ` (${selectedAnimalGuess.charAt(0).toUpperCase() + selectedAnimalGuess.slice(1)}), hasil: ${animalResultKey.charAt(0).toUpperCase() + animalResultKey.slice(1)}. `;
             }
         }
 
@@ -779,32 +779,32 @@
             if (die3 === guessedNumber) { numberMatches++; }
             
             if (numberMatches > 0) {
-                const multiplier = numberMatches; // Multiplier is exactly the number of matches (x1, x2, or x3)
-                totalWinAmount += betAmount * multiplier;
-                // isOverallWin = true; // Tidak perlu
+                const multiplier = numberMatches; // multiplier 1x, 2x, atau 3x (ini adalah keuntungan murni)
+                totalWinAmount += betAmount * multiplier; 
+                
                 if (finalMessage.includes("Selamat!")) {
-                    finalMessage += `Dan Anda menebak angka ${guessedNumber} dengan benar (${numberMatches} kali)! Total kemenangan angka: Rp${(betAmount * multiplier).toLocaleString('id-ID')}!`;
+                    finalMessage += ` ${guessedNumber} (${numberMatches} )! Total kemenangan : Rp${(betAmount * (multiplier + 1)).toLocaleString('id-ID')}!`; // Tampilkan total payout (modal + keuntungan)
                 } else {
-                    finalMessage = `Selamat! Anda menebak angka ${guessedNumber} dengan benar (${numberMatches} kali)! Anda menang Rp${(betAmount * multiplier).toLocaleString('id-ID')}.`;
+                    finalMessage = `Selamat! ${guessedNumber} (${numberMatches} Rp${(betAmount * (multiplier + 1)).toLocaleString('id-ID')}.`; // Tampilkan total payout (modal + keuntungan)
                 }
             } else {
                 if (finalMessage.includes("Anda kalah!")) {
-                    finalMessage += `Tebakan angka ${guessedNumber} salah.`;
+                    finalMessage += ` ${guessedNumber} `;
                 } else {
-                    finalMessage += ` Namun, tebakan angka ${guessedNumber} salah.`;
+                    finalMessage += `  ${guessedNumber} `;
                 }
             }
         }
         
         if (totalWinAmount > 0) {
-            currentSaldo += totalWinAmount;
+            currentSaldo += betAmount + totalWinAmount; // KEMBALIKAN MODAL + TAMBAHKAN KEUNTUNGAN MURNI
             gameMessage.classList.add('win');
             winSound.play();
         } else {
             // Jika totalWinAmount 0, berarti kalah, pastikan pesan kalah muncul.
-            // Pastikan pesan kalah tidak menimpa pesan lain jika sudah ada (misal dari tebakan hewan yang salah tapi tebakan angka juga salah)
-            if (!finalMessage.includes("Selamat!")) { // Hanya tambahkan "Anda kalah kali ini" jika belum ada kemenangan
-                finalMessage = "Anda kalah kali ini. Coba lagi! " + finalMessage;
+            if (!finalMessage.includes("Selamat!") && !finalMessage.includes("Kalah")) {
+                // Tambahkan pesan kalah umum hanya jika belum ada pesan kemenangan atau pesan salah tebak hewan
+                finalMessage = "Anda kalah! " + finalMessage;
             }
             gameMessage.classList.add('lose');
             loseSound.play();
@@ -820,8 +820,9 @@
         numberGuessOptions.forEach(radio => radio.disabled = false);
         animalGuessOptions.forEach(radio => radio.disabled = false);
 
-      }, 2500); // Animation time
+      }, 2500); // Durasi kocokan dadu dalam milidetik (2.5 detik)
     }
   </script>
 </body>
-  </html>
+</html>
+
