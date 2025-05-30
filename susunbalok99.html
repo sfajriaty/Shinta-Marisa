@@ -24,7 +24,7 @@
         body {
             margin: 0;
             overflow: hidden; /* Sembunyikan scrollbar jika canvas melebihi viewport */
-            font-family: 'Press Start 2P', cursive; /* Gunakan font Press Start 2P */
+            font-family: 'Press Start ', cursive; /* Gunakan font Press Start 2P */
             color: var(--text-light);
             display: flex;
             justify-content: center;
@@ -174,7 +174,7 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            height: 30px; /* Tinggi tetap untuk tombol */
+            height: 35px; /* Tinggi tetap untuk tombol */
             box-shadow: 0 4px 0 var(--button-active); /* Efek 3D */
             -webkit-tap-highlight-color: transparent; /* Hilangkan highlight di Android saat tap */
         }
@@ -319,8 +319,8 @@
 
         // Konfigurasi Game Board
         const TILE_SIZE = 10;
-        const BOARD_WIDTH = 20;
-        const BOARD_HEIGHT = 30;
+        const BOARD_WIDTH = 15;
+        const BOARD_HEIGHT = 20;
 
         // Sesuaikan ukuran canvas berdasarkan TILE_SIZE dan BOARD_DIMENSIONS
         canvas.width = BOARD_WIDTH * TILE_SIZE; 
