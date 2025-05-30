@@ -184,14 +184,9 @@
       background: #fff;
       color: #28a745; /* This color might not affect emojis, which have their own rendering */
       border-color: red;
-      line-height: 1; /* Adjust line height for better emoji centering */
+      line-height: 1;
     }
-
-    /* Sections */
-    .bet-section {
-      margin-bottom: 15px; /* Reduced margin */
-      text-align: center; /* Memusatkan input taruhan dan labelnya */
-    }
+    
     .guess-section {
       margin-bottom: 15px; /* Reduced margin */
       text-align: center; /* Memusatkan label tebakan */
@@ -226,6 +221,62 @@
     }
     input[type="number"]::placeholder {
       color: #ccc;
+    }
+   
+       /* Tambahkan di bawah bagian input[type="number"] atau di akhir CSS Anda */
+    .bet-control {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 10px; /* Jarak antara tombol dan tampilan taruhan */
+        margin-top: 5px; /* Sedikit jarak dari label */
+        margin-bottom: 15px; /* Jarak ke elemen berikutnya */
+    }
+
+    .bet-control #display-bet-amount {
+        font-size: 20px;
+        font-weight: 700;
+        color: #ffeb3b;
+        min-width: 100px; /* Agar ukurannya stabil saat angka berubah */
+        text-align: center;
+    }
+
+    .btn-bet-adjust {
+        background: #007bff; /* Warna biru untuk tombol adjust */
+        color: white;
+        border: none;
+        border-radius: 50%; /* Membuat tombol bulat */
+        width: 40px; /* Ukuran tombol */
+        height: 40px; /* Ukuran tombol */
+        font-size: 24px;
+        font-weight: 700;
+        cursor: pointer;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        transition: background 0.3s, transform 0.2s;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+    }
+
+    .btn-bet-adjust:hover {
+        background: #0056b3;
+        transform: translateY(-1px);
+    }
+
+    .btn-bet-adjust:active {
+        transform: translateY(0);
+        box-shadow: none;
+    }
+
+    /* Jika Anda ingin warna yang lebih sesuai dengan tema emas/oranye */
+    .btn-bet-adjust {
+        background: #ffc107; /* Warna emas */
+        color: #333; /* Warna teks gelap */
+        box-shadow: 0 0 10px rgba(255,193,7,0.7);
+    }
+    .btn-bet-adjust:hover {
+        background: #ffcd38;
+        box-shadow: 0 0 15px rgba(255,193,7,0.9);
     }
 
     /* Guess Options - Boxes (for number and animal) */
@@ -326,25 +377,93 @@
         transform: none;
     }
 
-    /* Message Display */
-    .message {
-      margin-top: 20px; /* Reduced margin */
-      font-size: 20px; /* Smaller message font */
-      font-weight: 700;
-      color: #fff;
-      text-shadow: 0 0 8px rgba(255,255,255,0.8);
-      min-height: 25px; /* Reduced min-height */
-    }
-    .message.win {
-        color: #aaffaa;
-        text-shadow: 0 0 12px #aaffaa, 0 0 20px rgba(170,255,170,0.8);
-    }
-    .message.lose {
-        color: #ffaaaa;
-        text-shadow: 0 0 12px #ffaaaa, 0 0 20px rgba(255,170,170,0.8);
-    }
+.message {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.7); 
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  opacity: 0;
+  visibility: hidden; 
+  transition: opacity 0.3s ease, visibility 0.3s ease;
+  flex-direction: column; 
+  padding: 20px; 
+}
 
-    /* Responsive adjustments for even smaller screens */
+.message.active {
+  opacity: 1;
+  visibility: visible;
+}
+
+.message p {
+    font-size: 1.8em; /* Ukuran font lebih besar untuk judul */
+    font-weight: 700;
+    margin-bottom: 15px; /* Jarak antara judul dan pesan */
+    font-family: 'Luckiest Guy', cursive;
+    text-shadow: 0 0 10px; /* Default shadow */
+}
+
+.message span { /* Untuk detail pesan di bawah judul */
+    font-size: 1.1em;
+    font-weight: 400;
+    line-height: 1.4;
+    text-align: center;
+}
+
+/* Warna untuk pesan menang/kalah */
+.message.win p {
+    color: #aaffaa;
+    text-shadow: 0 0 15px #aaffaa;
+}
+.message.win span {
+    color: #e0ffe0;
+}
+.message.lose p {
+    color: #ffaaaa;
+    text-shadow: 0 0 15px #ffaaaa;
+}
+.message.lose span {
+    color: #ffe0e0;
+}
+
+/* Tombol Tutup (opsional, tapi disarankan untuk popup) */
+.message .close-popup-btn {
+    background: #ff9500;
+    border: none;
+    border-radius: 25px;
+    padding: 10px 20px;
+    font-size: 1em;
+    font-weight: 700;
+    cursor: pointer;
+    color: #fff;
+    box-shadow: 0 0 10px #ffb347;
+    transition: background 0.3s, transform 0.2s;
+    margin-top: 25px; /* Jarak dari teks pesan */
+}
+.message .close-popup-btn:hover {
+    background: #ffb347;
+    transform: translateY(-1px);
+}
+
+/* Media queries untuk responsif */
+@media (max-width: 550px) {
+    .message p { font-size: 1.6em; margin-bottom: 10px; }
+    .message span { font-size: 1em; }
+    .message .close-popup-btn { padding: 8px 18px; font-size: 0.95em; margin-top: 20px; }
+}
+@media (max-width: 400px) {
+    .message p { font-size: 1.4em; margin-bottom: 8px; }
+    .message span { font-size: 0.9em; }
+    .message .close-popup-btn { padding: 7px 15px; font-size: 0.9em; margin-top: 15px; }
+}
+
+
+  
     @media (max-width: 550px) {
         .game-container {
             padding: 20px 25px;
@@ -442,12 +561,15 @@
       <div class="dice animal" id="animal-die">❓</div> </div>
 
     <div class="bet-section">
-      <label for="bet-amount">Jumlah Taruhan (Rp):</label>
-      <input type="number" id="bet-amount" placeholder="Minimal Rp1000" min="1000" step="1000" value="1000">
+        <label>Jumlah Taruhan (Rp):</label>
+        <div class="bet-control">
+         <button class="btn-bet-adjust" id="decrease-bet">-</button>
+            <span id="display-bet-amount">Rp100</span> <button class="btn-bet-adjust" id="increase-bet">+</button>
+        </div>
     </div>
 
     <div class="guess-section">
-      <label>Tebakan Angka (Pilih 1-6 pada Dadu):</label>
+      <label>Tebakan Dadu</label>
       <div class="guess-options-grid">
         <input type="radio" id="guess-num-1" name="number-guess" value="1">
         <label for="guess-num-1" class="guess-box number-guess-box" data-value="1">
@@ -477,7 +599,7 @@
     </div>
 
     <div class="guess-section">
-      <label>Tebakan Simbol Hewan:</label>
+      <label> Simbol Hewan (x4)</label>
       <div class="guess-options-grid">
         <input type="radio" id="guess-gajah" name="animal-guess" value="gajah">
         <label for="guess-gajah" class="guess-box animal-guess-box">🐘</label>
@@ -530,9 +652,8 @@
     let uid = localStorage.getItem('uid');
     let currentSaldo = 0; // Deklarasi dan inisialisasi currentSaldo
 
-
-    const saldoDisplay = document.getElementById('saldo-display');
-    const betAmountInput = document.getElementById('bet-amount');
+  const saldoDisplay = document.getElementById('saldo-display');
+    // const betAmountInput = document.getElementById('bet-amount'); // REMOVED
     const numberGuessOptions = document.querySelectorAll('input[name="number-guess"]');
     const animalGuessOptions = document.querySelectorAll('input[name="animal-guess"]');
     const rollDiceBtn = document.getElementById('roll-dice-btn');
@@ -541,6 +662,15 @@
     const die3Display = document.getElementById('die3');
     const animalDieDisplay = document.getElementById('animal-die');
     const gameMessage = document.getElementById('game-message');
+
+    // New Bet Adjustment Elements
+    const decreaseBetBtn = document.getElementById('decrease-bet');
+    const increaseBetBtn = document.getElementById('increase-bet');
+    const displayBetAmount = document.getElementById('display-bet-amount');
+
+    const MIN_BET_UNIT = 100; // Minimum unit for bet adjustment
+    const BET_STEP = 100; // Step for bet adjustment
+    let currentManualBet = MIN_BET_UNIT; // Current base bet selected by user
 
     // Audio Elements
     const bgMusic = document.getElementById('bg-music');
@@ -563,6 +693,25 @@
     document.addEventListener('DOMContentLoaded', async () => {
       await loadUserProfile();
       rollDiceBtn.addEventListener('click', playDiceGame);
+      
+      // Event listeners for bet adjustment buttons
+      decreaseBetBtn.addEventListener('click', () => {
+          if (currentManualBet > MIN_BET_UNIT) {
+              currentManualBet -= BET_STEP;
+              displayBetAmount.textContent = `Rp${currentManualBet.toLocaleString('id-ID')}`;
+              clickSound.play();
+          }
+      });
+
+      increaseBetBtn.addEventListener('click', () => {
+          currentManualBet += BET_STEP;
+          displayBetAmount.textContent = `Rp${currentManualBet.toLocaleString('id-ID')}`;
+          clickSound.play();
+      });
+
+      // Initialize displayed bet amount
+      displayBetAmount.textContent = `Rp${currentManualBet.toLocaleString('id-ID')}`;
+
       // Play background music on user interaction (e.g., first click)
       document.body.addEventListener('click', () => {
         if (bgMusic.paused) {
@@ -667,7 +816,7 @@
       gameMessage.textContent = '';
       gameMessage.className = 'message';
 
-      const betAmount = parseInt(betAmountInput.value);
+      let betAmount = 0; // Final bet amount based on chosen guesses
       let selectedNumberGuess = null;
       for (const radio of numberGuessOptions) {
         if (radio.checked) {
@@ -684,29 +833,24 @@
         }
       }
 
-      if (isNaN(betAmount) || betAmount < 1000) {
-        alert('Jumlah taruhan minimal Rp1000.');
-        return;
-      }
-
-      if (betAmount % 1000 !== 0) {
-        alert('Jumlah taruhan harus kelipatan Rp1000.');
-        return;
-      }
-
-      if (!selectedNumberGuess && !selectedAnimalGuess) {
-        alert('Pilih tebakan Angka (1-6) atau tebakan Simbol Hewan.');
-        return;
+      if (selectedNumberGuess && selectedAnimalGuess) {
+          betAmount = currentManualBet * 2; // Bet 2x if both types are guessed
+      } else if (selectedNumberGuess || selectedAnimalGuess) {
+          betAmount = currentManualBet; // Bet 1x if only one type is guessed
+      } else {
+          alert('Pilih tebakan Angka (1-6) atau tebakan Simbol Hewan.');
+          return; // Stop game if no guess is selected
       }
 
       if (currentSaldo < betAmount) {
-        alert('Saldo Anda tidak cukup untuk taruhan ini!');
+        alert('Saldo Anda tidak cukup untuk taruhan ini! Diperlukan Rp' + betAmount.toLocaleString('id-ID'));
         return;
       }
 
       // Disable buttons and inputs
       rollDiceBtn.disabled = true;
-      betAmountInput.disabled = true;
+      decreaseBetBtn.disabled = true;
+      increaseBetBtn.disabled = true;
       numberGuessOptions.forEach(radio => radio.disabled = true);
       animalGuessOptions.forEach(radio => radio.disabled = true);
 
@@ -717,12 +861,13 @@
         currentSaldo += betAmount; // Revert saldo if update failed
         saldoDisplay.textContent = `Saldo: Rp${currentSaldo.toLocaleString('id-ID')}`;
         rollDiceBtn.disabled = false;
-        betAmountInput.disabled = false;
+        decreaseBetBtn.disabled = false;
+        increaseBetBtn.disabled = false;
         numberGuessOptions.forEach(radio => radio.disabled = false);
         animalGuessOptions.forEach(radio => radio.disabled = false);
         return;
       }
-      saldoDisplay.textContent = `Saldo: Rp${currentSaldo.toLocaleString('id-ID')}`;
+      saldoDisplay.textContent = `Saldo: Rp.${currentSaldo.toLocaleString('id-ID')}`;
 
       // Animate dice rolling
       die1Display.classList.add('rolling');
@@ -755,17 +900,19 @@
         renderDiceDots(die3Display, die3);
         animalDieDisplay.innerHTML = animalResultEmoji;
 
-        let totalWinAmount = 0; // Ini akan menjadi keuntungan murni
+        let totalWinAmount = 0; // This will be the pure profit (excluding the returned bet)
         let finalMessage = "Anda kalah!";
-        
+        let isAnyWin = false; // Flag to check if any guess was correct
+
         // Check Animal Guess
         if (selectedAnimalGuess) {
             if (selectedAnimalGuess === animalResultKey) {
                 const winMultiplier = 4; // 4x payout
-                totalWinAmount += betAmount * (winMultiplier - 1); // KEUNTUNGAN: (4x - 1x modal) = 3x betAmount
-                finalMessage = `Selamat! (${animalResultKey.charAt(0).toUpperCase() + animalResultKey.slice(1)})! Rp${(betAmount * winMultiplier).toLocaleString('id-ID')}. `;
+                totalWinAmount += currentManualBet * (winMultiplier - 1); // Profit from animal bet
+                isAnyWin = true;
+                finalMessage = `Selamat! (${animalResultKey.charAt(0).toUpperCase() + animalResultKey.slice(1)})! Payout hewan: Rp${(currentManualBet * winMultiplier).toLocaleString('id-ID')}. `;
             } else {
-                finalMessage += ` (${selectedAnimalGuess.charAt(0).toUpperCase() + selectedAnimalGuess.slice(1)}), hasil: ${animalResultKey.charAt(0).toUpperCase() + animalResultKey.slice(1)}. `;
+                finalMessage += `Tebakan hewan salah (${selectedAnimalGuess.charAt(0).toUpperCase() + selectedAnimalGuess.slice(1)}), hasil: ${animalResultKey.charAt(0).toUpperCase() + animalResultKey.slice(1)}. `;
             }
         }
 
@@ -779,32 +926,40 @@
             if (die3 === guessedNumber) { numberMatches++; }
             
             if (numberMatches > 0) {
-                const multiplier = numberMatches; // multiplier 1x, 2x, atau 3x (ini adalah keuntungan murni)
-                totalWinAmount += betAmount * multiplier; 
+                const multiplier = numberMatches; // Multiplier is exactly the number of matches (1x, 2x, or 3x PROFIT)
+                totalWinAmount += currentManualBet * multiplier; 
+                isAnyWin = true;
                 
                 if (finalMessage.includes("Selamat!")) {
-                    finalMessage += ` ${guessedNumber} (${numberMatches} )! Total kemenangan : Rp${(betAmount * (multiplier + 1)).toLocaleString('id-ID')}!`; // Tampilkan total payout (modal + keuntungan)
+                    finalMessage += ` ${guessedNumber} (${numberMatches} kali)! Payout angka: Rp${(currentManualBet * (multiplier + 1)).toLocaleString('id-ID')}!`; // Display total payout (bet + profit)
                 } else {
-                    finalMessage = `Selamat! ${guessedNumber} (${numberMatches} Rp${(betAmount * (multiplier + 1)).toLocaleString('id-ID')}.`; // Tampilkan total payout (modal + keuntungan)
+                    finalMessage = `Selamat! ${guessedNumber} (${numberMatches} kali)! Rp${(currentManualBet * (multiplier + 1)).toLocaleString('id-ID')}.`; // Display total payout (bet + profit)
                 }
             } else {
-                if (finalMessage.includes("Anda kalah!")) {
-                    finalMessage += ` ${guessedNumber} `;
+                if (!isAnyWin) { // Only add if no animal win and no number win yet
+                    if (finalMessage.includes("Anda kalah!")) {
+                        finalMessage += ` ${guessedNumber} `;
+                    } else {
+                        finalMessage += `  ${guessedNumber} `;
+                    }
                 } else {
-                    finalMessage += `  ${guessedNumber} `;
+                    finalMessage += ` ${guessedNumber} `;
                 }
             }
         }
-        
-        if (totalWinAmount > 0) {
-            currentSaldo += betAmount + totalWinAmount; // KEMBALIKAN MODAL + TAMBAHKAN KEUNTUNGAN MURNI
+        if (isAnyWin) { // Check if there was any win (animal or number)
+            currentSaldo += betAmount + totalWinAmount; // RETURN BET + ADD PURE PROFIT
             gameMessage.classList.add('win');
             winSound.play();
         } else {
-            // Jika totalWinAmount 0, berarti kalah, pastikan pesan kalah muncul.
-            if (!finalMessage.includes("Selamat!") && !finalMessage.includes("Kalah")) {
-                // Tambahkan pesan kalah umum hanya jika belum ada pesan kemenangan atau pesan salah tebak hewan
-                finalMessage = "Anda kalah! " + finalMessage;
+            // If no win at all, ensure a clear losing message
+            if (!finalMessage.includes("") && !finalMessage.includes("")) {
+                // This means no specific wrong guess message was appended, so add a generic one.
+                 finalMessage = "Anda kalah" + finalMessage;
+            } else if (finalMessage.includes("Selamat!")) {
+                // If by some chance a winning message was partially constructed but then logic
+                // determined no actual win, revert to lose message. This is a safeguard.
+                finalMessage = "Anda kalah";
             }
             gameMessage.classList.add('lose');
             loseSound.play();
@@ -816,7 +971,8 @@
 
         // Re-enable buttons and inputs
         rollDiceBtn.disabled = false;
-        betAmountInput.disabled = false;
+        decreaseBetBtn.disabled = false;
+        increaseBetBtn.disabled = false;
         numberGuessOptions.forEach(radio => radio.disabled = false);
         animalGuessOptions.forEach(radio => radio.disabled = false);
 
@@ -824,5 +980,4 @@
     }
   </script>
 </body>
-</html>
-
+  </html>
