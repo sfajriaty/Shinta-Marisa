@@ -814,7 +814,7 @@
     async function playDiceGame() {
       clickSound.play();
       gameMessage.textContent = '';
-      gameMessage.className = 'message';
+      gameMessage.className = 'message'; // Ini mengatur ulang kelas dasar, tapi kita akan menambahkan 'active' nanti
 
       let betAmount = 0; // Final bet amount based on chosen guesses
       let selectedNumberGuess = null;
@@ -874,7 +874,7 @@
       die2Display.classList.add('rolling');
       die3Display.classList.add('rolling');
       animalDieDisplay.classList.add('rolling');
-      
+
       // Initial "?" state for dice
       renderDiceDots(die1Display, '?');
       renderDiceDots(die2Display, '?');
@@ -900,74 +900,76 @@
         renderDiceDots(die3Display, die3);
         animalDieDisplay.innerHTML = animalResultEmoji;
 
-        let totalWinAmount = 0; // This will be the pure profit (excluding the returned bet)
-        let finalMessage = "Anda kalah!";
-        let isAnyWin = false; // Flag to check if any guess was correct
+        let totalProfit = 0; // Ini adalah keuntungan murni, tidak termasuk taruhan yang dikembalikan
+        let winDetails = []; // Array untuk menyimpan detail kemenangan
+        let isAnyWin = false;
 
         // Check Animal Guess
         if (selectedAnimalGuess) {
             if (selectedAnimalGuess === animalResultKey) {
                 const winMultiplier = 4; // 4x payout
-                totalWinAmount += currentManualBet * (winMultiplier - 1); // Profit from animal bet
+                const animalWinAmount = currentManualBet * winMultiplier;
+                totalProfit += currentManualBet * (winMultiplier - 1); // Keuntungan murni dari hewan
+                winDetails.push(`Tebakan Hewan: **${animals[selectedAnimalGuess]} (${selectedAnimalGuess.charAt(0).toUpperCase() + selectedAnimalGuess.slice(1)})** tepat! Anda memenangkan **Rp${animalWinAmount.toLocaleString('id-ID')}** (taruhan Rp${currentManualBet.toLocaleString('id-ID')} x${winMultiplier}).`);
                 isAnyWin = true;
-                finalMessage = `Selamat! (${animalResultKey.charAt(0).toUpperCase() + animalResultKey.slice(1)})! Payout hewan: Rp${(currentManualBet * winMultiplier).toLocaleString('id-ID')}. `;
             } else {
-                finalMessage += `Tebakan hewan salah (${selectedAnimalGuess.charAt(0).toUpperCase() + selectedAnimalGuess.slice(1)}), hasil: ${animalResultKey.charAt(0).toUpperCase() + animalResultKey.slice(1)}. `;
+                winDetails.push(`Tebakan Hewan: **${animals[selectedAnimalGuess]} (${selectedAnimalGuess.charAt(0).toUpperCase() + selectedAnimalGuess.slice(1)})** salah. Hasil: **${animals[animalResultKey]} (${animalResultKey.charAt(0).toUpperCase() + animalResultKey.slice(1)})**.`);
             }
         }
 
-        // Check Number Guess (if any of the three number dice matches)
+        // Check Number Guess
         if (selectedNumberGuess) {
             const guessedNumber = parseInt(selectedNumberGuess);
-            let numberMatches = 0; // Count how many times the guessed number appears
-            
+            let numberMatches = 0;
             if (die1 === guessedNumber) { numberMatches++; }
             if (die2 === guessedNumber) { numberMatches++; }
             if (die3 === guessedNumber) { numberMatches++; }
-            
+
             if (numberMatches > 0) {
-                const multiplier = numberMatches; // Multiplier is exactly the number of matches (1x, 2x, or 3x PROFIT)
-                totalWinAmount += currentManualBet * multiplier; 
+                const multiplier = numberMatches; // Multiplier adalah jumlah kemunculan angka
+                const numberWinAmount = currentManualBet * (multiplier + 1); // Total payout (bet + profit)
+                totalProfit += currentManualBet * multiplier; // Keuntungan murni dari angka
+                winDetails.push(`Tebakan Angka: **${guessedNumber}** tepat (${numberMatches} kali)! Anda memenangkan **Rp${numberWinAmount.toLocaleString('id-ID')}** (taruhan Rp${currentManualBet.toLocaleString('id-ID')} x${multiplier+1}).`);
                 isAnyWin = true;
-                
-                if (finalMessage.includes("Selamat!")) {
-                    finalMessage += ` ${guessedNumber} (${numberMatches} kali)! Payout angka: Rp${(currentManualBet * (multiplier + 1)).toLocaleString('id-ID')}!`; // Display total payout (bet + profit)
-                } else {
-                    finalMessage = `Selamat! ${guessedNumber} (${numberMatches} kali)! Rp${(currentManualBet * (multiplier + 1)).toLocaleString('id-ID')}.`; // Display total payout (bet + profit)
-                }
             } else {
-                if (!isAnyWin) { // Only add if no animal win and no number win yet
-                    if (finalMessage.includes("Anda kalah!")) {
-                        finalMessage += ` ${guessedNumber} `;
-                    } else {
-                        finalMessage += `  ${guessedNumber} `;
-                    }
-                } else {
-                    finalMessage += ` ${guessedNumber} `;
-                }
+                winDetails.push(`Tebakan Angka: **${guessedNumber}** salah. Tidak ada dadu angka yang menunjukkan ${guessedNumber}.`);
             }
         }
-        if (isAnyWin) { // Check if there was any win (animal or number)
-            currentSaldo += betAmount + totalWinAmount; // RETURN BET + ADD PURE PROFIT
+
+        let messageTitle = "";
+        let messageBody = "";
+
+        if (isAnyWin) {
+            currentSaldo += betAmount + totalProfit; // Kembalikan taruhan awal + tambahkan keuntungan
+            messageTitle = "Selamat! Anda Menang!";
+            messageBody = `Total kemenangan Anda: **Rp.${(betAmount + totalProfit).toLocaleString('id-ID')}**.<br><br>` + winDetails.join('<br>');
             gameMessage.classList.add('win');
             winSound.play();
         } else {
-            // If no win at all, ensure a clear losing message
-            if (!finalMessage.includes("") && !finalMessage.includes("")) {
-                // This means no specific wrong guess message was appended, so add a generic one.
-                 finalMessage = "Anda kalah" + finalMessage;
-            } else if (finalMessage.includes("Selamat!")) {
-                // If by some chance a winning message was partially constructed but then logic
-                // determined no actual win, revert to lose message. This is a safeguard.
-                finalMessage = "Anda kalah";
-            }
+            messageTitle = "Anda Kalah!";
+            messageBody = `Taruhan Anda **Rp.${betAmount.toLocaleString('id-ID')}** hangus.<br><br>` + winDetails.join('<br>');
             gameMessage.classList.add('lose');
             loseSound.play();
         }
 
         await updateSaldoInSupabase(currentSaldo);
         saldoDisplay.textContent = `Saldo: Rp${currentSaldo.toLocaleString('id-ID')}`;
-        gameMessage.textContent = finalMessage;
+
+        // Mengisi popup dengan struktur HTML yang sesuai
+        gameMessage.innerHTML = `
+            <p>${messageTitle}</p>
+            <span>${messageBody}</span>
+            <button class="close-popup-btn">Tutup</button>
+        `;
+        gameMessage.classList.add('active'); // Tampilkan pop-up
+
+        // Event listener untuk tombol tutup pop-up
+        document.querySelector('#game-message .close-popup-btn').onclick = () => {
+            gameMessage.classList.remove('active');
+            gameMessage.classList.remove('win');
+            gameMessage.classList.remove('lose');
+            clickSound.play(); // Mainkan suara saat tombol tutup diklik
+        };
 
         // Re-enable buttons and inputs
         rollDiceBtn.disabled = false;
@@ -976,8 +978,9 @@
         numberGuessOptions.forEach(radio => radio.disabled = false);
         animalGuessOptions.forEach(radio => radio.disabled = false);
 
-      }, 2500); // Durasi kocokan dadu dalam milidetik (2.5 detik)
+      }, 2500); // Durasi kocokan dadu
     }
+
   </script>
 </body>
-  </html>
+</html>
