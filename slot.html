@@ -59,7 +59,7 @@
       background:;
       padding: 0px;
       border-radius: 2px;
-      box-shadow: inset 0 0 4px rgba(0,0,0,0.3);
+      box-shadow: inset 0 0 4px rgba(0,0,0,0.1);
       border: 2px solid #fff;
     }
     .slot-grid {
@@ -68,17 +68,17 @@
       grid-template-rows: repeat(5, 85px);
       gap: 0px;
       justify-content: center;
-      border: 1px solid red;
+      border: 10px solid red;
     }
     .tile {
-      background: #fff ;
+      background: #333;
       border-radius: 5px;
       display: flex;
       align-items: center;
       justify-content: center;
       font-size: 40px;
       font-weight: bold;
-      box-shadow: 0 9px 9px rgba(0,0,0,0.5);
+      box-shadow: 1 1px 1px rgba(0,0,0,0.5);
       transition: transform 0.1s linear;
       overflow: hidden;
     }
@@ -201,17 +201,17 @@
     }
 
     .tile.wild-symbol {
-      font-size: 55px;
+      font-size: 75px;
       color: gold;
       text-shadow: 0 0 10px yellow, 0 0 20px orange;
-      animation: pulse 1.5s infinite alternate;
+      animation: pulse 0s infinite alternate;
     }
 
     .tile.scatter-symbol {
-      font-size: 55px;
+      font-size: 75px;
       color: cyan;
       text-shadow: 0 0 10px blue, 0 0 20px lightblue;
-      animation: rotate 2s linear infinite;
+      animation: pulse 0s infinite alternate;
     }
 
     @keyframes pulse {
@@ -219,9 +219,9 @@
       100% { transform: scale(1.1); }
     }
 
-    @keyframes rotate {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
+    @keyframes pulse {
+     0% { transform: scale(1); }
+     100% { transform: scale(1.1); }
     }
 
     /* Animasi kemenangan Free Spin */
@@ -242,7 +242,7 @@
     }
 
     .win-animation-content {
-        background: linear-gradient(45deg, #fff, #fff, #fff);
+        background: linear-gradient(45deg, #, #, #);
         padding: 40px 60px;
         border-radius: 50px;
         box-shadow: 0 0 30px rgba(255, 215, 0, 0.8);
@@ -271,6 +271,29 @@
         font-weight: bold;
         text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.2);
     }
+      .tile img {
+        
+      max-width: 100%;
+      max-height: 100%;
+      object-fit: contain;
+      display: block; 
+    }
+
+    .tile:not(.wild-symbol):not(.scatter-symbol) {
+        font-size: 40px;
+        font-weight: bold;
+    }
+
+    .tile.wild-symbol img {
+      font-size: 70px;
+      animation: pulse 0.1s infinite alternate;
+    }
+
+    .tile.scatter-symbol img {
+      animation: pulse 0.2s infinite;
+      alternate;
+    }
+
   </style>
   <audio id="rollSound" src="___"></audio>
   <audio id="winSmallSound" src="https://vqmfachxnjyxwuavpgds.supabase.co/storage/v1/object/public/music//mixkit-money-bag-drop-1989.mp3"></audio>
@@ -326,27 +349,27 @@
 
 
     const symbolPayouts = {
-      '🪁': 15,
-      '🎭': 13,
-      '🧸': 12,
-      '🪅': 11,
-      '🏆': 10,
-      '🎏': 9,
-      '🪄': 6,
-      '🎱': 4,
-      '🀄': 7,
-      '🎎': 6,
-      '🎃': 5,
+      '🦧': 15,
+      '🐅': 13,
+      '🦫': 12,
+      '🐥': 11,
+      '🦜': 10,
+      '🐓': 9,
+      '🕊️': 6,
+      '🐖': 4,
+      '🦕': 7,
+      '🐈': 6,
+      '🐬': 5,
     };
 
     const width = 5;
     const height = 5;
-   const symbols = ['🎃', '🎎', '🀄', '🎱', '🪄', '🎏', '🏆', '🪅', '🧸', '🎭', '🪁', '🌟', '🐉'];
+   const symbols = ['🐬', '🐈', '🦕', '🐖', '🕊️', '🐓', '🦜', '🐥', '🦫', '🐅', '🦧', '🌟', '🐉'];
     const WILD_SYMBOL = '🌟';
     const SCATTER_SYMBOL = '🐉';
 
     let currentSymbols = [];
-    let balance = 0;
+    let balance = 99990;
     let bet = 100;
     const minBet = 100;
     const maxBet = 1000;
@@ -375,7 +398,7 @@ async function loadSaldo() {
     .single();
 
   if (error || !data) {
-    alert("Gagal mengambil saldo!");
+    alert("Gagal mengambil saldo user!");
     return;
   }
 
@@ -383,11 +406,11 @@ async function loadSaldo() {
   updateBalance(0);
 }
 
-
 window.onload = () => {
   loadSaldo();
   init(); // jalankan game
 };
+
 
     function generateRandomSymbols() {
       const arr = [];
@@ -423,15 +446,27 @@ window.onload = () => {
       symbolsArr.forEach(sym => {
         const div = document.createElement('div');
         div.className = 'tile';
-        div.textContent = sym;
+
+        // Logika untuk menampilkan gambar atau teks
         if (sym === WILD_SYMBOL) {
-          div.classList.add('wild-symbol');
+          const img = document.createElement('img');
+          img.src = 'https://vqmfachxnjyxwuavpgds.supabase.co/storage/v1/object/public/qris//download%20(1).png'; // Ganti dengan URL gambar Wild Anda
+          img.alt = 'Wild';
+          div.appendChild(img);
+          div.classList.add('wild-symbol'); // Tambahkan kelas untuk styling
         } else if (sym === SCATTER_SYMBOL) {
-          div.classList.add('scatter-symbol');
+          const img = document.createElement('img');
+          img.src = 'https://vqmfachxnjyxwuavpgds.supabase.co/storage/v1/object/public/qris//2432cb49c2991c8dd62a77f44f51fb45.png'; // Ganti dengan URL gambar Scatter Anda
+          img.alt = 'Scatter';
+          div.appendChild(img);
+          div.classList.add('scatter-symbol'); // Tambahkan kelas untuk styling
+        } else {
+          div.textContent = sym; // Simbol reguler tetap berupa teks
         }
         grid.appendChild(div);
       });
     }
+
 
     function animateReelShake(col) {
       return new Promise(resolve => {
@@ -482,20 +517,28 @@ window.onload = () => {
 
             reelSymbols.unshift(newSymbol);
             reelSymbols.pop();
-
             for (let r = 0; r < height; r++) {
-              reelTiles[r].textContent = reelSymbols[r];
+              // Hapus konten lama
+              reelTiles[r].innerHTML = '';
               reelTiles[r].classList.remove('wild-symbol', 'scatter-symbol');
+
+              // Tambahkan gambar atau teks sesuai simbol
               if (reelSymbols[r] === WILD_SYMBOL) {
+                const img = document.createElement('img');
+                img.src = 'https://vqmfachxnjyxwuavpgds.supabase.co/storage/v1/object/public/qris//download%20(1).png'; // Ganti dengan URL gambar Wild Anda
+                img.alt = 'Wild';
+                reelTiles[r].appendChild(img);
                 reelTiles[r].classList.add('wild-symbol');
               } else if (reelSymbols[r] === SCATTER_SYMBOL) {
+                const img = document.createElement('img');
+                img.src = 'https://vqmfachxnjyxwuavpgds.supabase.co/storage/v1/object/public/qris//2432cb49c2991c8dd62a77f44f51fb45.png'; // Ganti dengan URL gambar Scatter Anda
+                img.alt = 'Scatter';
+                reelTiles[r].appendChild(img);
                 reelTiles[r].classList.add('scatter-symbol');
+              } else {
+                reelTiles[r].textContent = reelSymbols[r]; // Simbol reguler tetap berupa teks
               }
             }
-          }
-
-          for (let r = 0; r < height; r++) {
-            reelTiles[r].style.transform = `translateY(${Math.sin(scrollCount / totalScrolls * Math.PI) * -20}px)`;
           }
 
           if (scrollCount >= totalScrolls) {
@@ -562,7 +605,7 @@ window.onload = () => {
                         const symbolInNextReel = symbolsArr[index];
                         if (symbolInNextReel === targetSymbol || symbolInNextReel === WILD_SYMBOL) {
                             nextReelMatches.push({
-                                index: index,
+                                 index: index,
                                 symbol: symbolInNextReel,
                                 path: [...match.path, index]
                             });
@@ -894,7 +937,7 @@ window.onload = () => {
     spinButton.onclick = spin;
 
     // Pastikan BGM utama diatur volumenya saat init
-    bgm.volume = 0.1;
+    bgm.volume = 0.3;
 
     function init() {
       currentSymbols = generateRandomSymbols();
