@@ -67,17 +67,17 @@
         }
 
         .info-box {
-            font-size: 1.2em;
+            font-size: 1em;
             font-weight: 700;
             color: #ffd700; /* Warna emas untuk info penting */
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 5px;
             text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.4);
         }
         .info-box span {
             font-family: 'Playfair Display', serif; /* Font lebih elegan */
-            font-size: 1.3em;
+            font-size: 1em;
         }
 
         .game-message {
@@ -86,7 +86,7 @@
             border-radius: 10px;
             text-align: center;
             margin-bottom: 25px;
-            font-size: 1.2em;
+            font-size: 1em;
             color: #e0f2f7; /* Warna teks lebih terang */
         width: 90%;
             box-shadow: inset 0 0 8px rgba(0, 0, 0, 0.5);
@@ -121,7 +121,7 @@
             padding: 10px;
             box-sizing: border-box;
             flex-wrap: wrap;
-            gap: 5px; /* Jarak antar kartu */
+            gap: 0px; /* Jarak antar kartu */
             background: rgba(0, 0, 0, 0.0); /* Latar belakang transparan untuk area pemain/bandar */
             border-radius: 15px;
             box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.0);
@@ -154,8 +154,8 @@
 
         .player-hand, .dealer-hand, .community-cards {
             display: flex;
-            gap: 20px; /* Jarak kartu yang lebih baik */
-            margin-top: 10px;
+            gap: 0px; /* Jarak kartu yang lebih baik */
+            margin-top: 0px;
             justify-content: center;
             align-items: center;
         }
@@ -166,7 +166,7 @@
             left: 50%;
             transform: translate(-50%, -50%);
             gap: 5px; /* Jarak kartu komunitas sedikit dikecilkan */
-            padding: 15px;
+            padding: 5px;
             background: rgba(0, 0, 0, 0.4); /* Background lebih solid */
             border-radius: 15px;
             box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.3);
@@ -178,8 +178,8 @@
             background: linear-gradient(145deg, #f0f0f0, #ffffff); /* Gradien untuk efek kertas 3D */
             border: 1px solid #c0c0c0;
             border-radius: 8px; /* Sudut lebih membulat */
-            width: 8px; /* Ukuran kartu sedikit dikecilkan */
-            height: 15px; /* Ukuran kartu sedikit dikecilkan */
+            width: 5px; /* Ukuran kartu sedikit dikecilkan */
+            height: 8px; /* Ukuran kartu sedikit dikecilkan */
             display: flex;
             flex-direction: column;
             justify-content: space-between;
@@ -187,7 +187,7 @@
             font-size: 10px;
             font-weight: 700;
             color: #333;
-            padding: 8px 0; /* Padding vertikal */
+            padding: 5px 0; /* Padding vertikal */
             box-shadow: 3px 3px 8px rgba(0, 0, 0, 0.0), inset 0 0 5px rgba(255, 255, 255, 0.8); /* Bayangan dan highlight */
             position: relative;
             transition: transform 0.3s ease-out; /* Animasi saat hover */
@@ -866,7 +866,7 @@ cardDiv.appendChild(suitSpanTop);
             updatePotDisplay();
             gameMessageDisplay.textContent = `Anda bertaruh Rp${betAmount.toLocaleString('id-ID')}.`;
 
-            await new Promise(resolve => setTimeout(resolve, 1000));
+            await new Promise(resolve => setTimeout(resolve, 3000));
             clearHands();
             createDeck();
 
@@ -875,14 +875,14 @@ cardDiv.appendChild(suitSpanTop);
             displayCard(playerHand[1], playerHandDiv);
             gameMessageDisplay.textContent = "Membagikan kartu Anda...";
 
-            await new Promise(resolve => setTimeout(resolve, 1500));
+            await new Promise(resolve => setTimeout(resolve, 2000));
 
             dealerHand = [dealCard(), dealCard()];
             displayCard(null, dealerHandDiv, true); 
             displayCard(null, dealerHandDiv, true); 
             gameMessageDisplay.textContent = "Membagikan kartu bandar...";
 
-            await new Promise(resolve => setTimeout(resolve, 1500));
+            await new Promise(resolve => setTimeout(resolve, 2000));
 
             communityCards = [];
             gameMessageDisplay.textContent = "Membagikan kartu komunitas...";
@@ -898,7 +898,7 @@ cardDiv.appendChild(suitSpanTop);
                 }
             }
             
-            await new Promise(resolve => setTimeout(resolve, 2000));
+            await new Promise(resolve => setTimeout(resolve, 2500));
             
             await determineWinnerComplex(); // Panggil fungsi penentu pemenang yang lebih kompleks
         }
