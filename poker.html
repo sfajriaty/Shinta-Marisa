@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Poker Seru (Texas Hold'em Basic) - GameZone</title>
-        <style>
+    <style>
         @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap');
         @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&display=swap'); /* Tambah font klasik */
         
@@ -162,7 +162,7 @@
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            gap: 10px;
+            gap: 8px; /* Jarak kartu komunitas sedikit dikecilkan */
             padding: 15px;
             background: rgba(0, 0, 0, 0.4); /* Background lebih solid */
             border-radius: 15px;
@@ -174,8 +174,8 @@
             background: linear-gradient(145deg, #f0f0f0, #ffffff); /* Gradien untuk efek kertas 3D */
             border: 1px solid #c0c0c0;
             border-radius: 8px; /* Sudut lebih membulat */
-            width: 60px; /* Ukuran kartu lebih besar */
-            height: 90px;
+            width: 55px; /* Ukuran kartu sedikit dikecilkan */
+            height: 85px; /* Ukuran kartu sedikit dikecilkan */
             display: flex;
             flex-direction: column;
             justify-content: space-between;
@@ -518,9 +518,9 @@
                 padding: 6px;
                 font-size: 0.9em;
             }
-        
-</style>
-</head>
+        }
+    </style>
+   </head>
 <body>
   <div class="game-container">
         <div class="header-info-area">
@@ -786,7 +786,7 @@ const supabase = window.supabase.createClient(
             cardDiv.classList.add('card');
             if (isHidden) {
                 cardDiv.classList.add('hidden');
-                cardDiv.textContent = 'POKER'; 
+                // cardDiv.textContent = 'POKER'; // Tidak perlu teks jika ada gambar
             } else {
                 const rankSpan = document.createElement('span');
                 rankSpan.textContent = card.rank;
@@ -812,6 +812,7 @@ const supabase = window.supabase.createClient(
                 cardDiv.appendChild(suitSpanTop);
                 cardDiv.appendChild(rankSpan);
                 cardDiv.appendChild(suitSpanBottom);
+                cardDiv.style.animation = 'flipFront 0.5s forwards'; // Animasi saat kartu terbuka
             }
             container.appendChild(cardDiv);
         }
@@ -848,8 +849,7 @@ const supabase = window.supabase.createClient(
                 gameMessageDisplay.textContent = `Saldo Anda tidak cukup (perlu Rp${betAmount.toLocaleString('id-ID')}).`;
                 return;
             }
-
-            hideAllActionButtons(); 
+hideAllActionButtons(); 
             if (betSliderGroup) betSliderGroup.classList.add('hidden'); 
 
             const successBet = await updateSaldo(-betAmount);
@@ -882,13 +882,18 @@ const supabase = window.supabase.createClient(
 
             communityCards = [];
             gameMessageDisplay.textContent = "Membagikan kartu komunitas...";
-            for(let i=0; i<5; i++) {
+            
+            // Animasi pembagian kartu komunitas satu per satu
+            const totalCommunityCards = 5;
+            for (let i = 0; i < totalCommunityCards; i++) {
                 const card = dealCard();
                 if (card) {
                     communityCards.push(card);
                     displayCard(card, communityCardsDiv);
+                    await new Promise(resolve => setTimeout(resolve, 700)); // Jeda 0.7 detik antar kartu
                 }
             }
+            
             await new Promise(resolve => setTimeout(resolve, 2000));
             
             await determineWinnerComplex(); // Panggil fungsi penentu pemenang yang lebih kompleks
@@ -923,19 +928,19 @@ const supabase = window.supabase.createClient(
                 const evaluated = getHandRank(combo);
                 if (evaluated.rank > bestHand.rank) {
                     bestHand = evaluated;
-                HandName = evaluated.name;
+                bestHandName = evaluated.name;
                 } else if (evaluated.rank === bestHand.rank) {
                     // Handle tie-breaking based on hand values and kickers
                     // This is simplified, real tie-breaking can be complex
                     if (evaluated.value > bestHand.value) {
                         bestHand = evaluated;
-                    HandName = evaluated.name;
+                    bestHandName = evaluated.name;
                     } else if (evaluated.value === bestHand.value) {
                         // Compare kickers for same-rank hands
                         for (let i = 0; i < evaluated.kickers.length; i++) {
                             if (evaluated.kickers[i] > (bestHand.kickers[i] || 0)) {
                                 bestHand = evaluated;
-                            HandName = evaluated.name;
+                            bestHandName = evaluated.name;
                                 break;
                             } else if (evaluated.kickers[i] < (bestHand.kickers[i] || 0)) {
                                 break;
@@ -972,8 +977,7 @@ const supabase = window.supabase.createClient(
 
             const ranks = fiveCards.map(c => c.value);
             const suits = fiveCards.map(c => c.suit);
-
-            const rankCounts = {};
+const rankCounts = {};
             for (const r of ranks) {
                 rankCounts[r] = (rankCounts[r] || 0) + 1;
             }
