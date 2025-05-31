@@ -358,6 +358,12 @@
       return;
     }
 
+localStorage.setItem('saldo', userData.saldo);
+    showSuccessModal(`Login berhasil! Saldo Anda: Rp${userData.saldo ?? 0}`);
+    // TAMBAHKAN BARIS INI DI SINI:
+    window.location.href = 'profil.html'
+  });
+
     localStorage.setItem('saldo', userData.saldo);
     showSuccessModal(`Login berhasil! Saldo Anda: Rp${userData.saldo ?? 0}`);
   });
@@ -397,6 +403,7 @@
 
     showSuccessModal('Pendaftaran berhasil! Silakan login.');
   });
+
 
   function showSuccessModal(message) {
     document.getElementById('modalMessage').innerText = message;
