@@ -12,12 +12,12 @@
   body, html {
     margin: 0; padding: 0; height: 100%;
     font-family: 'Poppins', sans-serif;
-    /* Ini dia bagian untuk background GIF kamu */
-    background: url('https://vqmfachxnjyxwuavpgds.supabase.co/storage/v1/object/public/zaus//87dac1a2-9c05-49b7-a375-417866aeb9c3.gif') no-repeat center center fixed;
+    /* Background GIF kustom kamu */
+    background: url('https://vqmfachxnjyxwuavpgds.supabase.co/storage/v1/object/public/zaus//images.jpeg') no-repeat center center fixed;
     background-size: cover;
     overflow-x: hidden;
     color: #fff;
-    position: relative; /* Penting untuk overlay */
+    position: relative;
   }
 
   /* Overlay gelap di atas GIF agar teks dan elemen lain lebih jelas */
@@ -34,12 +34,12 @@
     z-index: 1; /* Pastikan container di atas overlay dan background GIF */
     max-width: 400px;
     margin: 50px auto 80px;
-    background: rgba(0, 0, 0, 0.7); /* Background container sedikit lebih gelap */
+    background: rgba(0, 0, 0, 0.7);
     border-radius: 15px;
     padding: 30px 40px;
-    box-shadow: 0 0 35px 8px rgba(255, 215, 0, 0.6); /* Efek shadow emas */
-    backdrop-filter: blur(5px); /* Efek blur pada background container */
-    animation: fadeIn 1s ease-out; /* Animasi muncul */
+    box-shadow: 0 0 35px 8px rgba(255, 215, 0, 0.6);
+    backdrop-filter: blur(5px);
+    animation: fadeIn 1s ease-out;
   }
 
   @keyframes fadeIn {
@@ -52,14 +52,14 @@
     font-size: 48px;
     margin-bottom: 20px;
     letter-spacing: 5px;
-    color: #ffd700; /* Warna emas */
-    text-shadow: 0 0 10px #ffeb3b, /* Efek glow awal */
+    color: #ffd700;
+    text-shadow: 0 0 10px #ffeb3b,
                  0 0 20px #ffeb3b,
                  0 0 30px #ffeb3b,
                  0 0 40px #ffeb3b,
                  0 0 50px #ffeb3b,
                  0 0 60px #ffeb3b;
-    animation: neon-glow 1.5s ease-in-out infinite alternate; /* Animasi neon berdenyut */
+    animation: neon-glow 1.5s ease-in-out infinite alternate;
     margin-top: 0;
     line-height: 1.2;
   }
@@ -80,7 +80,7 @@
     display: flex;
     justify-content: space-around;
     margin-bottom: 30px;
-    background: rgba(255, 255, 255, 0.1); /* Latar belakang transparan untuk tab */
+    background: rgba(255, 255, 255, 0.1);
     border-radius: 10px;
     overflow: hidden;
   }
@@ -104,7 +104,7 @@
     bottom: 0;
     width: 100%;
     height: 3px;
-    background: #ffd700; /* Garis emas di bawah tab aktif */
+    background: #ffd700;
     transform: scaleX(0);
     transition: transform 0.3s ease;
   }
@@ -310,9 +310,11 @@
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
+  // Inisialisasi SupabaseClient kamu
+  // Ganti URL dan anon key ini dengan yang dari project Supabase kamu
   const supabase = window.supabase.createClient(
-    'https://vqmfachxnjyxwuavpgds.supabase.co',
-    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZxbWZhY2h4bmp5eHd1YXZwZ2RzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDg0MDYxNDAsImV4cCI6MjA2Mzk4MjE0MH0.Bzr8mUiEl8MzRWpVQ3_59eFxKk0EWZ3ca-4IEcpGLkk'
+    'https://vqmfachxnjyxwuavpgds.supabase.co', // GANTI DENGAN URL SUPABASE PROJECT KAMU
+    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZxbWZhY2h4bmp5eHd1YXZwZ2RzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDg0MDYxNDAsImV4cCI6MjA2Mzk4MjE0MH0.Bzr8mUiEl8MzRWpVQ3_59eFxKk0EWZ3ca-4IEcpGLkk' // GANTI DENGAN ANON KEY SUPABASE PROJECT KAMU
   );
 </script>
 <script>
@@ -340,13 +342,19 @@
     });
 
     if (error || !data.user) {
-      showSuccessModal('Login gagal. Periksa kembali email dan password Anda.');
+      // Menampilkan pesan error spesifik dari Supabase jika ada
+      if (error.message.includes('Invalid login credentials')) {
+        showSuccessModal('Login gagal. Email atau password salah.');
+      } else {
+        showSuccessModal(`Login gagal: ${error.message}`);
+      }
       return;
     }
 
     const uid = data.user.id;
     localStorage.setItem('uid', uid);
 
+    // Mengambil data saldo dari tabel 'users_data'
     const { data: userData, error: userError } = await supabase
       .from('users_data')
       .select('saldo')
@@ -354,18 +362,24 @@
       .single();
 
     if (userError) {
-      showSuccessModal('Login berhasil! Namun, gagal mengambil data saldo.');
+      // Jika login Supabase berhasil tapi gagal mengambil data pengguna
+      showSuccessModal('Login berhasil! Namun, gagal mengambil data saldo pengguna. Silakan coba lagi.');
+      // Untuk tujuan debug, log error ke console
+      console.error('Error fetching user data:', userError.message);
+      // Tetap alihkan jika login berhasil, meskipun data saldo tidak terambil
+      setTimeout(() => {
+        window.location.href = 'profil.html';
+      }, 1500);
       return;
     }
 
-localStorage.setItem('saldo', userData.saldo);
-    showSuccessModal(`Login berhasil! Saldo Anda: Rp${userData.saldo ?? 0}`);
-    // TAMBAHKAN BARIS INI DI SINI:
-    window.location.href = 'profil.html'
-  });
-
     localStorage.setItem('saldo', userData.saldo);
-    showSuccessModal(`Login berhasil! Saldo Anda: Rp${userData.saldo ?? 0}`);
+    showSuccessModal(`Login berhasil! Saldo Anda: Rp${userData.saldo ?? 0}`); // Menampilkan saldo dari Supabase
+    
+    // Alihkan ke profil.html setelah modal tampil sebentar
+    setTimeout(() => {
+      window.location.href = 'profil.html';
+    }, 1500); // Redirect setelah 1.5 detik
   });
 
   document.getElementById('register').addEventListener('submit', async e => {
@@ -380,31 +394,49 @@ localStorage.setItem('saldo', userData.saldo);
       return;
     }
 
+    // Mendaftar user di Supabase Auth
     const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
       email,
       password: pw1
     });
 
     if (signUpError) {
+      // Menangani error pendaftaran dari Supabase
       if (signUpError.message.includes('already registered')) {
         showSuccessModal('Pendaftaran gagal. Email ini sudah terdaftar.');
+      } else if (signUpError.message.includes('Password should be at least 6 characters')) {
+        showSuccessModal('Pendaftaran gagal. Password minimal 6 karakter.');
       } else {
         showSuccessModal(`Pendaftaran gagal: ${signUpError.message}`);
       }
       return;
     }
 
-    await supabase.from('users_data').insert({
+    // Menyimpan data tambahan user ke tabel 'users_data'
+    const { error: insertError } = await supabase.from('users_data').insert({
       user_id: signUpData.user.id,
       username,
       email,
-      saldo: 0
+      saldo: 0 // Saldo awal saat pendaftaran
     });
 
-    showSuccessModal('Pendaftaran berhasil! Silakan login.');
+    if (insertError) {
+      showSuccessModal(`Pendaftaran berhasil di autentikasi, tetapi gagal menyimpan data user: ${insertError.message}`);
+      // Untuk tujuan debug, log error ke console
+      console.error('Error inserting user data:', insertError.message);
+      return;
+    }
+
+    showSuccessModal('Pendaftaran berhasil! Silakan login dengan akun yang baru dibuat.');
+    
+    // Opsional: reset form registrasi dan pindah ke tab login
+    document.getElementById('register').reset();
+    setTimeout(() => {
+        document.querySelector('.tab-btn[data-tab="login"]').click();
+    }, 1500); // Pindah tab setelah 1.5 detik
   });
 
-
+  // Fungsi untuk menampilkan modal notifikasi
   function showSuccessModal(message) {
     document.getElementById('modalMessage').innerText = message;
     document.getElementById('successModal').style.display = 'flex';
