@@ -113,12 +113,12 @@
             align-items: center;
         }
 
-                  .player-area, .dealer-area {
+         .player-area, .dealer-area {
             position: absolute;
             width: 50%; /* Lebar area lebih luas */
             display: flex;
             justify-content: center;
-            padding: 15px;
+            padding: 10px;
             box-sizing: border-box;
             flex-wrap: wrap;
             gap: 3px; /* Jarak antar kartu */
@@ -137,7 +137,7 @@
             font-size: 1em;
             flex-direction: column;
             align-items: center;
-            justify-content: flex-end;
+            justify-content: flex-start;
             z-index: 2; /* Player area juga di atas community cards */
         }
 
@@ -154,8 +154,8 @@
 
         .player-hand, .dealer-hand, .community-cards {
             display: flex;
-            gap: 0px; /* Jarak kartu yang lebih baik */
-            margin-top: 5px;
+            gap: 10px; /* Jarak kartu yang lebih baik */
+            margin-top: 0px;
             justify-content: center;
             align-items: center;
         }
@@ -178,8 +178,8 @@
             background: linear-gradient(145deg, #f0f0f0, #ffffff); /* Gradien untuk efek kertas 3D */
             border: 1px solid #c0c0c0;
             border-radius: 8px; /* Sudut lebih membulat */
-            width: 20px; /* Ukuran kartu sedikit dikecilkan */
-            height: 35px; /* Ukuran kartu sedikit dikecilkan */
+            width: 8px; /* Ukuran kartu sedikit dikecilkan */
+            height: 15px; /* Ukuran kartu sedikit dikecilkan */
             display: flex;
             flex-direction: column;
             justify-content: space-between;
