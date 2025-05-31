@@ -24,7 +24,7 @@
         body {
             margin: 0;
             overflow: hidden; /* Sembunyikan scrollbar jika canvas melebihi viewport */
-            font-family: 'Press Start', cursive; /* Gunakan font Press Start */
+            font-family: 'Press Start ', cursive; /* Gunakan font Press Start */
             color: var(--text-light);
             display: flex;
             justify-content: center;
@@ -380,19 +380,19 @@
         const decreaseBetBtn = document.getElementById('decreaseBetBtn');
         const increaseBetBtn = document.getElementById('increaseBetBtn');
 
-        let currentBetLevel = 1; // Tingkat taruhan awal (pengali 100)
+        let currentBetLevel = 1; // Tingkat taruhan awal
         const MAX_BET_LEVEL = 5; // Tingkat taruhan maksimum
         const MIN_BET_LEVEL = 1; // Tingkat taruhan minimum
 
         const BASE_GAME_START_COST = 100; // Biaya dasar untuk memulai game (akan dikalikan tingkat taruhan)
         const BASE_PIECE_COST_PER_TYPE = { // Biaya dasar per jenis balok
             'T': 10,
-            'S': 8,
-            'Z': 8,
-            'O': 6,
+            'S': 10,
+            'Z': 10,
+            'O': 10,
             'L': 10,
             'J': 10,
-            'I': 12
+            'I': 10
         };
         const BASE_LINE_CLEAR_VALUE_PER_TYPE = { // Nilai dasar koin per blok saat baris hilang
             'T': 10,
@@ -407,9 +407,9 @@
 
 
         // Konfigurasi Game Board
-        const TILE_SIZE = 15;
-        const BOARD_WIDTH = 20;
-        const BOARD_HEIGHT = 30;
+        const TILE_SIZE = 20;
+        const BOARD_WIDTH = 15;
+        const BOARD_HEIGHT = 20;
 
         // Sesuaikan ukuran canvas berdasarkan TILE_SIZE dan BOARD_DIMENSIONS
         canvas.width = BOARD_WIDTH * TILE_SIZE; 
@@ -496,7 +496,7 @@
             balanceDisplay.textContent = 'Memuat...';
             totalKemenanganDisplay.textContent = 'Memuat...';
 
-            try {
+               try {
                 const { data, error } = await supabase
                     .from('users_data')
                     .select('saldo, username, highest_kemenangan')
@@ -529,7 +529,18 @@
                     showMessage('Data pemain dimuat!', 'success');
                     console.log('Saldo fetched:', currentBalance, 'Highest Kemenangan:', highestKemenangan);
 
-                    startGamePrompt(); // Pindahkan panggilan startGamePrompt() ke sini agar selalu dipanggil setelah data saldo dimuat
+                    // NEW: Gunakan biaya awal game yang dihitung berdasarkan tingkat taruhan
+                    const currentCalculatedGameStartCost = BASE_GAME_START_COST * currentBetLevel;
+                    if (currentBalance >= currentCalculatedGameStartCost) {
+                        showMessage(`Siap! Saldo Anda: Rp${currentBalance.toLocaleString('id-ID')}. Biaya per game: Rp${currentCalculatedGameStartCost.toLocaleString('id-ID')} @ Lv.${currentBetLevel}.`, 'info');
+                        startGamePrompt();
+                    } else {
+                        showMessage(`Saldo Anda tidak cukup (Rp${currentBalance.toLocaleString('id-ID')}). Perlu Rp${currentCalculatedGameStartCost.toLocaleString('id-ID')} untuk mulai. Top up untuk bermain!`, 'error');
+                        balanceDisplay.classList.add('animate-loss');
+                        setTimeout(() => balanceDisplay.classList.remove('animate-loss'), 500);
+                        backToProfileBtn.style.display = 'block';
+                        showBetControls(); // Tampilkan kontrol taruhan jika saldo tidak cukup
+                    }
                 }
 
             } catch (err) {
@@ -868,15 +879,10 @@
 
         function startGamePrompt() {
             hideGameControls();
-            showBetControls(); // Selalu tampilkan kontrol taruhan saat prompt dimulai
+            hideBetControls(); // NEW: Sembunyikan kontrol taruhan saat prompt dimulai
             
             // NEW: Hitung biaya awal game berdasarkan tingkat taruhan saat ini
             const currentCalculatedGameStartCost = BASE_GAME_START_COST * currentBetLevel;
-
-            const existingStartButton = document.getElementById('startButton');
-            if (existingStartButton) {
-                existingStartButton.remove(); // Hapus tombol lama jika ada untuk membuat yang baru dengan teks yang diperbarui
-            }
 
             const startButton = document.createElement('button');
             startButton.textContent = `Mulai Game (Bayar Rp${currentCalculatedGameStartCost.toLocaleString('id-ID')} @ Lv.${currentBetLevel})`;
@@ -900,14 +906,7 @@
             startButton.onmouseup = () => { startButton.style.transform = 'translateY(0)'; startButton.style.boxShadow = '0 4px 0 #4CAF50'; };
             startButton.onclick = initiateGameStart;
 
-            // Pastikan tombol ditempatkan di posisi yang benar
-            const existingPlayAgainBtn = document.getElementById('playAgainBtn');
-            if (existingPlayAgainBtn) {
-                document.querySelector('.game-container').insertBefore(startButton, existingPlayAgainBtn);
-            } else {
-                document.querySelector('.game-container').insertBefore(startButton, document.querySelector('.controls'));
-            }
-            
+            document.querySelector('.game-container').insertBefore(startButton, document.querySelector('.controls'));
             showMessage('Klik "Mulai Game" untuk bermain.', 'info');
             
             backToProfileBtn.style.display = 'block';
@@ -917,8 +916,7 @@
             playSound(clickSound);
             document.getElementById('startButton')?.remove();
 
-            hideBetControls(); // Kontrol taruhan disembunyikan saat game benar-benar mulai
-
+            // NEW: Hitung ulang biaya awal game
             const currentCalculatedGameStartCost = BASE_GAME_START_COST * currentBetLevel;
 
             if (currentBalance < currentCalculatedGameStartCost) {
@@ -926,8 +924,8 @@
                 balanceDisplay.classList.add('animate-loss');
                 setTimeout(() => balanceDisplay.classList.remove('animate-loss'), 500);
                 backToProfileBtn.style.display = 'block';
-                showBetControls(); // Tampilkan kembali jika saldo tidak cukup
-                startGamePrompt(); // Panggil ulang prompt agar tombol "Mulai Game" muncul lagi
+                showBetControls(); // NEW: Tampilkan kembali kontrol taruhan jika saldo tidak cukup
+                startGamePrompt(); // NEW: Panggil ulang prompt agar tombol "Mulai Game" muncul lagi
                 return;
             }
 
@@ -943,6 +941,7 @@
             backToProfileBtn.style.display = 'none';
 
             showGameControls();
+            hideBetControls(); // NEW: Sembunyikan kontrol taruhan saat game berjalan
             createNewPiece();
             if (animationFrameId) cancelAnimationFrame(animationFrameId);
             animationFrameId = requestAnimationFrame(gameLoop);
@@ -962,14 +961,8 @@
             }
                
             hideGameControls();
-            showBetControls(); // Tampilkan kembali kontrol taruhan setelah game berakhir
+            showBetControls(); // NEW: Tampilkan kembali kontrol taruhan setelah game berakhir
             
-            // Hapus tombol "Main Lagi" lama jika ada
-            const existingPlayAgainBtn = document.getElementById('playAgainBtn');
-            if (existingPlayAgainBtn) {
-                existingPlayAgainBtn.remove();
-            }
-
             const playAgainBtn = document.createElement('button');
             playAgainBtn.textContent = 'Main Lagi';
             playAgainBtn.id = 'playAgainBtn';
@@ -1108,7 +1101,7 @@
         document.addEventListener('DOMContentLoaded', () => {
             initializeUserAndSaldo();
             hideGameControls();
-            // showBetControls(); // Dihapus, startGamePrompt akan menangani penampilan kontrol taruhan.
+            showBetControls(); // NEW: Pastikan kontrol taruhan terlihat di awal
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             drawBoard();
         });
