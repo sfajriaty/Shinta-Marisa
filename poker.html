@@ -118,7 +118,7 @@
             width: 50%; /* Lebar area lebih luas */
             display: flex;
             justify-content: center;
-            padding: 10px;
+            padding: 1px;
             box-sizing: border-box;
             flex-wrap: wrap;
             gap: 0px; /* Jarak antar kartu */
@@ -894,7 +894,7 @@ cardDiv.appendChild(suitSpanTop);
                 if (card) {
                     communityCards.push(card);
                     displayCard(card, communityCardsDiv);
-                    await new Promise(resolve => setTimeout(resolve, 700)); // Jeda 0.7 detik antar kartu
+                    await new Promise(resolve => setTimeout(resolve, 1000)); // Jeda 0.7 detik antar kartu
                 }
             }
             
