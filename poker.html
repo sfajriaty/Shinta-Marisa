@@ -125,6 +125,8 @@
             background: rgba(0, 0, 0, 0.3); /* Latar belakang transparan untuk area pemain/bandar */
             border-radius: 15px;
             box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.6);
+            /* Tambahkan z-index pada dealer-area */
+            z-index: 2; /* Dealer area di atas community cards (z-index: 1) */
         }
 
         .player-area {
@@ -136,6 +138,7 @@
             flex-direction: column;
             align-items: center;
             justify-content: flex-end;
+            z-index: 2; /* Player area juga di atas community cards */
         }
 
         .dealer-area {
@@ -168,6 +171,7 @@
             border-radius: 15px;
             box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.7);
             border: 1px solid rgba(255, 255, 255, 0.1);
+            z-index: 1; /* Biarkan community cards di bawah dealer/player */
         }
 
         .card {
@@ -808,8 +812,7 @@ const supabase = window.supabase.createClient(
                     suitSpanTop.classList.add('black-suit');
                     suitSpanBottom.classList.add('black-suit');
                 }
-
-                cardDiv.appendChild(suitSpanTop);
+cardDiv.appendChild(suitSpanTop);
                 cardDiv.appendChild(rankSpan);
                 cardDiv.appendChild(suitSpanBottom);
                 cardDiv.style.animation = 'flipFront 0.5s forwards'; // Animasi saat kartu terbuka
@@ -849,7 +852,8 @@ const supabase = window.supabase.createClient(
                 gameMessageDisplay.textContent = `Saldo Anda tidak cukup (perlu Rp${betAmount.toLocaleString('id-ID')}).`;
                 return;
             }
-hideAllActionButtons(); 
+
+            hideAllActionButtons(); 
             if (betSliderGroup) betSliderGroup.classList.add('hidden'); 
 
             const successBet = await updateSaldo(-betAmount);
