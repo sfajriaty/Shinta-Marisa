@@ -183,13 +183,13 @@
             height: 70px; /* Ukuran kartu diperbesar */
             display: flex;
             flex-direction: column;
-            justify-content: space-between;
+            justify-content: space-between; /* Untuk suit di sudut */
             align-items: center;
             font-weight: 700;
             color: #333;
             padding: 5px 0; /* Padding vertikal */
             box-shadow: 3px 3px 8px rgba(0, 0, 0, 0.0), inset 0 0 5px rgba(255, 255, 255, 0.8); /* Bayangan dan highlight */
-            position: relative;
+            position: relative; /* Penting untuk penempatan absolute inner elements */
             transition: transform 0.3s ease-out; /* Animasi saat hover */
             overflow: hidden; /* Pastikan konten tidak keluar */
         }
@@ -199,17 +199,19 @@
         }
 
         .card .suit {
-            font-size: 1.2em; /* Ukuran suit lebih besar secara default */
+            font-size: 1.2em; /* Ukuran suit tetap jelas */
             line-height: 1;
-            position: absolute;
+            position: absolute; /* Posisikan suit secara absolut */
             font-family: Arial, sans-serif; /* Font sederhana untuk simbol */
-            z-index: 2; /* Pastikan simbol di atas background */
+            z-index: 2; /* Pastikan simbol di atas background dan rank */
         }
-        .card .suit.top-left {
+        /* Top-left suit */
+        .card .suit:first-child { /* Target suit pertama (atas kiri) */
             top: 5px;
             left: 5px;
         }
-        .card .suit.bottom-right {
+        /* Bottom-right suit */
+        .card .suit:last-child { /* Target suit terakhir (bawah kanan) */
             bottom: 5px;
             right: 5px;
             transform: rotate(180deg);
@@ -223,7 +225,7 @@
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            z-index: 1; /* Angka di bawah simbol, tapi di tengah */
+            z-index: 1; /* Angka di bawah simbol */
         }
 
         .red-suit { color: #d62828; } /* Merah yang lebih pekat */
@@ -445,12 +447,15 @@
             }
             .card .suit {
                 font-size: 1.1em; /* Ukuran simbol lebih besar */
-                top: 4px; /* Sesuaikan posisi */
-                left: 4px; /* Sesuaikan posisi */
+                /* Adjust top/left/bottom/right as needed */
             }
-            .card .suit.bottom-right {
-                bottom: 4px; /* Sesuaikan posisi */
-                right: 4px; /* Sesuaikan posisi */
+            .card .suit:first-child {
+                top: 4px;
+                left: 4px;
+            }
+            .card .suit:last-child {
+                bottom: 4px;
+                right: 4px;
             }
             .card .rank {
                 font-size: 1.8em; /* Ukuran angka utama disesuaikan */
@@ -504,12 +509,15 @@
             }
             .card .suit {
                 font-size: 1em; /* Ukuran simbol tetap cukup besar */
-                top: 3px; /* Posisi lebih kecil */
-                left: 3px; /* Posisi lebih kecil */
+                /* Adjust top/left/bottom/right as needed */
             }
-            .card .suit.bottom-right {
-                bottom: 3px; /* Posisi lebih kecil */
-                right: 3px; /* Posisi lebih kecil */
+            .card .suit:first-child {
+                top: 3px;
+                left: 3px;
+            }
+            .card .suit:last-child {
+                bottom: 3px;
+                right: 3px;
             }
             .card .rank {
                 font-size: 1.5em; /* Ukuran angka utama disesuaikan */
