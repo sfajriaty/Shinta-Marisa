@@ -24,7 +24,7 @@
         body {
             margin: 0;
             overflow: hidden; /* Sembunyikan scrollbar jika canvas melebihi viewport */
-            font-family: 'Press Start ', cursive; /* Gunakan font Press Start 2P */
+            font-family: 'Press Start ', cursive; /* Gunakan font Press Start */
             color: var(--text-light);
             display: flex;
             justify-content: center;
@@ -156,17 +156,17 @@
                 "left softdrop right"
             ;
             grid-template-columns: 1fr 1fr 1fr; /* Lebar kolom yang sama */
-            gap: 5px; /* Jarak antar tombol */
+            gap: 10px; /* Jarak antar tombol */
             width: 100%;
-            margin-top: 10px;
+            margin-top: 20px;
         }
 
         .controls button {
             background-color: var(--button-bg);
             color: var(--text-dark);
             border: none;
-            padding: 10px 0;
-            font-size: 1em;
+            padding: 15px 0;
+            font-size: 1.5em;
             border-radius: 8px;
             cursor: pointer;
             transition: background-color 0.3s ease, transform 0.1s ease, box-shadow 0.1s ease;
@@ -174,7 +174,7 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            height: 20px; /* Tinggi tetap untuk tombol */
+            height: 60px; /* Tinggi tetap untuk tombol */
             box-shadow: 0 4px 0 var(--button-active); /* Efek 3D */
             -webkit-tap-highlight-color: transparent; /* Hilangkan highlight di Android saat tap */
         }
@@ -211,6 +211,51 @@
             box-shadow: 0 2px 0 #997A00;
         }
 
+        /* Styling untuk Pengaturan Taruhan */
+        .bet-settings {
+            margin-top: 15px;
+            margin-bottom: 15px;
+            text-align: center;
+            width: 100%;
+        }
+
+        .bet-settings .info-item {
+            font-size: 0.9em; /* Sesuaikan ukuran font jika perlu */
+            margin-bottom: 10px;
+        }
+
+        .bet-controls {
+            display: flex;
+            justify-content: center;
+            gap: 15px; /* Jarak antara tombol - dan + */
+            width: 100%;
+        }
+
+        .bet-controls button {
+            width: 60px; /* Lebar tetap untuk tombol + dan - */
+            height: 60px; /* Tinggi tetap untuk tombol + dan - */
+            font-size: 2em; /* Ukuran font lebih besar */
+            padding: 0; /* Hapus padding default */
+            background-color: var(--button-bg);
+            color: var(--text-dark);
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.1s ease, box-shadow 0.1s ease;
+            box-shadow: 0 4px 0 var(--button-active);
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .bet-controls button:active {
+            background-color: var(--button-active);
+            transform: translateY(2px);
+            box-shadow: 0 2px 0 var(--button-active);
+        }
+
+        /* Sembunyikan kontrol taruhan saat game berjalan */
+        .bet-settings.hidden {
+            display: none;
+        }
 
         .message-area {
             margin-top: 15px;
@@ -266,6 +311,11 @@
                 font-size: 0.8em;
                 padding: 8px;
             }
+            .bet-controls button {
+                width: 50px;
+                height: 50px;
+                font-size: 1.8em;
+            }
         }
     </style>
 </head>
@@ -277,9 +327,17 @@
         </div>
 
         <div class="game-info">
-            <h1>Susun Balok </h1>
+            <h1>Susun Balok</h1>
             <p class="info-item">Kemenangan: <span id="totalKemenangan">0</span></p>
             <p class="info-item">Saldo: <span id="balance">Memuat...</span></p>
+        </div>
+
+        <div class="bet-settings">
+            <p class="info-item">Tingkat Taruhan: <span id="betLevelDisplay">1</span></p>
+            <div class="bet-controls">
+                <button id="decreaseBetBtn" class="control-btn">-</button>
+                <button id="increaseBetBtn" class="control-btn">+</button>
+            </div>
         </div>
         <canvas id="gameCanvas"></canvas>
         <div class="controls">
@@ -317,10 +375,41 @@
         const softDropBtn = document.getElementById('softDropBtn');
         const backToProfileBtn = document.getElementById('backToProfileBtn');
 
+        // NEW: Elemen dan Variabel untuk Pengaturan Taruhan
+        const betLevelDisplay = document.getElementById('betLevelDisplay');
+        const decreaseBetBtn = document.getElementById('decreaseBetBtn');
+        const increaseBetBtn = document.getElementById('increaseBetBtn');
+
+        let currentBetLevel = 1; // Tingkat taruhan awal
+        const MAX_BET_LEVEL = 5; // Tingkat taruhan maksimum
+        const MIN_BET_LEVEL = 1; // Tingkat taruhan minimum
+
+        const BASE_GAME_START_COST = 100; // Biaya dasar untuk memulai game (akan dikalikan tingkat taruhan)
+        const BASE_PIECE_COST_PER_TYPE = { // Biaya dasar per jenis balok
+            'T': 10,
+            'S': 10,
+            'Z': 10,
+            'O': 10,
+            'L': 10,
+            'J': 10,
+            'I': 10
+        };
+        const BASE_LINE_CLEAR_VALUE_PER_TYPE = { // Nilai dasar koin per blok saat baris hilang
+            'T': 10,
+            'S': 20, // S sedikit lebih tinggi
+            'Z': 10,
+            'O': 10,
+            'L': 10,
+            'J': 10,
+            'I': 15 // I sedikit lebih tinggi
+        };
+        // END NEW
+
+
         // Konfigurasi Game Board
-        const TILE_SIZE = 12;
-        const BOARD_WIDTH = 20;
-        const BOARD_HEIGHT = 25;
+        const TILE_SIZE = 10;
+        const BOARD_WIDTH = 30;
+        const BOARD_HEIGHT = 35;
 
         // Sesuaikan ukuran canvas berdasarkan TILE_SIZE dan BOARD_DIMENSIONS
         canvas.width = BOARD_WIDTH * TILE_SIZE; 
@@ -340,7 +429,7 @@
         // Dapatkan elemen audio
         const clickSound = document.getElementById('clickSound');
         const lineClearSound = document.getElementById('lineClearSound');
-        const blockLandSound = document.getElementById('blockLandSound'); // NEW: Referensi audio balok jatuh
+        const blockLandSound = document.getElementById('blockLandSound'); 
         const backgroundMusic = document.getElementById('backgroundMusic');
 
         // Fungsi untuk memutar suara
@@ -388,7 +477,7 @@
                     console.warn('No active user session. Redirecting to login.');
                     playerStatusDisplay.textContent = 'Tidak Login';
                     showMessage('Anda belum login. Mengarahkan ke halaman login...', 'info');
-                    setTimeout(() => { window.location.href = 'index.html', 3000; });
+                    setTimeout(() => { window.location.href = 'index.html'; }, 3000);
                 }
             } catch (error) {
                 console.error('Unexpected error during user initialization:', error.message);
@@ -407,7 +496,7 @@
             balanceDisplay.textContent = 'Memuat...';
             totalKemenanganDisplay.textContent = 'Memuat...';
 
-            try {
+               try {
                 const { data, error } = await supabase
                     .from('users_data')
                     .select('saldo, username, highest_kemenangan')
@@ -420,7 +509,7 @@
                         console.warn('User entry not found in users_data. Creating new entry with default saldo...');
                         const usernameFromMeta = currentUser.user_metadata?.username || currentUser.email?.split('@')[0] || 'Unknown';
                         await createNewUserEntryWithDefaultSaldo(currentUser.id, currentUser.email, usernameFromMeta);
-                        await fetchSaldoAndKemenangan();
+                        await fetchSaldoAndKemenangan(); // Coba lagi setelah membuat entri baru
                     } else {
                         showMessage(`Gagal memuat data: ${error.message}. Periksa RLS/Koneksi.`, 'error');
                         balanceDisplay.textContent = 'Gagal';
@@ -440,14 +529,17 @@
                     showMessage('Data pemain dimuat!', 'success');
                     console.log('Saldo fetched:', currentBalance, 'Highest Kemenangan:', highestKemenangan);
 
-                    if (currentBalance >= GAME_START_COST) {
-                        showMessage(`Siap! Saldo Anda: Rp${currentBalance.toLocaleString('id-ID')}. Biaya per game: Rp${GAME_START_COST.toLocaleString('id-ID')}.`, 'info');
+                    // NEW: Gunakan biaya awal game yang dihitung berdasarkan tingkat taruhan
+                    const currentCalculatedGameStartCost = BASE_GAME_START_COST * currentBetLevel;
+                    if (currentBalance >= currentCalculatedGameStartCost) {
+                        showMessage(`Siap! Saldo Anda: Rp${currentBalance.toLocaleString('id-ID')}. Biaya per game: Rp${currentCalculatedGameStartCost.toLocaleString('id-ID')} @ Lv.${currentBetLevel}.`, 'info');
                         startGamePrompt();
                     } else {
-                        showMessage(`Saldo Anda tidak cukup (Rp${currentBalance.toLocaleString('id-ID')}). Perlu Rp${GAME_START_COST.toLocaleString('id-ID')} untuk mulai. Top up untuk bermain!`, 'error');
+                        showMessage(`Saldo Anda tidak cukup (Rp${currentBalance.toLocaleString('id-ID')}). Perlu Rp${currentCalculatedGameStartCost.toLocaleString('id-ID')} untuk mulai. Top up untuk bermain!`, 'error');
                         balanceDisplay.classList.add('animate-loss');
                         setTimeout(() => balanceDisplay.classList.remove('animate-loss'), 500);
                         backToProfileBtn.style.display = 'block';
+                        showBetControls(); // Tampilkan kontrol taruhan jika saldo tidak cukup
                     }
                 }
 
@@ -556,52 +648,46 @@
             }
         }
 
+        // NEW: Modifikasi TETROMINOS. Hapus properti 'cost' dan 'clear_value_per_block' dari sini.
+        // Nilai ini akan dihitung secara dinamis berdasarkan currentBetLevel dan BASE_COST/VALUE
         const TETROMINOS = [
             {
                 shape: [[0, 1, 0], [1, 1, 1], [0, 0, 0]], // T
                 color: '#FF00FF', // Magenta
-                cost: 10,
-                clear_value_per_block: 10
+                type: 'T' // Tambahkan properti type untuk identifikasi
             },
             {
                 shape: [[1, 1, 0], [0, 1, 1], [0, 0, 0]], // S
                 color: '#00FF00', // Hijau
-                cost: 8,
-                clear_value_per_block: 20
+                type: 'S'
             },
             {
                 shape: [[0, 1, 1], [1, 1, 0], [0, 0, 0]], // Z
                 color: '#FF0000', // Merah
-                cost: 8,
-                clear_value_per_block: 15
+                type: 'Z'
             },
             {
                 shape: [[1, 1], [1, 1]], // O
                 color: '#FFFF00', // Kuning
-                cost: 6,
-                clear_value_per_block: 10
+                type: 'O'
             },
             {
                 shape: [[1, 0, 0], [1, 1, 1], [0, 0, 0]], // L
                 color: '#FFA500', // Oranye
-                cost: 10,
-                clear_value_per_block: 20
+                type: 'L'
             },
             {
                 shape: [[0, 0, 1], [1, 1, 1], [0, 0, 0]], // J
                 color: '#0000FF', // Biru
-                cost: 10,
-                clear_value_per_block: 10
+                type: 'J'
             },
             {
                 shape: [[1], [1], [1], [1]], // I
                 color: '#00FFFF', // Cyan
-                cost: 12,
-                clear_value_per_block: 20
+                type: 'I'
             }
         ];
-
-        const GAME_START_COST = 100;
+        // END NEW
 
         // --- Fungsi Helper UI ---
         function showMessage(msg, type = 'info') {
@@ -684,14 +770,15 @@
                             gameOver();
                             return;
                         }
+                        // NEW: Simpan juga clear_value_per_block pada balok yang diletakkan
                         board[currentY + row][currentX + col] = {
                             color: currentPiece.color,
-                            clear_value_per_block: currentPiece.clear_value_per_block
+                            clear_value_per_block: currentPiece.clear_value_per_block || BASE_LINE_CLEAR_VALUE_PER_TYPE[currentPiece.type] * currentBetLevel
                         };
                     }
                 }
             }
-            playSound(blockLandSound); // NEW: Mainkan suara saat balok mendarat
+            playSound(blockLandSound); 
             clearLines();
             createNewPiece();
         }
@@ -714,7 +801,7 @@
                 if (board[row].every(cell => cell !== 0)) {
                     linesCleared++;
                     for (let col = 0; col < BOARD_WIDTH; col++) {
-                        coinsEarned += board[row][col].clear_value_per_block || 1; 
+                        coinsEarned += board[row][col].clear_value_per_block || (BASE_LINE_CLEAR_VALUE_PER_TYPE[currentPiece.type] * currentBetLevel) || 1; 
                     }
                     for (let r = row; r > 0; r--) {
                         board[r] = [...board[r - 1]];
@@ -725,7 +812,7 @@
             }
 
             if (linesCleared > 0) {
-                playSound(lineClearSound); // NEW: Mainkan suara line clear
+                playSound(lineClearSound); 
                 updateSaldo(coinsEarned);
                 showMessage(`+${coinsEarned.toLocaleString('id-ID')} Saldo dari ${linesCleared} baris!`, 'success');
             }
@@ -734,6 +821,7 @@
         function updateTotalKemenanganDisplay() {
             totalKemenanganDisplay.textContent = totalKemenangan.toLocaleString('id-ID');
         }
+
         function updateBalanceDisplay() {
             balanceDisplay.textContent = currentBalance.toLocaleString('id-ID');
         }
@@ -743,14 +831,18 @@
             currentY = 0;
             currentX = Math.floor(BOARD_WIDTH / 2) - Math.floor(currentPiece.shape[0].length / 2);
 
-            if (currentBalance < currentPiece.cost) {
-                showMessage(`Saldo tidak cukup untuk balok ini (perlu Rp${currentPiece.cost.toLocaleString('id-ID')})!`, 'error');
+            // NEW: Hitung biaya balok berdasarkan tingkat taruhan dan jenis balok
+            const pieceCost = BASE_PIECE_COST_PER_TYPE[currentPiece.type] * currentBetLevel;
+            currentPiece.clear_value_per_block = BASE_LINE_CLEAR_VALUE_PER_TYPE[currentPiece.type] * currentBetLevel;
+
+            if (currentBalance < pieceCost) {
+                showMessage(`Saldo tidak cukup untuk balok ini (perlu Rp${pieceCost.toLocaleString('id-ID')})!`, 'error');
                 gameOver();
                 return;
             }
 
-            updateSaldo(-currentPiece.cost);
-            showMessage(`-${currentPiece.cost.toLocaleString('id-ID')} Saldo. Sisa: Rp${currentBalance.toLocaleString('id-ID')}`, 'info');
+            updateSaldo(-pieceCost);
+            showMessage(`-${pieceCost.toLocaleString('id-ID')} Saldo. Sisa: Rp${currentBalance.toLocaleString('id-ID')}`, 'info');
             
             if (!isValidMove(currentPiece, currentX, currentY)) {
                 gameOver();
@@ -787,9 +879,13 @@
 
         function startGamePrompt() {
             hideGameControls();
+            hideBetControls(); // NEW: Sembunyikan kontrol taruhan saat prompt dimulai
             
+            // NEW: Hitung biaya awal game berdasarkan tingkat taruhan saat ini
+            const currentCalculatedGameStartCost = BASE_GAME_START_COST * currentBetLevel;
+
             const startButton = document.createElement('button');
-            startButton.textContent = `Mulai Game (Bayar Rp${GAME_START_COST.toLocaleString('id-ID')})`;
+            startButton.textContent = `Mulai Game (Bayar Rp${currentCalculatedGameStartCost.toLocaleString('id-ID')} @ Lv.${currentBetLevel})`;
             startButton.id = 'startButton';
             startButton.style.cssText = `
                 margin-top: 20px;
@@ -820,26 +916,32 @@
             playSound(clickSound);
             document.getElementById('startButton')?.remove();
 
-            if (currentBalance < GAME_START_COST) {
-                showMessage(`Saldo Anda tidak cukup (Rp${currentBalance.toLocaleString('id-ID')}). Perlu Rp${GAME_START_COST.toLocaleString('id-ID')} untuk mulai. Top up untuk bermain!`, 'error');
+            // NEW: Hitung ulang biaya awal game
+            const currentCalculatedGameStartCost = BASE_GAME_START_COST * currentBetLevel;
+
+            if (currentBalance < currentCalculatedGameStartCost) {
+                showMessage(`Saldo Anda tidak cukup (Rp${currentBalance.toLocaleString('id-ID')}). Perlu Rp${currentCalculatedGameStartCost.toLocaleString('id-ID')} untuk mulai. Top up untuk bermain!`, 'error');
                 balanceDisplay.classList.add('animate-loss');
                 setTimeout(() => balanceDisplay.classList.remove('animate-loss'), 500);
                 backToProfileBtn.style.display = 'block';
+                showBetControls(); // NEW: Tampilkan kembali kontrol taruhan jika saldo tidak cukup
+                startGamePrompt(); // NEW: Panggil ulang prompt agar tombol "Mulai Game" muncul lagi
                 return;
             }
 
-            await updateSaldo(-GAME_START_COST, true);
-            showMessage(`Rp${GAME_START_COST.toLocaleString('id-ID')} dikurangi untuk memulai game.`, 'info');
+            await updateSaldo(-currentCalculatedGameStartCost, true);
+            showMessage(`Rp${currentCalculatedGameStartCost.toLocaleString('id-ID')} dikurangi untuk memulai game.`, 'info');
             
             gameRunning = true;
             board = Array(BOARD_HEIGHT).fill(null).map(() => Array(BOARD_WIDTH).fill(0));
-            totalKemenangan = 0;
+            totalKemenangan = 0; // Reset kemenangan saat game baru dimulai
             updateTotalKemenanganDisplay();
             updateBalanceDisplay();
             messageArea.textContent = '';
             backToProfileBtn.style.display = 'none';
 
             showGameControls();
+            hideBetControls(); // NEW: Sembunyikan kontrol taruhan saat game berjalan
             createNewPiece();
             if (animationFrameId) cancelAnimationFrame(animationFrameId);
             animationFrameId = requestAnimationFrame(gameLoop);
@@ -859,6 +961,8 @@
             }
                
             hideGameControls();
+            showBetControls(); // NEW: Tampilkan kembali kontrol taruhan setelah game berakhir
+            
             const playAgainBtn = document.createElement('button');
             playAgainBtn.textContent = 'Main Lagi';
             playAgainBtn.id = 'playAgainBtn';
@@ -882,7 +986,7 @@
             playAgainBtn.onclick = () => {
                 playSound(clickSound);
                 playAgainBtn.remove();
-                initializeUserAndSaldo();
+                initializeUserAndSaldo(); // Ini akan memanggil startGamePrompt() lagi
             };
             document.querySelector('.game-container').insertBefore(playAgainBtn, backToProfileBtn);
 
@@ -903,6 +1007,16 @@
             softDropBtn.style.display = 'flex';
         }
 
+        // NEW: Fungsi untuk menyembunyikan dan menampilkan kontrol taruhan
+        function hideBetControls() {
+            document.querySelector('.bet-settings').classList.add('hidden');
+        }
+
+        function showBetControls() {
+            document.querySelector('.bet-settings').classList.remove('hidden');
+        }
+        // END NEW
+
         document.addEventListener('keydown', e => {
             if (!gameRunning || !currentPiece) return;
 
@@ -911,13 +1025,13 @@
             let newY = currentY;
             let newPiece = currentPiece;
 
-            if (e.key === 'ArrowLeft') { newX--; moved = true; playSound(clickSound); } // NEW: Suara klik
-            else if (e.key === 'ArrowRight') { newX++; moved = true; playSound(clickSound); } // NEW: Suara klik
-            else if (e.key === 'ArrowDown') { newY++; moved = true; lastDropTime = performance.now(); playSound(clickSound); } // Soft drop, NEW: Suara klik
-            else if (e.key === 'ArrowUp' || e.key === ' ') { newPiece = rotatePiece(currentPiece); moved = true; playSound(clickSound); } // Rotate, NEW: Suara klik
+            if (e.key === 'ArrowLeft') { newX--; moved = true; playSound(clickSound); } 
+            else if (e.key === 'ArrowRight') { newX++; moved = true; playSound(clickSound); } 
+            else if (e.key === 'ArrowDown') { newY++; moved = true; lastDropTime = performance.now(); playSound(clickSound); } 
+            else if (e.key === 'ArrowUp' || e.key === ' ') { newPiece = rotatePiece(currentPiece); moved = true; playSound(clickSound); } 
             else if (e.key === 'Control' || e.key === 'Enter') { // Hard drop
                 while (isValidMove(currentPiece, currentX, currentY + 1)) { currentY++; }
-                placePiece(); // Suara landing sudah di sini
+                placePiece(); 
                 return;
             }
 
@@ -925,7 +1039,6 @@
                 currentX = newX;
                 currentY = newY;
                 currentPiece = newPiece;
-                // playSound(clickSound); // Pindah ke masing-masing key
             }
             ctx.clearRect(0, 0, canvas.width, canvas.height); drawBoard(); drawPiece(currentPiece, currentX, currentY);
         });
@@ -950,13 +1063,37 @@
         softDropBtn.addEventListener('click', () => {
             if (!gameRunning || !currentPiece) return;
             if (isValidMove(currentPiece, currentX, currentY + 1)) { currentY++; lastDropTime = performance.now(); } else { placePiece(); }
-            playSound(clickSound); // Suara klik saat soft drop
+            playSound(clickSound); 
             ctx.clearRect(0, 0, canvas.width, canvas.height); drawBoard(); drawPiece(currentPiece, currentX, currentY);
         });
 
+        // NEW: Event listener untuk tombol pengaturan taruhan
+        decreaseBetBtn.addEventListener('click', () => {
+            playSound(clickSound);
+            if (!gameRunning && currentBetLevel > MIN_BET_LEVEL) {
+                currentBetLevel--;
+                betLevelDisplay.textContent = currentBetLevel;
+                startGamePrompt(); // Panggil ulang prompt untuk update teks tombol "Mulai Game"
+            } else if (gameRunning) {
+                showMessage('Tidak bisa mengubah taruhan saat game berjalan.', 'error');
+            }
+        });
+
+        increaseBetBtn.addEventListener('click', () => {
+            playSound(clickSound);
+            if (!gameRunning && currentBetLevel < MAX_BET_LEVEL) {
+                currentBetLevel++;
+                betLevelDisplay.textContent = currentBetLevel;
+                startGamePrompt(); // Panggil ulang prompt untuk update teks tombol "Mulai Game"
+            } else if (gameRunning) {
+                showMessage('Tidak bisa mengubah taruhan saat game berjalan.', 'error');
+            }
+        });
+        // END NEW
+
         // Tombol Kembali ke Profil
         backToProfileBtn.addEventListener('click', () => {
-            playSound(clickSound); // NEW: Suara klik saat kembali ke profil
+            playSound(clickSound); 
             window.location.href = 'index.html';
         });
 
@@ -964,6 +1101,7 @@
         document.addEventListener('DOMContentLoaded', () => {
             initializeUserAndSaldo();
             hideGameControls();
+            showBetControls(); // NEW: Pastikan kontrol taruhan terlihat di awal
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             drawBoard();
         });
