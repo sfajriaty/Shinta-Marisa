@@ -179,19 +179,19 @@
             background: linear-gradient(145deg, #f0f0f0, #ffffff); /* Gradien untuk efek kertas 3D */
             border: 1px solid #c0c0c0;
             border-radius: 8px; /* Sudut lebih membulat */
-            width: 25px; /* Ukuran kartu sedikit dikecilkan */
-            height: 30px; /* Ukuran kartu sedikit dikecilkan */
+            width: 50px; /* Ukuran kartu diperbesar */
+            height: 70px; /* Ukuran kartu diperbesar */
             display: flex;
             flex-direction: column;
             justify-content: space-between;
             align-items: center;
-            font-size: 5px;
             font-weight: 700;
             color: #333;
             padding: 5px 0; /* Padding vertikal */
             box-shadow: 3px 3px 8px rgba(0, 0, 0, 0.0), inset 0 0 5px rgba(255, 255, 255, 0.8); /* Bayangan dan highlight */
             position: relative;
             transition: transform 0.3s ease-out; /* Animasi saat hover */
+            overflow: hidden; /* Pastikan konten tidak keluar */
         }
 
         .card:hover:not(.hidden) {
@@ -199,25 +199,31 @@
         }
 
         .card .suit {
-            font-size: 1em; /* Ukuran suit lebih besar */
+            font-size: 1.2em; /* Ukuran suit lebih besar secara default */
             line-height: 1;
             position: absolute;
+            font-family: Arial, sans-serif; /* Font sederhana untuk simbol */
+            z-index: 2; /* Pastikan simbol di atas background */
+        }
+        .card .suit.top-left {
             top: 5px;
             left: 5px;
-            font-family: Arial, sans-serif; /* Font sederhana untuk simbol */
         }
-        .card .suit.bottom {
-            top: auto;
+        .card .suit.bottom-right {
             bottom: 5px;
-            left: auto;
             right: 5px;
             transform: rotate(180deg);
         }
 
         .card .rank {
-            font-size: 1em; /* Ukuran angka utama lebih besar */
+            font-size: 2.2em; /* Ukuran angka utama lebih besar */
             line-height: 1;
             font-family: 'Playfair Display', serif; /* Font elegan untuk angka */
+            position: absolute; /* Posisikan angka di tengah */
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 1; /* Angka di bawah simbol, tapi di tengah */
         }
 
         .red-suit { color: #d62828; } /* Merah yang lebih pekat */
@@ -433,12 +439,21 @@
                 padding-bottom: 55%;
             }
             .card {
-                width: 30px;
-                height: 40px;
-                font-size: 10px;
+                width: 40px; /* Ukuran kartu disesuaikan */
+                height: 60px; /* Ukuran kartu disesuaikan */
+                border-radius: 6px;
+            }
+            .card .suit {
+                font-size: 1.1em; /* Ukuran simbol lebih besar */
+                top: 4px; /* Sesuaikan posisi */
+                left: 4px; /* Sesuaikan posisi */
+            }
+            .card .suit.bottom-right {
+                bottom: 4px; /* Sesuaikan posisi */
+                right: 4px; /* Sesuaikan posisi */
             }
             .card .rank {
-                font-size: 10px;
+                font-size: 1.8em; /* Ukuran angka utama disesuaikan */
             }
             .community-cards {
                 gap: 6px;
@@ -481,17 +496,23 @@
                 padding-bottom: 60%; /* Mungkin perlu lebih tinggi pada layar sangat kecil */
             }
             .card {
-                width: 20px;
-                height: 40px;
+                width: 35px; /* Ukuran kartu lebih kecil lagi */
+                height: 50px; /* Ukuran kartu lebih kecil lagi */
                 font-size: 0.9em;
                 border-radius: 5px;
-                padding: 5px 0;
-            }
-            .card .rank {
-                font-size: 1.5em;
+                padding: 3px 0; /* Padding vertikal sedikit disesuaikan */
             }
             .card .suit {
-                font-size: 0.9em;
+                font-size: 1em; /* Ukuran simbol tetap cukup besar */
+                top: 3px; /* Posisi lebih kecil */
+                left: 3px; /* Posisi lebih kecil */
+            }
+            .card .suit.bottom-right {
+                bottom: 3px; /* Posisi lebih kecil */
+                right: 3px; /* Posisi lebih kecil */
+            }
+            .card .rank {
+                font-size: 1.5em; /* Ukuran angka utama disesuaikan */
             }
             .community-cards {
                 gap: 5px;
