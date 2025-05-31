@@ -24,7 +24,7 @@
         body {
             margin: 0;
             overflow: hidden; /* Sembunyikan scrollbar jika canvas melebihi viewport */
-            font-family: 'Press Start 2P', cursive; /* Gunakan font Press Start 2P */
+            font-family: 'Press Start', cursive; /* Gunakan font Press Start 2P */
             color: var(--text-light);
             display: flex;
             justify-content: center;
@@ -407,9 +407,9 @@
 
 
         // Konfigurasi Game Board
-        const TILE_SIZE = 10;
+        const TILE_SIZE = 20;
         const BOARD_WIDTH = 30;
-        const BOARD_HEIGHT = 35;
+        const BOARD_HEIGHT = 30;
 
         // Sesuaikan ukuran canvas berdasarkan TILE_SIZE dan BOARD_DIMENSIONS
         canvas.width = BOARD_WIDTH * TILE_SIZE; 
