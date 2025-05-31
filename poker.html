@@ -121,7 +121,7 @@
             padding: 10px;
             box-sizing: border-box;
             flex-wrap: wrap;
-            gap: 3px; /* Jarak antar kartu */
+            gap: 5px; /* Jarak antar kartu */
             background: rgba(0, 0, 0, 0.0); /* Latar belakang transparan untuk area pemain/bandar */
             border-radius: 15px;
             box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.0);
@@ -154,8 +154,8 @@
 
         .player-hand, .dealer-hand, .community-cards {
             display: flex;
-            gap: 10px; /* Jarak kartu yang lebih baik */
-            margin-top: 0px;
+            gap: 20px; /* Jarak kartu yang lebih baik */
+            margin-top: 10px;
             justify-content: center;
             align-items: center;
         }
@@ -184,13 +184,13 @@
             flex-direction: column;
             justify-content: space-between;
             align-items: center;
-            font-size: 1em;
+            font-size: 10px;
             font-weight: 700;
             color: #333;
             padding: 8px 0; /* Padding vertikal */
             box-shadow: 3px 3px 8px rgba(0, 0, 0, 0.0), inset 0 0 5px rgba(255, 255, 255, 0.8); /* Bayangan dan highlight */
             position: relative;
-            transition: transform 0.2s ease-out; /* Animasi saat hover */
+            transition: transform 0.3s ease-out; /* Animasi saat hover */
         }
 
         .card:hover:not(.hidden) {
