@@ -207,7 +207,7 @@
         }
         /* Top-left suit */
         .card .suit:first-child { /* Target suit pertama (atas kiri) */
-            top: 5px;
+            top: 7px;
             left: 5px;
         }
         /* Bottom-right suit */
@@ -222,7 +222,7 @@
             line-height: 1;
             font-family: 'Playfair Display', serif; /* Font elegan untuk angka */
             position: absolute; /* Posisikan angka di tengah */
-            top: 50%;
+            top: 70%;
             left: 50%;
             transform: translate(-50%, -50%);
             z-index: 1; /* Angka di bawah simbol */
@@ -446,19 +446,20 @@
                 border-radius: 6px;
             }
             .card .suit {
-                font-size: 0.5em; /* Ukuran simbol lebih besar */
+                font-size: 0.2em; /* Ukuran simbol lebih besar */
                 /* Adjust top/left/bottom/right as needed */
             }
             .card .suit:first-child {
-                top: 6px;
+                top: 7px;
                 left: 4px;
             }
             .card .suit:last-child {
-                bottom: 6px;
+                bottom: 7px;
                 right: 4px;
             }
             .card .rank {
-                font-size: 2em; /* Ukuran angka utama disesuaikan */
+                font-size: 2em;
+                top: 7px; /* Ukuran angka utama disesuaikan */
             }
             .community-cards {
                 gap: 5px;
