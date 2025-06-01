@@ -92,29 +92,29 @@
         }
 
         /* --- PLAYER & DEALER POSITIONS (Diatur ulang) --- */
-        .dealer-position {
-            position: absolute;
-            top: 25%; /* Lebih ke tengah, tapi masih di atas */
-            left: 20%; /* Pindah ke kiri meja */
-            transform: translate(-50%, -50%); /* Penyesuaian posisi */
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 3px;
-            z-index: 10;
-        }
+.dealer-position {
+    position: absolute;
+    top: 25%;
+    left: 20%;
+    transform: translate(-50%, -50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+    z-index: 20; /* Penting! Pastikan ini lebih tinggi dari meja */
+}
 
-        .player-position {
-            position: absolute;
-            bottom: 25%; /* Lebih ke tengah, tapi masih di bawah */
-            right: 20%; /* Pindah ke kanan meja */
-            transform: translate(50%, 50%); /* Penyesuaian posisi */
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 3px;
-            z-index: 10;
-        }
+.player-position {
+    position: absolute;
+    bottom: 25%;
+    right: 20%;
+    transform: translate(50%, 50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+    z-index: 20; /* Penting! Pastikan ini lebih tinggi dari meja */
+}
 
         .player-avatar, .dealer-avatar {
             width: 45px; /* Avatar lebih kecil */
@@ -146,7 +146,7 @@
         .hand-display {
             display: flex;
             justify-content: center;
-            gap: -15px; /* Overlap kartu lebih banyak */
+            gap: 5px; /* Overlap kartu lebih banyak */
             position: relative;
             z-index: 5;
         }
@@ -159,19 +159,19 @@
             margin-bottom: 5px; /* Sedikit jarak dari avatar pemain */
         }
 
-        #community-cards {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            display: flex;
-            gap: 8px; /* Jarak antar kartu komunitas lebih kecil */
-            background-color: rgba(0, 0, 0, 0.3); /* Sedikit lebih transparan */
-            border-radius: 8px; /* Radius lebih kecil */
-            padding: 3px 12px; /* Padding lebih kecil */
-            box-shadow: inset 0 0 8px rgba(0,0,0,0.4);
-            z-index: 8;
-        }
+#community-cards {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    display: flex;
+    gap: 8px; /* Anda bisa mempertahankan ini jika suka jaraknya, atau ubah menjadi 5px juga */
+    background-color: rgba(0, 0, 0, 0.3);
+    border-radius: 8px;
+    padding: 3px 12px;
+    box-shadow: inset 0 0 8px rgba(0,0,0,0.4);
+    z-index: 8; /* Lebih tinggi dari hand-display agar selalu di depan jika tumpang tindih */
+}
 
         /* --- GAME INFO & POT --- */
         .game-message {
@@ -357,17 +357,18 @@
         }
 
         /* --- CARD STYLES (DIUBAH) --- */
-        .card-container {
-            width: 55px; /* Lebar kartu lebih kecil lagi */
-            height: 75px; /* Tinggi kartu lebih kecil lagi */
-            position: relative;
-            transform-style: preserve-3d;
-            transition: transform 0.7s ease-in-out; /* Transisi flip lebih cepat */
-            margin: 0 -15px; /* Overlap kartu lebih banyak */
-            transform-origin: center;
-            opacity: 0; /* Mulai tersembunyi untuk animasi */
-            animation: dealCardAnimation 0.4s ease-out forwards; /* Animasi muncul saat dibagikan lebih cepat */
-        }
+card-container {
+    width: 45px; /* Lebar kartu (ubah sesuai keinginan, misalnya 40px, 50px) */
+    height: 65px; /* Tinggi kartu (proporsional dengan lebar) */
+    position: relative;
+    transform-style: preserve-3d;
+    transition: transform 0.7s ease-in-out;
+    margin: 0 3px; /* Ubah ini: Memberikan jarak positif 3px antar kartu */
+    transform-origin: center;
+    opacity: 0;
+    animation: dealCardAnimation 0.4s ease-out forwards;
+    z-index: 5; /* Tambahkan ini jika belum ada, atau setel lebih tinggi dari meja */
+}
 
         /* Animasi pembagian kartu */
         @keyframes dealCardAnimation {
@@ -432,12 +433,12 @@
 
         .card-front span {
             font-weight: bold;
-            font-size: 1em; /* Ukuran rank lebih kecil */
+            font-size: 0.9em; /* Ukuran rank lebih kecil */
         }
 
         .card-suit-top-left, .card-suit-bottom-right {
             position: absolute;
-            font-size: 0.7em; /* Ukuran simbol suit lebih kecil */
+            font-size: 0.6em; /* Ukuran simbol suit lebih kecil */
         }
 
         .card-suit-top-left {
