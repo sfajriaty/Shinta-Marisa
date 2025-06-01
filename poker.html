@@ -146,13 +146,13 @@
         .hand-display {
             display: flex;
             justify-content: center;
-            gap: 5px; /* Overlap kartu lebih banyak */
+            gap: 3px; /* Overlap kartu lebih banyak */
             position: relative;
-            z-index: 5;
+            z-index: 9;
         }
 
         #dealer-hand {
-            margin-top: 5px; /* Sedikit jarak dari avatar bandar */
+            margin-top: 3px; /* Sedikit jarak dari avatar bandar */
         }
 
         #player-hand {
@@ -165,7 +165,7 @@
             left: 50%;
             transform: translate(-50%, -50%);
             display: flex;
-            gap: 8px; /* Jarak antar kartu komunitas lebih kecil */
+            gap: 3px; /* Jarak antar kartu komunitas lebih kecil */
             background-color: rgba(0, 0, 0, 0.3); /* Sedikit lebih transparan */
             border-radius: 8px; /* Radius lebih kecil */
             padding: 3px 12px; /* Padding lebih kecil */
@@ -178,7 +178,7 @@
             position: absolute;
             top: 10px; /* Pindah ke pojok kiri atas */
             left: 140px; /* Di samping saldo dan tombol keluar */
-            font-size: 1.0em; /* Ukuran pesan lebih kecil */
+            font-size: 0.5em; /* Ukuran pesan lebih kecil */
             font-weight: bold;
             color: #ffd700; /* Warna emas */
             background-color: rgba(0, 0, 0, 0.5); /* Sedikit transparan */
@@ -358,8 +358,8 @@
 
         /* --- CARD STYLES (DIUBAH) --- */
         .card-container {
-            width: 45px; /* Lebar kartu lebih kecil lagi */
-            height: 65px; /* Tinggi kartu lebih kecil lagi */
+            width: 30px; /* Lebar kartu lebih kecil lagi */
+            height: 40px; /* Tinggi kartu lebih kecil lagi */
             position: relative;
             transform-style: preserve-3d;
             transition: transform 0.7s ease-in-out; /* Transisi flip lebih cepat */
@@ -399,7 +399,7 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            font-size: 1.6em; /* Ukuran simbol kartu belakang sedikit lebih kecil */
+            font-size: 0.6em; /* Ukuran simbol kartu belakang sedikit lebih kecil */
             border: 0.5px solid #666; /* Border lebih tipis */
         }
 
@@ -432,12 +432,12 @@
 
         .card-front span {
             font-weight: bold;
-            font-size: 1em; /* Ukuran rank lebih kecil */
+            font-size: 0.5em; /* Ukuran rank lebih kecil */
         }
 
         .card-suit-top-left, .card-suit-bottom-right {
             position: absolute;
-            font-size: 0.7em; /* Ukuran simbol suit lebih kecil */
+            font-size: 0.5em; /* Ukuran simbol suit lebih kecil */
         }
 
         .card-suit-top-left {
