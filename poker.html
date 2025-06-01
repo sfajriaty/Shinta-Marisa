@@ -239,44 +239,7 @@
             color: #2c3e50;
         }
 
-        .card-front {
-            background-color: #f8f8f8; /* Warna latar depan kartu putih */
-            transform: rotateY(0deg);
-            display: flex; /* Menggunakan flexbox untuk penataan konten */
-            flex-direction: column;
-            justify-content: space-between;
-            align-items: center;
-            padding: 5px; /* Padding di dalam kartu */
-        }
-
-        .card-back {
-            background-color: #a72828; /* Warna merah gelap untuk bagian belakang kartu */
-            transform: rotateY(180deg);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-size: 1.5em; /* Ukuran simbol di belakang kartu */
-            color: #f8f8f8; /* Warna simbol di belakang kartu */
-            /* Anda bisa menambahkan gambar latar belakang di sini untuk desain kartu belakang */
-             background-image: url('https://your-image-url.com/card-back-pattern.png'); /* Opsional: Pola di belakang kartu */
-             background-size: cover;
-        }
-
-
-        .card-container.flipped .card-front {
-            transform: rotateY(-180deg);
-        }
-
-        .card-container.flipped .card-back {
-            transform: rotateY(0deg);
-        }
-
-        .card-suit-top-left, .card-suit-bottom-right {
-            font-size: 0.6em;
-            position: absolute;
-            font-weight: normal;
-        }
-
+        
         /* Styling untuk Rank (angka/huruf) di tengah kartu */
         .card-rank {
             font-size: 1.8em; /* Ukuran font lebih besar untuk rank di tengah */
