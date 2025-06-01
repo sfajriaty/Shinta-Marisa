@@ -163,10 +163,16 @@
             padding-bottom: 5px;
         }
         
-        .hand:has(.card-container:nth-child(4)), .hand:has(.card-container:nth-child(5)) {
-            gap: 1px;
-            justify-content: space-between;
+        /* Mengatur kartu agar tidak terlalu sempit jika ada banyak */
+        .hand:has(.card-container:nth-child(4)), 
+        .hand:has(.card-container:nth-child(5)),
+        .hand:has(.card-container:nth-child(6)),
+        .hand:has(.card-container:nth-child(7)) {
+            gap: 1px; /* Kurangi gap untuk banyak kartu */
+            justify-content: space-between; /* Distribusi rata */
         }
+        /* Jika terlalu sempit, bisa dipertimbangkan mengubah width/height kartu sedikit lebih kecil lagi */
+
 
         /* --- CSS for Cards --- */
         .card-container {
@@ -283,7 +289,7 @@
             justify-content: center;
             gap: 10px;
             margin-top: 10px;
-            margin-bottom: 5px;
+            margin-bottom: 5px; /* Added margin-bottom */
         }
 
         .action-buttons button {
@@ -397,7 +403,7 @@
     </style>
 </head>
 <body>
-<div class="game-container">
+  <div class="game-container">
         <audio id="backgroundMusic" src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" loop volume="0.3"></audio>
         <audio id="clickSound" src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3"></audio>
         <audio id="winSound" src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3"></audio>
@@ -511,7 +517,6 @@
         let dealerCurrentHand = [];
         let playerCanHit = true;
         
-        // REVISI NILAI KARTU SESUAI SAMGONG ASLI
         const cardValues = {
             'A': 11, '2': 2, '3': 3, '4': 4, '5': 5,
             '6': 6, '7': 7, '8': 8, '9': 9, '10': 10,
@@ -644,10 +649,9 @@
             return deckToShuffle;
         }
 
-        // REVISI FUNGSI CALCULATE HAND VALUE SESUAI ATURAN ASLI SAMGONG
         function calculateHandValue(hand) {
             let totalValue = 0;
-            const rankCounts = {}; // Untuk menghitung kartu kembar
+            const rankCounts = {};
 
             for (const card of hand) {
                 totalValue += cardValues[card.rank];
@@ -658,12 +662,9 @@
             if (hand.length === 3) {
                 for (const rank in rankCounts) {
                     if (rankCounts[rank] === 3) {
-                        // Jika 3 kartu kembar, kembalikan nilai khusus yang lebih tinggi dari 30
-                        // Contoh: 31 untuk 3A, 32 untuk 3K, dst. Semakin tinggi nilai kartu kembar, semakin tinggi nilainya.
-                        // Urutan: A, K, Q, J, 10, 9, ..., 2
                         const rankOrder = ['A', 'K', 'Q', 'J', '10', '9', '8', '7', '6', '5', '4', '3', '2'];
-                        const kembarBonus = 100 - rankOrder.indexOf(rank); // Misalnya 100 untuk A, 99 untuk K, dst.
-                        return 300 + kembarBonus; // Memberikan nilai sangat tinggi agar selalu menang dari 30
+                        const kembarBonus = 100 - rankOrder.indexOf(rank); 
+                        return 300 + kembarBonus; 
                     }
                 }
             }
@@ -678,17 +679,13 @@
 
         // Fungsi bantu untuk menampilkan nilai yang benar di UI
         function getDisplayValue(value, handLength) {
-            if (value === 0 && handLength > 3) { // Hanya jika "amsyong" (total > 30) dan lebih dari 3 kartu
+            if (value === 0 && handLength > 3) { // Jika "amsyong" (total > 30) dan lebih dari 3 kartu
                 return 'Amsyong!';
-            } else if (value > 30) { // Ini adalah nilai untuk 3 kartu kembar
-                 // Kita bisa mengkonversi kembali nilai bonus ini ke string yang lebih mudah dibaca
-                if (value >= 300) { // Kembar 3
-                    const rankOrder = ['A', 'K', 'Q', 'J', '10', '9', '8', '7', '6', '5', '4', '3', '2'];
-                    const bonusValue = value - 300;
-                    const kembarRank = rankOrder[100 - bonusValue];
-                    return `3x ${kembarRank} (${value})`; // Menampilkan angka asli juga untuk debugging
-                }
-                return value; // Untuk nilai custom lainnya (belum ada)
+            } else if (value >= 300) { // Ini adalah nilai untuk 3 kartu kembar
+                const rankOrder = ['A', 'K', 'Q', 'J', '10', '9', '8', '7', '6', '5', '4', '3', '2'];
+                const bonusValue = value - 300;
+                const kembarRank = rankOrder[100 - bonusValue];
+                return `3x ${kembarRank}`; // Tampilkan "3x K"
             }
             return value; // Untuk nilai 1-30
         }
@@ -765,7 +762,6 @@
             popupTitle.textContent = title;
             popupResultText.textContent = resultText;
             
-            // Menggunakan getDisplayValue untuk menampilkan "Amsyong!" atau "3x K"
             popupPlayerValue.textContent = getDisplayValue(playerRawVal, playerHandLen);
             popupDealerValue.textContent = getDisplayValue(dealerRawVal, dealerHandLen);
             
@@ -788,6 +784,7 @@
         }
 
         // --- Game Logic ---
+
         async function dealInitialCards() {
             playSound(clickSound);
             const bet = parseInt(betInput.value);
@@ -802,14 +799,14 @@
             }
 
             dealButton.disabled = true;
-            betInput.disabled = true;
+            betInput.disabled = true; // Nonaktifkan input taruhan saat permainan aktif
             gameMessageDiv.textContent = 'Membagikan kartu...';
 
             const successBet = await updateSaldo(-bet);
             if (!successBet) {
                 updateMessage("Gagal mengurangi saldo untuk taruhan.", 'error');
                 dealButton.disabled = false;
-                betInput.disabled = false;
+                betInput.disabled = false; // Aktifkan kembali jika gagal
                 return;
             }
             pot = bet * 2;
@@ -819,7 +816,6 @@
             playerCurrentHand = [];
             dealerCurrentHand = [];
 
-            // Deal 3 initial cards to player and dealer
             for (let i = 0; i < 3; i++) {
                 playerCurrentHand.push(deck.pop());
                 dealerCurrentHand.push(deck.pop());
@@ -832,8 +828,6 @@
 
             await new Promise(resolve => setTimeout(resolve, 1500));
 
-            // Tidak ada "instant Samgong" lagi, karena Samgong di sini adalah 3 kartu kembar (prioritas tertinggi)
-            // Jadi langsung masuk fase hit/stand
             updateMessage('Ambil kartu atau Berhenti?');
             hitButton.style.display = 'inline-block';
             standButton.style.display = 'inline-block';
@@ -844,14 +838,12 @@
             playSound(clickSound);
             if (!playerCanHit) return;
 
-            // Batasi pengambilan kartu maksimal 4 kartu (total 7 kartu)
-            if (playerCurrentHand.length >= 7) { // Maksimal 7 kartu
+            if (playerCurrentHand.length >= 7) { 
                 updateMessage('Anda sudah memiliki 7 kartu. Tidak bisa mengambil lagi.');
                 playerCanHit = false;
                 playerStand();
                 return;
             }
-
             const newCard = deck.pop();
             playerCurrentHand.push(newCard);
             renderHand(playerCurrentHand, playerHandDiv);
@@ -861,8 +853,8 @@
 
             await new Promise(resolve => setTimeout(resolve, 800));
 
-            // Jika nilai total > 30 (Amsyong) atau mencapai 30, otomatis stand
-            if (playerValue === 0 || playerValue === 30 || playerCurrentHand.length >= 7 || playerValue > 30) { // Amsyong (nilai 0), 30, 3 kartu kembar
+            // Jika nilai total > 30 (Amsyong) atau mencapai 30 atau 3 kartu kembar atau 7 kartu
+            if (playerValue === 0 || playerValue === 30 || playerValue >= 300 || playerCurrentHand.length >= 7) {
                 updateMessage('Anda mencapai batas kartu atau nilai. Anda otomatis Berhenti.');
                 playerCanHit = false;
                 playerStand();
@@ -886,10 +878,8 @@
             dealerValueSpan.textContent = getDisplayValue(dealerValue, dealerCurrentHand.length);
             await new Promise(resolve => setTimeout(resolve, 1000));
 
-            // Aturan Bandar: Ambil kartu jika nilai < 25 ATAU jika kartu < 7 dan bukan 30 atau 3 kartu kembar
-            // (Asumsi bandar berusaha mendekati 30, tapi tidak mengambil jika sudah tinggi atau Amsyong)
-            // Bandar juga berhenti jika sudah 7 kartu
-            while (dealerCurrentHand.length < 7 && dealerValue < 25 && dealerValue !== 30 && dealerValue < 300) { // < 300 untuk tidak ambil jika sudah 3 kartu kembar
+            // Perbaikan: Bandar berhenti jika sudah "Amsyong" (nilai 0)
+            while (dealerCurrentHand.length < 7 && dealerValue !== 0 && dealerValue < 25 && dealerValue !== 30 && dealerValue < 300) { 
                 if (deck.length === 0) {
                     console.warn("Deck kosong, bandar tidak bisa mengambil kartu lagi.");
                     break;
@@ -898,9 +888,15 @@
                 const newCard = deck.pop();
                 dealerCurrentHand.push(newCard);
                 renderHand(dealerCurrentHand, dealerHandDiv);
-                dealerValue = calculateHandValue(dealerCurrentHand); // Recalculate
+                dealerValue = calculateHandValue(dealerCurrentHand);
                 dealerValueSpan.textContent = getDisplayValue(dealerValue, dealerCurrentHand.length);
                 await new Promise(resolve => setTimeout(resolve, 1000));
+
+                // Jika bandar menjadi amsyong setelah mengambil kartu, hentikan loop
+                if (dealerValue === 0) {
+                    updateMessage('Bandar Amsyong! Menentukan pemenang...');
+                    break; 
+                }
             }
             
             updateMessage('Bandar Berhenti. Menentukan pemenang...');
@@ -920,13 +916,13 @@
             let finalMessage = '';
             let messageType = 'info';
 
-            // PRIORITAS PENENTUAN PEMENANG
+            // PRIORITAS PENENTUAN PEMENANG (tetap sama)
             // 1. 3 Kartu Kembar
-            const playerIsKembar3 = playerValue >= 300; // Cek nilai khusus untuk 3 kartu kembar
+            const playerIsKembar3 = playerValue >= 300;
             const dealerIsKembar3 = dealerValue >= 300;
 
             if (playerIsKembar3 && !dealerIsKembar3) {
-                winAmount = bet * 3; // Contoh: menang 3x lipat untuk kembar 3
+                winAmount = bet * 3; 
                 finalMessage = `3 Kartu Kembar! Anda menang Rp ${winAmount.toLocaleString('id-ID')}!`;
                 messageType = 'win';
             } else if (!playerIsKembar3 && dealerIsKembar3) {
@@ -934,7 +930,7 @@
                 finalMessage = `Bandar 3 Kartu Kembar! Anda kalah Rp ${bet.toLocaleString('id-ID')}.`;
                 messageType = 'lose';
             } else if (playerIsKembar3 && dealerIsKembar3) {
-                if (playerValue > dealerValue) { // Bandingkan nilai bonus kembar 3
+                if (playerValue > dealerValue) { 
                     winAmount = bet * 3;
                     finalMessage = `Keduanya 3 Kartu Kembar! Anda menang (nilai lebih tinggi)! Rp ${winAmount.toLocaleString('id-ID')}!`;
                     messageType = 'win';
@@ -949,22 +945,22 @@
                 }
             }
             // 2. Amsyong (nilai 0)
-            else if (playerValue === 0 && dealerValue !== 0) { // Pemain amsyong, bandar tidak
+            else if (playerValue === 0 && dealerValue !== 0) { 
                 winAmount = 0;
                 finalMessage = `Anda Amsyong (${getDisplayValue(playerValue, playerCurrentHand.length)})! Anda kalah Rp ${bet.toLocaleString('id-ID')}.`;
                 messageType = 'lose';
-            } else if (playerValue !== 0 && dealerValue === 0) { // Bandar amsyong, pemain tidak
+            } else if (playerValue !== 0 && dealerValue === 0) { 
                 winAmount = bet * 2;
                 finalMessage = `Bandar Amsyong (${getDisplayValue(dealerValue, dealerCurrentHand.length)})! Anda menang Rp ${bet.toLocaleString('id-ID')}!`;
                 messageType = 'win';
-            } else if (playerValue === 0 && dealerValue === 0) { // Keduanya amsyong
-                winAmount = bet; // Seri, kembali modal
+            } else if (playerValue === 0 && dealerValue === 0) { 
+                winAmount = bet; 
                 finalMessage = 'Keduanya Amsyong! Seri.';
                 messageType = 'draw';
             }
             // 3. Nilai 30
             else if (playerValue === 30 && dealerValue !== 30) {
-                winAmount = bet * 3; // Menang 2x lipat (taruhan kembali + 2x bonus)
+                winAmount = bet * 3; 
                 finalMessage = `SAMGONG SEMPURNA (30)! Anda menang Rp ${winAmount.toLocaleString('id-ID')}!`;
                 messageType = 'win';
             } else if (playerValue !== 30 && dealerValue === 30) {
@@ -985,7 +981,7 @@
                 winAmount = 0;
                 finalMessage = `Anda kalah dengan nilai ${playerValue} vs ${dealerValue}.`;
                 messageType = 'lose';
-            } else { // Seri nilai biasa
+            } else { 
                 winAmount = bet;
                 finalMessage = 'Seri! Taruhan Anda dikembalikan.';
                 messageType = 'draw';
@@ -996,10 +992,10 @@
                 showResultPopup(
                     'Hasil Permainan',
                     finalMessage,
-                    playerValue, // Pass raw value for calculation
-                    dealerValue, // Pass raw value for calculation
+                    playerValue, 
+                    dealerValue, 
                     messageType,
-                    playerCurrentHand.length, // Pass hand length for display logic
+                    playerCurrentHand.length, 
                     dealerCurrentHand.length
                 );
             } else {
@@ -1025,6 +1021,10 @@
             pot = 0;
             updatePotDisplay();
             
+            // Perbaikan: Aktifkan kembali input taruhan dan tombol deal
+            betInput.disabled = false; 
+            dealButton.disabled = false;
+
             betInput.max = userSaldo;
             if (parseInt(betInput.value) > userSaldo) {
                 betInput.value = userSaldo;
