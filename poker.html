@@ -176,22 +176,20 @@
         }          
 
         .card {
-            background: linear-gradient(145deg, #f0f0f0, #ffffff); /* Gradien untuk efek kertas 3D */
-            border: 1px solid #c0c0c0;
-            border-radius: 8px; /* Sudut lebih membulat */
-            width: 100px; /* Ukuran kartu diperbesar */
-            height: 110px; /* Ukuran kartu diperbesar */
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            border-radius: 4px;
             display: flex;
             flex-direction: column;
-            justify-content: space-between; /* Untuk suit di sudut */
+            justify-content: space-between;
             align-items: center;
-            font-weight: 700;
-            color: #333;
-            padding: 15px 20px; /* Padding vertikal */
-            box-shadow: 3px 3px 8px rgba(0, 0, 0, 0.0), inset 0 0 5px rgba(255, 255, 255, 0.8); /* Bayangan dan highlight */
-            position: relative; /* Penting untuk penempatan absolute inner elements */
-            transition: transform 0.3s ease-out; /* Animasi saat hover */
-            overflow: hidden; /* Pastikan konten tidak keluar */
+            padding: 2px;
+            box-sizing: border-box;
+            font-weight: bold;
+            font-size: 1.2em;
+            color: #2c3e50;
         }
 
         .card:hover:not(.hidden) {
