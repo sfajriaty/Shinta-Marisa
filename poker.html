@@ -406,7 +406,6 @@
 
         .card-front {
             background-color: white;
-            color: #333;
             display: flex;
             flex-direction: column;
             justify-content: space-between;
@@ -785,16 +784,21 @@
 
                 const rankDisplay = document.createElement('span');
                 rankDisplay.textContent = card.rank;
+                // Tambahkan kelas warna ke rankDisplay juga
+                rankDisplay.classList.add(card.suit === 'H' || card.suit === 'D' ? 'red-suit' : 'black-suit');
 
                 const suitTL = document.createElement('span');
                 suitTL.classList.add('card-suit-top-left');
                 suitTL.textContent = suitSymbols[card.suit];
+                // Pastikan ini juga punya kelas warna
                 suitTL.classList.add(card.suit === 'H' || card.suit === 'D' ? 'red-suit' : 'black-suit');
 
                 const suitBR = document.createElement('span');
                 suitBR.classList.add('card-suit-bottom-right');
                 suitBR.textContent = suitSymbols[card.suit];
+                // Pastikan ini juga punya kelas warna
                 suitBR.classList.add(card.suit === 'H' || card.suit === 'D' ? 'red-suit' : 'black-suit');
+
 
                 cardFront.appendChild(suitTL);
                 cardFront.appendChild(rankDisplay);
