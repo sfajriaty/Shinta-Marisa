@@ -3,668 +3,459 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Poker Seru (Texas Hold'em Basic) - GameZone</title>
+    <title>Poker Royal Flush - Mainkan & Menangkan!</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap');
-        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&display=swap'); /* Tambah font klasik */
-        
+        /* --- GLOBAL & BODY STYLES --- */
         body {
             margin: 0;
             padding: 0;
-            min-height: 100vh;
-            font-family: 'Poppins', sans-serif;
-            background: linear-gradient(135deg, #1a2a3a, #0f1822); /* Latar belakang lebih gelap, kesan premium */
-            color: #ecf0f1;
+            overflow: hidden; /* Mencegah scroll */
+            font-family: 'Roboto', sans-serif;
+            background: linear-gradient(to bottom right, #1a3a2a, #0d2a1b); /* Warna gelap yang nyaman */
+            color: #fff;
             display: flex;
-            flex-direction: column;
             justify-content: center;
             align-items: center;
-            overflow: hidden; /* Sembunyikan scrollbar jika tidak diperlukan */
-            position: relative; /* Untuk efek latar belakang */
+            min-height: 100vh;
         }
 
-        /* Efek latar belakang kasino yang samar */
-        body::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: url('https://images.unsplash.com/photo-1598466699195-2c3f191b7d8d?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D') no-repeat center center;
-            background-size: cover;
-            opacity: 0.1; /* Transparansi agar tidak mengganggu */
-            filter: blur(3px); /* Efek blur untuk kedalaman */
-            z-index: -1;
+        /* Orientasi Landscape */
+        @media (orientation: portrait) {
+            body::before {
+                content: "Putar perangkat Anda untuk pengalaman bermain yang lebih baik.";
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background-color: rgba(0, 0, 0, 0.9);
+                color: white;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                font-size: 1.5em;
+                text-align: center;
+                z-index: 1000;
+            }
+            .game-container {
+                display: none; /* Sembunyikan game saat portrait */
+            }
         }
 
         .game-container {
-            width: 95%;
-            max-width: 750px; /* Lebar maksimum lebih besar */
-            padding: 25px;
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 10px;
             box-sizing: border-box;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            background: rgba(0, 0, 0, 0.6); /* Sedikit transparan untuk latar belakang */
-            border-radius: 20px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7); /* Bayangan lebih dalam */
-            position: relative;
-            z-index: 1;
-        }
-
-        .header-info-area {
-            width: 100%;
-            display: flex;
-            justify-content: space-around; /* Agar lebih menyebar */
-            align-items: center;
-            background: rgba(17, 25, 33, 0.7); /* Background lebih gelap */
-            padding: 12px 20px;
+            background-image: url('https://i.imgur.com/your-poker-table-background.jpg'); /* GANTI DENGAN GAMBAR MEJA POKER REALISTIS */
+            background-size: cover;
+            background-position: center;
             border-radius: 15px;
-            margin-bottom: 25px;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        .info-box {
-            font-size: 1em;
-            font-weight: 700;
-            color: #ffd700; /* Warna emas untuk info penting */
-            display: flex;
-            align-items: center;
-            gap: 5px;
-            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.4);
-        }
-        .info-box span {
-            font-family: 'Playfair Display', serif; /* Font lebih elegan */
-            font-size: 1em;
-        }
-
-        .game-message {
-            background: rgba(255, 255, 255, 0.15); /* Lebih transparan */
-            padding: 12px 20px;
-            border-radius: 10px;
-            text-align: center;
-            margin-bottom: 25px;
-            font-size: 1em;
-            color: #e0f2f7; /* Warna teks lebih terang */
-            width: 90%;
-            box-shadow: inset 0 0 8px rgba(0, 0, 0, 0.5);
-            animation: fadeIn 0.8s ease-out; /* Animasi pesan */
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(-10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .game-table {
-            background: radial-gradient(ellipse at center, #2e8b57 0%, #1e6d42 70%, #175232 100%); /* Gradien radial untuk efek 3D */
-            border: 8px solid #4a2c00; /* Border kayu gelap */
-            border-radius: 50%; 
-            width: 95%; /* Lebih lebar */
-            padding-bottom: 50%; 
+            box-shadow: 0 0 30px rgba(0, 0, 0, 0.7);
             position: relative;
-            margin-bottom: 30px;
-            box-shadow: 0 12px 25px rgba(0, 0, 0, 0.8), inset 0 0 20px rgba(0, 0, 0, 0.5); /* Bayangan lebih dramatis */
+        }
+
+        /* --- TOP SECTION (Dealer Hand & Community Cards) --- */
+        .top-section {
             display: flex;
             flex-direction: column;
-            justify-content: space-around;
             align-items: center;
+            gap: 10px;
+            margin-top: 10px;
         }
 
-         .player-area, .dealer-area {
-            position: absolute;
-            width: 50%; /* Lebar area lebih luas */
+        .dealer-area, .community-area {
+            background-color: rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+            padding: 10px;
             display: flex;
             justify-content: center;
-            padding: 1px;
-            box-sizing: border-box;
-            flex-wrap: wrap;
-            gap: 0px; /* Jarak antar kartu */
-            background: rgba(0, 0, 0, 0.0); /* Latar belakang transparan untuk area pemain/bandar */
-            border-radius: 15px;
-            box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.0);
-            /* Tambahkan z-index pada dealer-area */
-            z-index: 2; /* Dealer area di atas community cards (z-index: 1) */
-        }
-
-        .player-area {
-            bottom: -10%; /* Sedikit lebih rendah */
-            left: 5%; /* Lebih ke tengah */
-            color: #fff;
-            font-weight: bold;
-            font-size: 1em;
-            flex-direction: column;
             align-items: center;
-            justify-content: flex-start;
-            z-index: 2; /* Player area juga di atas community cards */
+            min-height: 100px;
+            flex-wrap: wrap; /* Memungkinkan kartu untuk wrap jika terlalu banyak */
+            gap: 5px;
         }
 
         .dealer-area {
-            top: -18%; /* Sedikit lebih tinggi */
-            left: 5%; /* Lebih ke tengah */
-            color: #fff;
-            font-weight: bold;
-            font-size: 1em;
+            width: 80%; /* Lebar area dealer */
+        }
+
+        .community-area {
+            width: 90%; /* Lebar area komunitas */
+            border: 2px dashed rgba(255, 255, 255, 0.3); /* Border untuk area komunitas */
+        }
+
+        /* --- MIDDLE SECTION (Game Info & Pot) --- */
+        .middle-section {
+            text-align: center;
+            margin: 10px 0;
+            display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: flex-start;
+            gap: 10px;
         }
 
-        /* Ini akan diganti dengan .hand dari Samgong */
-        /* .player-hand, .dealer-hand, .community-cards {
+        .game-message {
+            font-size: 1.4em;
+            font-weight: bold;
+            color: #ffd700; /* Warna emas */
+            background-color: rgba(0, 0, 0, 0.5);
+            padding: 8px 15px;
+            border-radius: 8px;
+            width: fit-content;
+            margin: 0 auto;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.7);
+        }
+
+        .pot-display {
+            font-size: 1.8em;
+            font-weight: bold;
+            color: #aaffaa; /* Warna hijau cerah */
+            background-color: rgba(20, 80, 20, 0.7);
+            padding: 10px 20px;
+            border-radius: 25px;
+            box-shadow: 0 0 15px rgba(0,255,0,0.5);
+        }
+
+        /* --- BOTTOM SECTION (Player Hand & Controls) --- */
+        .bottom-section {
             display: flex;
-            gap: 2px;
-            margin-top: 0px;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 10px;
+        }
+
+        .player-area {
+            background-color: rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+            padding: 10px;
+            display: flex;
             justify-content: center;
             align-items: center;
-            padding: 5px;
-        } */
+            min-height: 100px;
+            flex-wrap: wrap;
+            gap: 5px;
+            width: 80%;
+        }
 
-        .community-cards {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            gap: 5px; /* Jarak kartu komunitas sedikit dikecilkan */
-            padding: 5px;
-            background: rgba(0, 0, 0, 0.4); /* Background lebih solid */
-            border-radius: 15px;
-            box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.3);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            z-index: 2; /* Biarkan community cards di bawah dealer/player */
-        }          
-
-        /* --- CSS for Cards (dari samgong.html) --- */
-        .hand {
+        .player-info {
             display: flex;
-            justify-content: center; /* Atau 'flex-start' atau 'space-around' tergantung layout poker Anda */
-            gap: 5px; /* Jarak antar kartu */
-            flex-wrap: nowrap; /* Penting agar kartu tidak turun ke baris baru */
-            overflow-x: auto; /* Untuk scroll jika banyak kartu */
-            -webkit-overflow-scrolling: touch;
-            align-items: center;
-            padding-bottom: 5px; /* Tambahkan padding bottom agar tidak terlalu mepet jika ada banyak kartu */
-        }
-        /* Untuk banyak kartu bisa disesuaikan gapnya */
-        .hand:has(.card-container:nth-child(4)), 
-        .hand:has(.card-container:nth-child(5)),
-        .hand:has(.card-container:nth-child(6)),
-        .hand:has(.card-container:nth-child(7)) {
-            gap: 1px; /* Kurangi gap untuk banyak kartu */
-            justify-content: space-between; /* Distribusi rata */
+            justify-content: space-between;
+            width: 80%;
+            max-width: 600px;
+            font-size: 1.1em;
+            background-color: rgba(0, 0, 0, 0.4);
+            padding: 8px 15px;
+            border-radius: 8px;
         }
 
+        .controls {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+            width: 80%;
+            max-width: 600px;
+        }
+
+        .bet-input-group {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+            background-color: rgba(255, 255, 255, 0.1);
+            padding: 10px;
+            border-radius: 10px;
+            gap: 8px;
+        }
+        
+        .bet-display {
+            font-size: 1.3em;
+            font-weight: bold;
+            color: #fff;
+            margin-bottom: 5px;
+        }
+
+        input[type="range"] {
+            width: 90%;
+            -webkit-appearance: none;
+            background: #4CAF50; /* Green */
+            outline: none;
+            opacity: 0.7;
+            -webkit-transition: .2s;
+            transition: opacity .2s;
+            height: 8px;
+            border-radius: 5px;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 25px;
+            height: 25px;
+            border-radius: 50%;
+            background: #fff;
+            cursor: pointer;
+            box-shadow: 0 0 5px rgba(0,0,0,0.5);
+        }
+
+        input[type="range"]::-moz-range-thumb {
+            width: 25px;
+            height: 25px;
+            border-radius: 50%;
+            background: #fff;
+            cursor: pointer;
+            box-shadow: 0 0 5px rgba(0,0,0,0.5);
+        }
+
+        input[type="number"] {
+            width: 70%;
+            padding: 8px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            background-color: rgba(255, 255, 255, 0.9);
+            color: #333;
+            font-size: 1em;
+            text-align: center;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+            width: 100%;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.2s, transform 0.1s;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+            white-space: nowrap; /* Mencegah teks tombol patah */
+        }
+
+        .btn-primary {
+            background-color: #4CAF50; /* Hijau */
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: #45a049;
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background-color: #f44336; /* Merah */
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background-color: #da190b;
+            transform: translateY(-2px);
+        }
+
+        .btn:disabled {
+            background-color: #666;
+            cursor: not-allowed;
+            opacity: 0.7;
+            transform: none;
+            box-shadow: none;
+        }
+
+        /* --- CARD STYLES (dari Samgong.html) --- */
         .card-container {
-            width: 50px; /* Sesuaikan ukuran kartu jika perlu */
-            height: 70px; /* Sesuaikan ukuran kartu jika perlu */
+            width: 70px; /* Lebar kartu */
+            height: 95px; /* Tinggi kartu */
             position: relative;
             transform-style: preserve-3d;
-            transition: transform 0.5s ease-out, opacity 0.4s ease-out;
-            border-radius: 4px;
-            box-shadow: 1px 1px 2px rgba(0, 0, 0, 0.4);
-            flex-shrink: 0;
+            transition: transform 0.6s;
+            margin: 0 3px; /* Jarak antar kartu */
         }
 
-        .card-container.dealt {
-            animation: dealAnimation 0.3s ease-out forwards;
-        }
-
-        @keyframes dealAnimation {
-            from {
-                opacity: 0;
-                transform: translateY(-20px) rotateY(90deg);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0) rotateY(0deg);
-            }
-        }
-
-        .card {
+        .card-face {
             position: absolute;
             width: 100%;
             height: 100%;
             backface-visibility: hidden;
-            border-radius: 4px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 2em; /* Ukuran simbol kartu belakang */
+        }
+
+        .card-front {
+            background-color: white;
+            color: #333;
             display: flex;
             flex-direction: column;
             justify-content: space-between;
-            align-items: center;
-            padding: 2px;
+            padding: 5px;
             box-sizing: border-box;
+            transform: rotateY(0deg);
+        }
+
+        .card-back {
+            background-image: url('https://i.imgur.com/kS9l6nE.png'); /* GAMBAR BELAKANG KARTU (Misal: back_blue.png) */
+            background-size: cover;
+            background-position: center;
+            transform: rotateY(180deg);
+            color: transparent; /* Sembunyikan '🃏' */
+        }
+
+        .card-container.flipped .card-front {
+            transform: rotateY(180deg);
+        }
+
+        .card-container.flipped .card-back {
+            transform: rotateY(360deg); /* Menjadi 0deg relatif terhadap parent */
+        }
+
+        .card-front span {
             font-weight: bold;
-            font-size: 1.2em;
-            z-index: 2;
-            background: #fff;
+            font-size: 1.2em; /* Ukuran rank */
         }
 
-        
-        /* Styling untuk Rank (angka/huruf) di tengah kartu */
-        .card-rank {
-            font-size: 1.8em; /* Ukuran font lebih besar untuk rank di tengah */
-            font-weight: 900; /* Lebih tebal */
-            line-height: 1;
-            text-align: center;
-            flex-grow: 1; /* Memastikan rank berada di tengah secara vertikal */
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: #fff;
+        .card-suit-top-left, .card-suit-bottom-right {
+            position: absolute;
+            font-size: 0.9em; /* Ukuran simbol suit */
         }
 
-        .card-suit-center {
-            font-size: 0em; /* Ukuran suit di tengah */
-            line-height: 0;
-            margin-top: 0px; /* Sesuaikan posisi suit tengah */
-        }
-
-
-       .card-suit-top-left {
-            top: 2px;
-            left: 2px;
+        .card-suit-top-left {
+            top: 3px;
+            left: 5px;
         }
 
         .card-suit-bottom-right {
-            bottom: 2px;
-            right: 2px;
-            transform: rotate(180deg);
+            bottom: 3px;
+            right: 5px;
+            transform: rotate(180deg); /* Balik suit di pojok bawah */
         }
 
         .red-suit {
-            color: #e74c3c; /* Merah untuk hati dan wajik */
+            color: #f44336; /* Merah untuk hati dan wajik */
         }
+
         .black-suit {
-            color: #2c3e50; /* Hitam untuk sekop dan keriting */
-        }
-        .bet-section {
-            width: 100%;
-            background: rgba(17, 25, 33, 0.7);
-            padding: 20px;
-            border-radius: 15px;
-            margin-bottom: 25px;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
-            text-align: center;
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: #333; /* Hitam untuk sekop dan keriting */
         }
 
-        .bet-section label {
-            display: block;
-            margin-bottom: 15px;
-            font-size: 1.2em;
-            color: #e0f2f7;
-            font-weight: 700;
+        /* --- UTILITY CLASSES --- */
+        .hidden {
+            display: none !important;
         }
 
-        .bet-slider-group {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            margin-bottom: 20px;
-        }
-
-        #bet-slider {
-            flex-grow: 1;
-            -webkit-appearance: none;
-            width: 100%;
-            height: 12px; /* Slider lebih tebal */
-            background: #444; /* Warna dasar slider */
-            outline: none;
-            opacity: 0.8;
-            transition: opacity .2s, box-shadow 0.2s;
-            border-radius: 6px;
-            box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.3);
-        }
-
-        #bet-slider:hover { opacity: 1; box-shadow: inset 0 0 8px rgba(0, 0, 0, 0.5); }
-
-        #bet-slider::-webkit-slider-thumb {
-            -webkit-appearance: none;
-            appearance: none;
-            width: 30px; /* Thumb lebih besar */
-            height: 30px;
-            background: #ffd700; /* Warna emas */
-            border: 3px solid #e6a700; /* Border emas gelap */
-            border-radius: 50%;
-            cursor: grab;
-            box-shadow: 0 0 10px rgba(255, 215, 0, 0.6); /* Kilauan emas */
-            transition: background 0.2s, border-color 0.2s;
-        }
-        #bet-slider::-webkit-slider-thumb:active { cursor: grabbing; background: #e6a700; }
-
-
-        #bet-slider::-moz-range-thumb {
-            width: 30px;
-            height: 30px;
-            background: #ffd700;
-            border: 3px solid #e6a700;
-            border-radius: 50%;
-            cursor: grab;
-            box-shadow: 0 0 10px rgba(255, 215, 0, 0.6);
-            transition: background 0.2s, border-color 0.2s;
-        }
-        #bet-slider::-moz-range-thumb:active { cursor: grabbing; background: #e6a700; }
-
-
-        #bet-amount-input {
-            width: 100px; /* Input lebih lebar */
-            padding: 10px;
-            border-radius: 8px;
+        /* --- MUSIC TOGGLE BUTTON --- */
+        .music-toggle-btn {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background-color: rgba(0, 0, 0, 0.5);
+            color: white;
             border: none;
-            text-align: center;
-            background: #2c3e50; /* Warna gelap untuk input */
-            color: #ecf0f1;
-            font-size: 1.1em;
-            box-shadow: inset 0 0 8px rgba(0, 0, 0, 0.5);
-        }
-
-        .actions-row {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            gap: 12px; /* Jarak antar tombol */
-            width: 100%;
-        }
-
-        .game-button {
-            background: linear-gradient(145deg, #27ae60, #229954); /* Gradien untuk efek 3D tombol */
-            border: none;
-            border-radius: 30px; /* Lebih membulat */
-            padding: 14px 25px;
-            font-size: 1.1em;
-            font-weight: 700;
-            color: #fff;
+            border-radius: 50%;
+            width: 45px;
+            height: 45px;
+            font-size: 1.5em;
             cursor: pointer;
-            transition: background 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
-            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.4); /* Bayangan lebih jelas */
-            min-width: 120px;
-            text-transform: uppercase; /* Teks kapital */
-            letter-spacing: 0.5px;
-        }
-
-        .game-button:hover { 
-            background: linear-gradient(145deg, #2ecc71, #27ae60); 
-            transform: translateY(-3px); 
-            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.5); 
-        }
-        .game-button:active { 
-            transform: translateY(0); 
-            box-shadow: 0 3px 6px rgba(0, 0, 0, 0.3); 
-            background: #229954; /* Warna lebih gelap saat diklik */
-        }
-        .game-button:disabled {
-            background: #5e6d7a; /* Warna abu-abu yang lebih enak dilihat */
-            cursor: not-allowed;
-            box-shadow: none;
-            opacity: 0.7;
-            transform: none;
-        }
-
-        .game-button.small-button {
-            min-width: 50px; /* Ukuran lebih besar untuk tombol kecil */
-            width: 50px; 
-            height: 50px; 
-            padding: 0;
             display: flex;
             justify-content: center;
             align-items: center;
-            font-size: 1.8em; /* Ukuran ikon lebih besar */
-            border-radius: 50%; /* Bulat sempurna */
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
-        }
-        .game-button.small-button:hover {
-            transform: scale(1.05); /* Sedikit membesar saat hover */
-            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.4);
+            z-index: 100;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.5);
+            transition: background-color 0.2s;
         }
 
-        /* Warna spesifik untuk tombol aksi */
-        #fold-btn { background: linear-gradient(145deg, #e74c3c, #c0392b); } 
-        #fold-btn:hover { background: linear-gradient(145deg, #c0392b, #a93226); }
-
-        #check-btn { background: linear-gradient(145deg, #3498db, #2980b9); } 
-        #check-btn:hover { background: linear-gradient(145deg, #2980b9, #2471a3); }
-
-        #call-btn { background: linear-gradient(145deg, #f39c12, #e67e22); } 
-        #call-btn:hover { background: linear-gradient(145deg, #e67e22, #d35400); }
-
-        #bet-raise-btn { background: linear-gradient(145deg, #9b59b6, #8e44ad); } 
-        #bet-raise-btn:hover { background: linear-gradient(145deg, #8e44ad, #7d3c98); }
-
-        #start-game-btn, #next-round-btn, #showdown-btn, #play-again-btn { background: linear-gradient(145deg, #27ae60, #229954); }
-        #start-game-btn:hover, #next-round-btn:hover, #showdown-btn:hover, #play-again-btn:hover { background: linear-gradient(145deg, #2ecc71, #27ae60); }
-
-        .hidden { display: none !important; }
-
-        /* Media Queries untuk ukuran layar yang lebih kecil */
-        @media (max-width: 768px) {
-            .game-container {
-                padding: 15px;
-            }
-            .header-info-area, .bet-section {
-                padding: 10px 15px;
-            }
-            .info-box {
-                font-size: 1em;
-                gap: 3px;
-            }
-            .info-box span {
-                font-size: 1.1em;
-            }
-            .game-message {
-                font-size: 1em;
-                padding: 10px 15px;
-            }
-            .game-table {
-                width: 100%;
-                padding-bottom: 55%;
-            }
-            .card-container { /* Sesuaikan untuk media query */
-                width: 60px; 
-                height: 70px; 
-            }
-            .card { /* Ini mungkin tidak digunakan lagi, ganti ke .card-front/.card-back */
-                border-radius: 6px; 
-                background: #fff; 
-                color: #fff;
-            }
-            .card-suit-top-left, .card-suit-bottom-right {
-                font-size: 0.95em; /* Ukuran simbol lebih kecil */
-            }
-            .card-front .card-rank { /* Rank display, sesuaikan font size */
-                font-size: 1.5em; /* Ukuran font lebih kecil untuk rank di tengah */
-            }
-
-            .community-cards {
-                gap: 6px;
-                padding: 12px;
-            }
-            .player-area, .dealer-area {
-                width: 90%;
-            }
-            .actions-row {
-                gap: 8px;
-            }
-            .game-button {
-                padding: 10px 18px;
-                font-size: 0.9em;
-                min-width: 90px;
-            }
-            .game-button.small-button {
-                width: 45px;
-                height: 45px;
-                font-size: 1.5em;
-            }
-            #bet-amount-input {
-                width: 80px;
-                padding: 8px;
-            }
+        .music-toggle-btn:hover {
+            background-color: rgba(0, 0, 0, 0.7);
+        }
+        
+        /* Logout button */
+        .logout-btn {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            background-color: rgba(244, 67, 54, 0.7); /* Merah sedikit transparan */
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 8px 15px;
+            font-size: 1em;
+            cursor: pointer;
+            z-index: 100;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.5);
+            transition: background-color 0.2s;
+        }
+        
+        .logout-btn:hover {
+            background-color: rgba(244, 67, 54, 1);
         }
 
-        @media (max-width: 480px) {
-            .game-container {
-                padding: 10px;
-            }
-            .info-box {
-                font-size: 0.9em;
-            }
-            .info-box span {
-                font-size: 1em;
-            }
-            .game-table {
-                width: 100%;
-                padding-bottom: 60%; /* Mungkin perlu lebih tinggi pada layar sangat kecil */
-            }
-            .card-container { /* Sesuaikan untuk media query */
-                width: 35px; 
-                height: 50px; 
-            } .card-front { /* Ini mungkin tidak digunakan lagi, ganti ke .card-front/.card-back */
-                border-radius: 5px; /* Sesuaikan border-radius */
-                font-size: 0.9em; /* Sesuaikan font size */
-                padding: 1px; /* Kurangi padding */
-            }
-            .card-suit-top-left, .card-suit-bottom-right {
-                font-size: 0.45em; /* Ukuran simbol lebih kecil lagi */
-            }
-            .card-front .card-rank { /* Rank display, sesuaikan font size */
-                font-size: 1.2em; /* Ukuran font lebih kecil untuk rank di tengah */
-            }
-            .community-cards {
-                gap: 5px;
-                padding: 10px;
-            }
-            .actions-row {
-                gap: 6px;
-            }
-            .game-button {
-                padding: 8px 12px;
-                font-size: 0.8em;
-                min-width: 70px;
-                border-radius: 20px;
-            }
-            .game-button.small-button {
-                width: 38px;
-                height: 38px;
-                font-size: 1.2em;
-            }
-            #bet-slider {
-                height: 8px;
-            }
-            #bet-slider::-webkit-slider-thumb, #bet-slider::-moz-range-thumb {
-                width: 20px;
-                height: 20px;
-            }
-            #bet-amount-input {
-                width: 60px;
-                padding: 6px;
-                font-size: 0.9em;
-            }
-        }
     </style>
-   </head>
+</head>
 <body>
-  <div class="game-container">
-        <div class="header-info-area">
-            <div class="info-box">💰 Saldo: <span id="current-saldo">Rp0</span></div>
-            <div class="info-box">💲 Pot: <span id="current-pot">Rp0</span></div>
-        </div>
+    <div class="game-container">
+        <button id="musicToggleBtn" class="music-toggle-btn">🔊</button>
+        <button id="backToProfileBtn" class="logout-btn">Keluar Game</button>
 
-        <p class="game-message" id="game-message">Memuat game...</p>
-
-        <div class="game-table">
+        <div class="top-section">
             <div class="dealer-area">
-                🧑‍💼
-                <div class="dealer-hand hand" id="dealer-hand">
-                    <div class="card-container">
-                        <div class="card card-back"></div>
-                    </div>
-                     <div class="card-container">
-                        <div class="card card-back"></div>
-                    </div>
-                     <div class="card-container">
-                        <div class="card card-back"></div>
-                    </div>
-                </div>
+                <div id="dealer-hand" class="hand-display"></div>
             </div>
-
-            <div class="community-cards hand" id="community-cards">
-                <div class="card-container flipped">
-                    <div class="card card-front">
-                        <span class="card-suit-top-left red-suit">&hearts;</span>
-                        <span class="card-rank red-suit">A</span>
-                        <span class="card-suit-bottom-right red-suit">&hearts;</span>
-                    </div>
-                    <div class="card card-back"></div>
-                </div>
-                <div class="card-container flipped">
-                    <div class="card card-front">
-                        <span class="card-suit-top-left black-suit">&spades;</span>
-                        <span class="card-rank black-suit">K</span>
-                        <span class="card-suit-bottom-right black-suit">&spades;</span>
-                    </div>
-                    <div class="card card-back"></div>
-                </div>
-                <div class="card-container flipped">
-                    <div class="card card-front">
-                        <span class="card-suit-top-left red-suit">&diams;</span>
-                        <span class="card-rank red-suit">7</span>
-                        <span class="card-suit-bottom-right red-suit">&diams;</span>
-                    </div>
-                    <div class="card card-back"></div>
-                </div>
+            <div class="community-area">
+                <div id="community-cards" class="hand-display"></div>
             </div>
+        </div>
 
+        <div class="middle-section">
+            <p id="game-message" class="game-message">Selamat datang di Poker Royal Flush!</p>
+            <div class="pot-display">Pot: <span id="current-pot">Rp0</span></div>
+        </div>
+
+        <div class="bottom-section">
+            <div class="player-info">
+                <span>Saldo Anda: <span id="current-saldo">Rp0</span></span>
+            </div>
             <div class="player-area">
-                🧑‍💼
-                <div class="player-hand hand" id="player-hand">
-                     <div class="card-container flipped">
-                        <div class="card card-front">
-                            <span class="card-suit-top-left red-suit">&hearts;</span>
-                            <span class="card-rank red-suit">Q</span>
-                            <span class="card-suit-bottom-right red-suit">&hearts;</span>
-                        </div>
-                        <div class="card card-back"></div>
-                    </div>
-                    <div class="card-container flipped">
-                        <div class="card card-front">
-                            <span class="card-suit-top-left black-suit">&clubs;</span>
-                            <span class="card-rank black-suit">J</span>
-                            <span class="card-suit-bottom-right black-suit">&clubs;</span>
-                        </div>
-                        <div class="card card-back"></div>
-                    </div>
+                <div id="player-hand" class="hand-display"></div>
+            </div>
+            
+            <div class="controls">
+                <div id="bet-slider-group" class="bet-input-group">
+                    <span class="bet-display">Taruhan: <span id="bet-display">Rp1.000</span></span>
+                    <input type="range" id="bet-slider" min="1000" max="100000" value="1000">
+                    <input type="number" id="bet-amount-input" min="1000" max="100000" value="1000">
+                </div>
+
+                <div class="action-buttons">
+                    <button id="startGameBtn" class="btn btn-primary">Mulai Taruhan</button>
+                    <button id="fold-btn" class="btn btn-secondary hidden">Fold</button>
+                    <button id="check-btn" class="btn btn-primary hidden">Check</button>
+                    <button id="call-btn" class="btn btn-primary hidden">Call</button>
+                    <button id="bet-raise-btn" class="btn btn-primary hidden">Bet/Raise</button>
+                    <button id="next-round-btn" class="btn btn-primary hidden">Next Round</button>
+                    <button id="showdown-btn" class="btn btn-primary hidden">Showdown</button>
+                    <button id="play-again-btn" class="btn btn-primary hidden">Main Lagi</button>
                 </div>
             </div>
-        </div>
-
-        <div class="bet-section">
-            <label for="bet-slider">Jumlah Taruhan (Rp): <span id="bet-display">0</span></label>
-            <div class="bet-slider-group" id="bet-slider-group">
-                <input type="range" id="bet-slider" min="0" max="100000" value="0">
-                <input type="number" id="bet-amount-input" min="0" max="100000" value="0">
-            </div>
-        </div>
-
-        <div class="actions-row">
-            <button class="game-button small-button" id="back-to-profile-btn">🏠</button>
-            <button class="game-button small-button" id="musicToggleBtn">🔇</button>
-            
-            <button class="game-button" id="start-game-btn">Mulai Taruhan</button>
-            
-            <button class="game-button hidden" id="fold-btn">Fold</button>
-            <button class="game-button hidden" id="check-btn">Check</button>
-            <button class="game-button hidden" id="call-btn">Call</button>
-            <button class="game-button hidden" id="bet-raise-btn">Bet / Raise</button>
-            <button class="game-button hidden" id="next-round-btn">Kartu Berikutnya</button>
-            <button class="game-button hidden" id="showdown-btn">Showdown</button>
-            <button class="game-button hidden" id="play-again-btn">Main Lagi</button>
         </div>
     </div>
 
-    <audio id="winSound" src="https://vqmfachxnjyxwuavpgds.supabase.co/storage/v1/object/public/music//mixkit-game-level-completed-2059.mp3" preload="auto"></audio>
-    <audio id="loseSound" src="https://vqmfachxnjyxwuavpgds.supabase.co/storage/v1/object/public/music//mixkit-player-losing-or-failing-2042.mp3" preload="auto"></audio>
-    <audio id="clickSound" src="https://vqmfachxnjyxwuavpgds.supabase.co/storage/v1/object/public/music//mixkit-game-ball-tap-2073.mp3" preload="auto"></audio>
-    <audio id="backgroundMusic" src="https://vqmfachxnjyxwuavpgds.supabase.co/storage/v1/object/public/music//dj-background-music-background-music-free-music-music-free-for-use-221916%20(1).mp3" loop preload="auto"></audio>
+    <audio id="winSound" src="https://assets.mixkit.co/sfx/preview/mixkit-casino-win-bell-1662.mp3" preload="auto"></audio>
+    <audio id="loseSound" src="https://assets.mixkit.co/sfx/preview/mixkit-negative-game-buzz-2.mp3" preload="auto"></audio>
+    <audio id="clickSound" src="https://assets.mixkit.co/sfx/preview/mixkit-fast-sci-fi-click-1125.mp3" preload="auto"></audio>
+    <audio id="backgroundMusic" src="https://assets.mixkit.co/sfx/preview/mixkit-mystery-game-music-777.mp3" loop preload="auto"></audio>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
