@@ -483,7 +483,7 @@
         let userSaldo = 0;
         let userId = null; 
 
-        // --- DOM Elements ---
+    // --- DOM Elements ---
         const currentSaldoDisplay = document.getElementById('current-saldo');
         const usernameDisplay = document.getElementById('username-display');
         const betInput = document.getElementById('bet-input');
@@ -799,14 +799,14 @@
             }
 
             dealButton.disabled = true;
-            betInput.disabled = true; // Nonaktifkan input taruhan saat permainan aktif
+            betInput.disabled = true; 
             gameMessageDiv.textContent = 'Membagikan kartu...';
 
             const successBet = await updateSaldo(-bet);
             if (!successBet) {
                 updateMessage("Gagal mengurangi saldo untuk taruhan.", 'error');
                 dealButton.disabled = false;
-                betInput.disabled = false; // Aktifkan kembali jika gagal
+                betInput.disabled = false;
                 return;
             }
             pot = bet * 2;
@@ -844,6 +844,7 @@
                 playerStand();
                 return;
             }
+
             const newCard = deck.pop();
             playerCurrentHand.push(newCard);
             renderHand(playerCurrentHand, playerHandDiv);
@@ -873,33 +874,64 @@
         }
 
         async function dealerPlays() {
-            renderHand(dealerCurrentHand, dealerHandDiv, false, true);
+            renderHand(dealerCurrentHand, dealerHandDiv, false, true); // Dealer cards revealed
             let dealerValue = calculateHandValue(dealerCurrentHand);
+            const playerValue = calculateHandValue(playerCurrentHand); // Get player's final value
             dealerValueSpan.textContent = getDisplayValue(dealerValue, dealerCurrentHand.length);
             await new Promise(resolve => setTimeout(resolve, 1000));
 
-            // Perbaikan: Bandar berhenti jika sudah "Amsyong" (nilai 0)
-            while (dealerCurrentHand.length < 7 && dealerValue !== 0 && dealerValue < 25 && dealerValue !== 30 && dealerValue < 300) { 
+            // Perbaikan Logika Bandar:
+            // Bandar berhenti jika:
+            // 1. Sudah Amsyong (nilai 0)
+            // 2. Sudah 30 (Sempurna)
+            // 3. Sudah 3 Kartu Kembar
+            // 4. Sudah memiliki 7 kartu
+            // 5. Nilai bandar sudah lebih besar dari nilai pemain (dan pemain tidak amsyong, dan bandar tidak amsyong)
+            //    Prioritas kembar 3 dan 30 tetap lebih tinggi dari perbandingan biasa
+            while (true) {
+                // Check current dealer value after potential hit
+                dealerValue = calculateHandValue(dealerCurrentHand);
+
+                // Kondisi berhenti prioritas tinggi (Amsyong, 30, 3 Kartu Kembar, Max 7 kartu)
+                if (dealerValue === 0 || dealerValue === 30 || dealerValue >= 300 || dealerCurrentHand.length >= 7) {
+                    break; 
+                }
+
+                // Kondisi berhenti berdasarkan perbandingan dengan pemain
+                // Ini berlaku jika bandar belum Amsyong, 30, atau 3 Kartu Kembar
+                if (dealerValue > playerValue) {
+                    // Cek edge case: jika pemain amsyong, bandar menang regardless of value (akan dihandle di revealWinner)
+                    // Tapi di sini, jika bandar sudah lebih besar dan tidak amsyong, bandar stop.
+                    // Ini menghindari bandar ambil kartu lagi jika sudah jelas menang dari pemain.
+                    if (playerValue !== 0) { // Jika pemain tidak amsyong
+                        break; 
+                    }
+                }
+                
+                // Jika deck kosong, bandar tidak bisa mengambil kartu lagi
                 if (deck.length === 0) {
                     console.warn("Deck kosong, bandar tidak bisa mengambil kartu lagi.");
                     break;
                 }
-                updateMessage('Bandar mengambil kartu...');
-                const newCard = deck.pop();
-                dealerCurrentHand.push(newCard);
-                renderHand(dealerCurrentHand, dealerHandDiv);
-                dealerValue = calculateHandValue(dealerCurrentHand);
-                dealerValueSpan.textContent = getDisplayValue(dealerValue, dealerCurrentHand.length);
-                await new Promise(resolve => setTimeout(resolve, 1000));
 
-                // Jika bandar menjadi amsyong setelah mengambil kartu, hentikan loop
-                if (dealerValue === 0) {
-                    updateMessage('Bandar Amsyong! Menentukan pemenang...');
+                // Default hit condition if none of the above break conditions are met
+                // Bandar akan mencoba mendekati 30 atau mengalahkan pemain
+                // Angka 25 bisa disesuaikan, ini adalah threshold agresivitas bandar
+                if (dealerValue < 25) { // Bandar ambil kartu jika nilai < 25
+                    updateMessage('Bandar mengambil kartu...');
+                    const newCard = deck.pop();
+                    dealerCurrentHand.push(newCard);
+                    renderHand(dealerCurrentHand, dealerHandDiv);
+                    dealerValueSpan.textContent = getDisplayValue(calculateHandValue(dealerCurrentHand), dealerCurrentHand.length);
+                    await new Promise(resolve => setTimeout(resolve, 1000));
+                } else {
+                    // Jika dealerValue >= 25 dan belum menang dari pemain (dan tidak memenuhi kondisi break lain)
+                    // Dealer berhenti
                     break; 
                 }
             }
-            
-            updateMessage('Bandar Berhenti. Menentukan pemenang...');
+
+ updateMessage('Bandar Berhenti. Menentukan pemenang...');
             await new Promise(resolve => setTimeout(resolve, 1500));
             
             revealDealerAndDetermineWinner();
@@ -1021,7 +1053,6 @@
             pot = 0;
             updatePotDisplay();
             
-            // Perbaikan: Aktifkan kembali input taruhan dan tombol deal
             betInput.disabled = false; 
             dealButton.disabled = false;
 
