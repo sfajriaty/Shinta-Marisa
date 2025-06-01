@@ -187,7 +187,7 @@
             align-items: center;
             font-weight: 700;
             color: #333;
-            padding: 5px 8px; /* Padding vertikal */
+            padding: 15px 20px; /* Padding vertikal */
             box-shadow: 3px 3px 8px rgba(0, 0, 0, 0.0), inset 0 0 5px rgba(255, 255, 255, 0.8); /* Bayangan dan highlight */
             position: relative; /* Penting untuk penempatan absolute inner elements */
             transition: transform 0.3s ease-out; /* Animasi saat hover */
@@ -208,7 +208,7 @@
         /* Top-left suit */
         .card .suit:first-child { /* Target suit pertama (atas kiri) */
             top: 7px;
-            left: 5px;
+            left: 2px;
         }
         /* Bottom-right suit */
         .card .suit:last-child { /* Target suit terakhir (bawah kanan) */
@@ -218,11 +218,11 @@
         }
 
         .card .rank {
-            font-size: 1em; /* Ukuran angka utama lebih besar */
+            font-size: 2em; /* Ukuran angka utama lebih besar */
             line-height: 1;
             font-family: 'Playfair Display', serif; /* Font elegan untuk angka */
             position: absolute; /* Posisikan angka di tengah */
-            top: 70%;
+            top: 150%;
             left: 50%;
             transform: translate(-50%, -50%);
             z-index: 1; /* Angka di bawah simbol */
