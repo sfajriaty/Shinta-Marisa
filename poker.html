@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Poker Royal Flush - Mainkan & Menangkan!</title>
+    <title>Poker Royal Flush - Realistis!</title>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
     <style>
         /* --- GLOBAL & BODY STYLES --- */
@@ -12,7 +12,7 @@
             padding: 0;
             overflow: hidden; /* Mencegah scroll */
             font-family: 'Roboto', sans-serif;
-            background: linear-gradient(to bottom right, #1a3a2a, #0d2a1b); /* Warna gelap yang nyaman */
+            background: #000; /* Latar belakang hitam penuh */
             color: #fff;
             display: flex;
             justify-content: center;
@@ -20,248 +20,336 @@
             min-height: 100vh;
         }
 
-        /* Orientasi Landscape */
+        /* Orientasi Landscape Checker */
         @media (orientation: portrait) {
             body::before {
-                content: "Putar perangkat Anda untuk pengalaman bermain yang lebih baik.";
+                content: "Putar perangkat Anda ke mode menyamping (landscape) untuk pengalaman bermain yang optimal!";
                 position: fixed;
                 top: 0;
                 left: 0;
                 width: 100%;
                 height: 100%;
-                background-color: rgba(0, 0, 0, 0.9);
+                background-color: rgba(0, 0, 0, 0.95);
                 color: white;
                 display: flex;
                 justify-content: center;
                 align-items: center;
-                font-size: 1.5em;
+                font-size: 1.8em;
                 text-align: center;
                 z-index: 1000;
+                font-weight: bold;
+                animation: pulse 1.5s infinite alternate;
             }
             .game-container {
                 display: none; /* Sembunyikan game saat portrait */
             }
         }
 
+        @keyframes pulse {
+            from { transform: scale(1); opacity: 1; }
+            to { transform: scale(1.05); opacity: 0.9; }
+        }
+
         .game-container {
             width: 100vw;
             height: 100vh;
             display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            padding: 10px;
-            box-sizing: border-box;
-            background-image: url('https://i.imgur.com/your-poker-table-background.jpg'); /* GANTI DENGAN GAMBAR MEJA POKER REALISTIS */
-            background-size: cover;
-            background-position: center;
-            border-radius: 15px;
-            box-shadow: 0 0 30px rgba(0, 0, 0, 0.7);
+            justify-content: center;
+            align-items: center;
             position: relative;
+            background: #000; /* Pastikan background container juga hitam */
         }
 
-        /* --- TOP SECTION (Dealer Hand & Community Cards) --- */
-        .top-section {
+        /* --- POKER TABLE VISUALS --- */
+        .poker-table-background {
+            position: absolute;
+            width: 95%; /* Sesuaikan ukuran meja */
+            height: 85%; /* Sesuaikan ukuran meja */
+            max-width: 1200px; /* Batasan ukuran maksimum */
+            max-height: 700px;
+            background-image: url('https://i.imgur.com/g8LqE9I.png'); /* **GAMBAR MEJA POKER OVAL** */
+            background-size: 100% 100%; /* Menyesuaikan gambar dengan dimensi elemen */
+            background-repeat: no-repeat;
+            background-position: center;
+            border-radius: 50%; /* Membuat efek oval/bundar */
+            box-shadow: 0 0 50px rgba(0, 255, 0, 0.5), inset 0 0 30px rgba(0, 0, 0, 0.8); /* Glow hijau dan efek dalam */
+            display: flex; /* Untuk menempatkan elemen di dalam meja */
+            flex-direction: column;
+            justify-content: space-around;
+            align-items: center;
+            padding: 20px;
+            box-sizing: border-box;
+            overflow: hidden; /* Penting untuk clip elemen di luar bentuk meja */
+            
+            /* Animasi Fade-in saat dimuat */
+            animation: fadeIn 1s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.9); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        /* --- PLAYER & DEALER POSITIONS --- */
+        .dealer-position {
+            position: absolute;
+            top: 5%;
+            left: 50%;
+            transform: translateX(-50%);
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 10px;
-            margin-top: 10px;
+            gap: 5px;
+            z-index: 10;
         }
 
-        .dealer-area, .community-area {
-            background-color: rgba(0, 0, 0, 0.3);
-            border-radius: 10px;
-            padding: 10px;
+        .player-position {
+            position: absolute;
+            bottom: 5%;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 5px;
+            z-index: 10;
+        }
+
+        .player-avatar, .dealer-avatar {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background-color: rgba(255, 255, 255, 0.2);
+            border: 2px solid #ffd700;
             display: flex;
             justify-content: center;
             align-items: center;
-            min-height: 100px;
-            flex-wrap: wrap; /* Memungkinkan kartu untuk wrap jika terlalu banyak */
-            gap: 5px;
+            font-size: 2em;
+            color: #fff;
+            box-shadow: 0 0 15px rgba(255, 215, 0, 0.5);
+            overflow: hidden; /* Untuk gambar avatar */
+        }
+        .player-avatar img, .dealer-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
         }
 
-        .dealer-area {
-            width: 80%; /* Lebar area dealer */
-        }
-
-        .community-area {
-            width: 90%; /* Lebar area komunitas */
-            border: 2px dashed rgba(255, 255, 255, 0.3); /* Border untuk area komunitas */
-        }
-
-        /* --- MIDDLE SECTION (Game Info & Pot) --- */
-        .middle-section {
-            text-align: center;
-            margin: 10px 0;
+        /* --- CARD AREAS --- */
+        .hand-display {
             display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 10px;
+            justify-content: center;
+            gap: -20px; /* Overlap kartu */
+            position: relative;
+            z-index: 5;
         }
 
+        #dealer-hand {
+            margin-top: 10px; /* Sedikit jarak dari avatar bandar */
+        }
+
+        #player-hand {
+            margin-bottom: 10px; /* Sedikit jarak dari avatar pemain */
+        }
+
+        #community-cards {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            display: flex;
+            gap: 10px;
+            background-color: rgba(0, 0, 0, 0.4);
+            border-radius: 10px;
+            padding: 5px 15px;
+            box-shadow: inset 0 0 10px rgba(0,0,0,0.5);
+            z-index: 8;
+        }
+
+        /* --- GAME INFO & POT --- */
         .game-message {
-            font-size: 1.4em;
+            position: absolute;
+            top: 25%; /* Di atas kartu komunitas */
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 1.5em;
             font-weight: bold;
             color: #ffd700; /* Warna emas */
-            background-color: rgba(0, 0, 0, 0.5);
-            padding: 8px 15px;
-            border-radius: 8px;
-            width: fit-content;
-            margin: 0 auto;
-            text-shadow: 1px 1px 2px rgba(0,0,0,0.7);
+            background-color: rgba(0, 0, 0, 0.6);
+            padding: 10px 20px;
+            border-radius: 15px;
+            box-shadow: 0 0 20px rgba(255,215,0,0.5);
+            z-index: 20;
+            text-align: center;
+            white-space: nowrap; /* Mencegah pesan patah baris */
+            animation: fadeInScale 0.5s ease-out;
+        }
+
+        @keyframes fadeInScale {
+            from { opacity: 0; transform: translateX(-50%) scale(0.8); }
+            to { opacity: 1; transform: translateX(-50%) scale(1); }
         }
 
         .pot-display {
-            font-size: 1.8em;
+            position: absolute;
+            top: 70%; /* Di bawah kartu komunitas */
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 2em;
             font-weight: bold;
             color: #aaffaa; /* Warna hijau cerah */
-            background-color: rgba(20, 80, 20, 0.7);
-            padding: 10px 20px;
-            border-radius: 25px;
-            box-shadow: 0 0 15px rgba(0,255,0,0.5);
+            background-color: rgba(20, 80, 20, 0.8);
+            padding: 15px 30px;
+            border-radius: 30px;
+            box-shadow: 0 0 25px rgba(0,255,0,0.7);
+            z-index: 20;
+            white-space: nowrap;
         }
 
-        /* --- BOTTOM SECTION (Player Hand & Controls) --- */
-        .bottom-section {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 15px;
-            margin-bottom: 10px;
-        }
-
-        .player-area {
-            background-color: rgba(0, 0, 0, 0.3);
+        /* --- PLAYER SALDO (Top-Left) --- */
+        .player-saldo-display {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background-color: rgba(0, 0, 0, 0.7);
+            padding: 10px 15px;
             border-radius: 10px;
-            padding: 10px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100px;
-            flex-wrap: wrap;
-            gap: 5px;
-            width: 80%;
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #fff;
+            border: 1px solid #4CAF50;
+            box-shadow: 0 0 10px rgba(76, 175, 80, 0.5);
+            z-index: 100; /* Pastikan di atas elemen lain */
         }
 
-        .player-info {
-            display: flex;
-            justify-content: space-between;
-            width: 80%;
-            max-width: 600px;
-            font-size: 1.1em;
-            background-color: rgba(0, 0, 0, 0.4);
-            padding: 8px 15px;
-            border-radius: 8px;
-        }
-
-        .controls {
+        /* --- CONTROLS (Bottom-Right) --- */
+        .controls-container {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
             display: flex;
             flex-direction: column;
-            align-items: center;
-            gap: 10px;
-            width: 80%;
-            max-width: 600px;
+            align-items: flex-end;
+            gap: 15px;
+            background-color: rgba(0, 0, 0, 0.7);
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 0 25px rgba(0,0,0,0.7);
+            z-index: 100;
         }
 
         .bet-input-group {
             display: flex;
             flex-direction: column;
             align-items: center;
-            width: 100%;
-            background-color: rgba(255, 255, 255, 0.1);
-            padding: 10px;
-            border-radius: 10px;
+            width: 250px; /* Lebar panel kontrol */
             gap: 8px;
+            padding: 10px;
+            background-color: rgba(255, 255, 255, 0.05); /* Sedikit transparan */
+            border-radius: 10px;
+            box-shadow: inset 0 0 5px rgba(255,255,255,0.2);
         }
         
         .bet-display {
-            font-size: 1.3em;
+            font-size: 1.4em;
             font-weight: bold;
             color: #fff;
-            margin-bottom: 5px;
         }
 
         input[type="range"] {
             width: 90%;
             -webkit-appearance: none;
-            background: #4CAF50; /* Green */
+            background: linear-gradient(to right, #4CAF50, #8bc34a); /* Gradien hijau */
             outline: none;
-            opacity: 0.7;
+            opacity: 0.9;
             -webkit-transition: .2s;
             transition: opacity .2s;
-            height: 8px;
+            height: 10px;
             border-radius: 5px;
+            box-shadow: inset 0 1px 3px rgba(0,0,0,0.5);
         }
 
         input[type="range"]::-webkit-slider-thumb {
             -webkit-appearance: none;
             appearance: none;
-            width: 25px;
-            height: 25px;
+            width: 28px;
+            height: 28px;
             border-radius: 50%;
             background: #fff;
             cursor: pointer;
-            box-shadow: 0 0 5px rgba(0,0,0,0.5);
+            box-shadow: 0 0 8px rgba(255,255,255,0.8), 0 0 20px rgba(255,255,255,0.3);
+            border: 2px solid #4CAF50;
         }
 
         input[type="range"]::-moz-range-thumb {
-            width: 25px;
-            height: 25px;
+            width: 28px;
+            height: 28px;
             border-radius: 50%;
             background: #fff;
             cursor: pointer;
-            box-shadow: 0 0 5px rgba(0,0,0,0.5);
+            box-shadow: 0 0 8px rgba(255,255,255,0.8), 0 0 20px rgba(255,255,255,0.3);
+            border: 2px solid #4CAF50;
         }
 
         input[type="number"] {
-            width: 70%;
-            padding: 8px;
-            border-radius: 5px;
-            border: 1px solid #ccc;
-            background-color: rgba(255, 255, 255, 0.9);
-            color: #333;
-            font-size: 1em;
+            width: 80%;
+            padding: 10px;
+            border-radius: 8px;
+            border: 1px solid #555;
+            background-color: rgba(0, 0, 0, 0.4);
+            color: #fff;
+            font-size: 1.1em;
             text-align: center;
+            appearance: textfield; /* Sembunyikan panah di Chrome/Edge */
+            -moz-appearance: textfield; /* Sembunyikan panah di Firefox */
+        }
+        input[type="number"]::-webkit-inner-spin-button, 
+        input[type="number"]::-webkit-outer-spin-button { 
+            -webkit-appearance: none; margin: 0; 
         }
 
         .action-buttons {
             display: flex;
             gap: 10px;
+            justify-content: flex-end; /* Tombol rata kanan */
+            flex-wrap: wrap; /* Pastikan tombol wrap jika terlalu banyak */
             width: 100%;
-            justify-content: center;
-            flex-wrap: wrap;
         }
 
         .btn {
-            padding: 10px 20px;
+            padding: 12px 25px;
             border: none;
-            border-radius: 8px;
-            font-size: 1.1em;
+            border-radius: 10px;
+            font-size: 1.2em;
             font-weight: bold;
             cursor: pointer;
-            transition: background-color 0.2s, transform 0.1s;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
-            white-space: nowrap; /* Mencegah teks tombol patah */
+            transition: background-color 0.2s, transform 0.1s, box-shadow 0.2s;
+            box-shadow: 0 5px 10px rgba(0, 0, 0, 0.4);
+            white-space: nowrap;
         }
 
         .btn-primary {
             background-color: #4CAF50; /* Hijau */
             color: white;
+            border: 1px solid #388e3c;
         }
 
         .btn-primary:hover {
             background-color: #45a049;
-            transform: translateY(-2px);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.6);
         }
 
         .btn-secondary {
             background-color: #f44336; /* Merah */
             color: white;
+            border: 1px solid #d32f2f;
         }
 
         .btn-secondary:hover {
             background-color: #da190b;
-            transform: translateY(-2px);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.6);
         }
 
         .btn:disabled {
@@ -270,17 +358,41 @@
             opacity: 0.7;
             transform: none;
             box-shadow: none;
+            border: none;
         }
 
-        /* --- CARD STYLES (dari Samgong.html) --- */
+        /* --- CARD STYLES --- */
         .card-container {
-            width: 70px; /* Lebar kartu */
-            height: 95px; /* Tinggi kartu */
+            width: 80px; /* Lebar kartu sedikit lebih besar */
+            height: 110px; /* Tinggi kartu sedikit lebih besar */
             position: relative;
             transform-style: preserve-3d;
-            transition: transform 0.6s;
-            margin: 0 3px; /* Jarak antar kartu */
+            transition: transform 0.8s ease-in-out; /* Transisi flip lebih halus */
+            margin: 0 -15px; /* Overlap kartu lebih banyak */
+            transform-origin: center;
+            opacity: 0; /* Mulai tersembunyi untuk animasi */
+            animation: dealCardAnimation 0.5s ease-out forwards; /* Animasi muncul saat dibagikan */
         }
+
+        /* Animasi pembagian kartu */
+        @keyframes dealCardAnimation {
+            from {
+                opacity: 0;
+                transform: translateY(-50px) scale(0.5); /* Muncul dari atas dan kecil */
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        /* Delay untuk kartu kedua dst */
+        .hand-display .card-container:nth-child(2) { animation-delay: 0.2s; }
+        .hand-display .card-container:nth-child(3) { animation-delay: 0.4s; }
+        .hand-display .card-container:nth-child(4) { animation-delay: 0.6s; }
+        .hand-display .card-container:nth-child(5) { animation-delay: 0.8s; }
+        .hand-display .card-container:nth-child(6) { animation-delay: 1.0s; }
+        .hand-display .card-container:nth-child(7) { animation-delay: 1.2s; }
 
         .card-face {
             position: absolute;
@@ -293,6 +405,7 @@
             justify-content: center;
             align-items: center;
             font-size: 2em; /* Ukuran simbol kartu belakang */
+            border: 1px solid #777; /* Border tipis untuk kartu */
         }
 
         .card-front {
@@ -307,7 +420,7 @@
         }
 
         .card-back {
-            background-image: url('https://i.imgur.com/kS9l6nE.png'); /* GAMBAR BELAKANG KARTU (Misal: back_blue.png) */
+            background-image: url('https://i.imgur.com/kS9l6nE.png'); /* GAMBAR BELAKANG KARTU (Biru atau merah) */
             background-size: cover;
             background-position: center;
             transform: rotateY(180deg);
@@ -319,28 +432,28 @@
         }
 
         .card-container.flipped .card-back {
-            transform: rotateY(360deg); /* Menjadi 0deg relatif terhadap parent */
+            transform: rotateY(360deg);
         }
 
         .card-front span {
             font-weight: bold;
-            font-size: 1.2em; /* Ukuran rank */
+            font-size: 1.4em; /* Ukuran rank lebih besar */
         }
 
         .card-suit-top-left, .card-suit-bottom-right {
             position: absolute;
-            font-size: 0.9em; /* Ukuran simbol suit */
+            font-size: 1em; /* Ukuran simbol suit lebih besar */
         }
 
         .card-suit-top-left {
-            top: 3px;
-            left: 5px;
+            top: 5px;
+            left: 7px;
         }
 
         .card-suit-bottom-right {
-            bottom: 3px;
-            right: 5px;
-            transform: rotate(180deg); /* Balik suit di pojok bawah */
+            bottom: 5px;
+            right: 7px;
+            transform: rotate(180deg);
         }
 
         .red-suit {
@@ -359,95 +472,93 @@
         /* --- MUSIC TOGGLE BUTTON --- */
         .music-toggle-btn {
             position: absolute;
-            top: 15px;
-            right: 15px;
-            background-color: rgba(0, 0, 0, 0.5);
+            top: 20px;
+            right: 20px;
+            background-color: rgba(0, 0, 0, 0.6);
             color: white;
             border: none;
             border-radius: 50%;
-            width: 45px;
-            height: 45px;
-            font-size: 1.5em;
+            width: 50px;
+            height: 50px;
+            font-size: 1.8em;
             cursor: pointer;
             display: flex;
             justify-content: center;
             align-items: center;
             z-index: 100;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.5);
-            transition: background-color 0.2s;
+            box-shadow: 0 0 15px rgba(255, 255, 255, 0.3);
+            transition: background-color 0.2s, transform 0.1s;
         }
 
         .music-toggle-btn:hover {
-            background-color: rgba(0, 0, 0, 0.7);
+            background-color: rgba(0, 0, 0, 0.8);
+            transform: scale(1.05);
         }
         
         /* Logout button */
         .logout-btn {
             position: absolute;
-            top: 15px;
-            left: 15px;
+            top: 80px; /* Di bawah tombol saldo */
+            left: 20px;
             background-color: rgba(244, 67, 54, 0.7); /* Merah sedikit transparan */
             color: white;
             border: none;
             border-radius: 8px;
-            padding: 8px 15px;
-            font-size: 1em;
+            padding: 10px 18px;
+            font-size: 1.1em;
             cursor: pointer;
             z-index: 100;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.5);
-            transition: background-color 0.2s;
+            box-shadow: 0 0 10px rgba(244, 67, 54, 0.5);
+            transition: background-color 0.2s, transform 0.1s;
         }
         
         .logout-btn:hover {
             background-color: rgba(244, 67, 54, 1);
+            transform: translateY(-2px);
         }
 
     </style>
 </head>
 <body>
-    <div class="game-container">
+  <div class="game-container">
         <button id="musicToggleBtn" class="music-toggle-btn">🔊</button>
+        <div class="player-saldo-display">
+            Saldo Anda: <span id="current-saldo">Rp0</span>
+        </div>
         <button id="backToProfileBtn" class="logout-btn">Keluar Game</button>
 
-        <div class="top-section">
-            <div class="dealer-area">
-                <div id="dealer-hand" class="hand-display"></div>
+        <div class="poker-table-background">
+            <div class="dealer-position">
+                <div class="dealer-avatar">👨‍💻</div> <div id="dealer-hand" class="hand-display"></div>
             </div>
-            <div class="community-area">
-                <div id="community-cards" class="hand-display"></div>
-            </div>
-        </div>
 
-        <div class="middle-section">
+            <div id="community-cards" class="hand-display"></div>
+
             <p id="game-message" class="game-message">Selamat datang di Poker Royal Flush!</p>
+            
             <div class="pot-display">Pot: <span id="current-pot">Rp0</span></div>
+
+            <div class="player-position">
+                <div class="player-avatar">🙋‍♂️</div> <div id="player-hand" class="hand-display"></div>
+            </div>
         </div>
 
-        <div class="bottom-section">
-            <div class="player-info">
-                <span>Saldo Anda: <span id="current-saldo">Rp0</span></span>
+        <div class="controls-container">
+            <div id="bet-slider-group" class="bet-input-group">
+                <span class="bet-display">Taruhan: <span id="bet-display">Rp1.000</span></span>
+                <input type="range" id="bet-slider" min="1000" max="100000" value="1000">
+                <input type="number" id="bet-amount-input" min="1000" max="100000" value="1000">
             </div>
-            <div class="player-area">
-                <div id="player-hand" class="hand-display"></div>
-            </div>
-            
-            <div class="controls">
-                <div id="bet-slider-group" class="bet-input-group">
-                    <span class="bet-display">Taruhan: <span id="bet-display">Rp1.000</span></span>
-                    <input type="range" id="bet-slider" min="1000" max="100000" value="1000">
-                    <input type="number" id="bet-amount-input" min="1000" max="100000" value="1000">
-                </div>
 
-                <div class="action-buttons">
-                    <button id="startGameBtn" class="btn btn-primary">Mulai Taruhan</button>
-                    <button id="fold-btn" class="btn btn-secondary hidden">Fold</button>
-                    <button id="check-btn" class="btn btn-primary hidden">Check</button>
-                    <button id="call-btn" class="btn btn-primary hidden">Call</button>
-                    <button id="bet-raise-btn" class="btn btn-primary hidden">Bet/Raise</button>
-                    <button id="next-round-btn" class="btn btn-primary hidden">Next Round</button>
-                    <button id="showdown-btn" class="btn btn-primary hidden">Showdown</button>
-                    <button id="play-again-btn" class="btn btn-primary hidden">Main Lagi</button>
-                </div>
+            <div class="action-buttons">
+                <button id="startGameBtn" class="btn btn-primary">Mulai Taruhan</button>
+                <button id="fold-btn" class="btn btn-secondary hidden">Fold</button>
+                <button id="check-btn" class="btn btn-primary hidden">Check</button>
+                <button id="call-btn" class="btn btn-primary hidden">Call</button>
+                <button id="bet-raise-btn" class="btn btn-primary hidden">Bet/Raise</button>
+                <button id="next-round-btn" class="btn btn-primary hidden">Next Round</button>
+                <button id="showdown-btn" class="btn btn-primary hidden">Showdown</button>
+                <button id="play-again-btn" class="btn btn-primary hidden">Main Lagi</button>
             </div>
         </div>
     </div>
@@ -456,6 +567,7 @@
     <audio id="loseSound" src="https://assets.mixkit.co/sfx/preview/mixkit-negative-game-buzz-2.mp3" preload="auto"></audio>
     <audio id="clickSound" src="https://assets.mixkit.co/sfx/preview/mixkit-fast-sci-fi-click-1125.mp3" preload="auto"></audio>
     <audio id="backgroundMusic" src="https://assets.mixkit.co/sfx/preview/mixkit-mystery-game-music-777.mp3" loop preload="auto"></audio>
+
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
