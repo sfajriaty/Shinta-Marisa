@@ -73,7 +73,7 @@
             background-repeat: no-repeat;
             background-position: center;
             border-radius: 50%; /* Membuat efek oval/bundar */
-            box-shadow: 0 0 40px rgba(0, 255, 0, 0.4), inset 0 0 25px rgba(0, 0, 0, 0.7); /* Glow hijau dan efek dalam */
+            box-shadow: 0 0 40px rgba(0, 255, 255, 0.9), inset 0 0 25px rgba(0, 0, 0, 0.7); /* Glow hijau dan efek dalam */
             display: flex; /* Untuk menempatkan elemen di dalam meja */
             flex-direction: column;
             justify-content: space-around;
@@ -165,7 +165,7 @@
             left: 50%;
             transform: translate(-50%, -50%);
             display: flex;
-            gap: 3px; /* Jarak antar kartu komunitas lebih kecil */
+            gap: 1px; /* Jarak antar kartu komunitas lebih kecil */
             background-color: rgba(0, 0, 0, 0.3); /* Sedikit lebih transparan */
             border-radius: 8px; /* Radius lebih kecil */
             padding: 3px 12px; /* Padding lebih kecil */
@@ -358,15 +358,16 @@
 
         /* --- CARD STYLES (DIUBAH) --- */
         .card-container {
-            width: 30px; /* Lebar kartu lebih kecil lagi */
-            height: 40px; /* Tinggi kartu lebih kecil lagi */
+            width: 35px; /* Lebar kartu lebih kecil lagi */
+            height: 45px; /* Tinggi kartu lebih kecil lagi */
             position: relative;
             transform-style: preserve-3d;
             transition: transform 0.7s ease-in-out; /* Transisi flip lebih cepat */
-            margin: 0 5px; /* Overlap kartu lebih banyak */
+            margin: 0.5px; /* Overlap kartu lebih banyak */
             transform-origin: center;
             opacity: 0; /* Mulai tersembunyi untuk animasi */
             animation: dealCardAnimation 0.4s ease-out forwards; /* Animasi muncul saat dibagikan lebih cepat */
+            z-index: 9;
         }
 
         /* Animasi pembagian kartu */
@@ -399,7 +400,7 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            font-size: 0.6em; /* Ukuran simbol kartu belakang sedikit lebih kecil */
+            font-size: 0.9em; /* Ukuran simbol kartu belakang sedikit lebih kecil */
             border: 0.5px solid #666; /* Border lebih tipis */
         }
 
@@ -432,12 +433,12 @@
 
         .card-front span {
             font-weight: bold;
-            font-size: 0.5em; /* Ukuran rank lebih kecil */
+            font-size: 0.9em; /* Ukuran rank lebih kecil */
         }
 
         .card-suit-top-left, .card-suit-bottom-right {
             position: absolute;
-            font-size: 0.5em; /* Ukuran simbol suit lebih kecil */
+            font-size: 0.7em; /* Ukuran simbol suit lebih kecil */
         }
 
         .card-suit-top-left {
@@ -445,7 +446,7 @@
             left: 4px;
         }
 
-        .card-suit-bottom-right {
+       .card-suit-bottom-right {
             bottom: 3px;
             right: 4px;
             transform: rotate(180deg);
@@ -572,7 +573,7 @@
         );
 
         let user; 
-        let userSaldo = 0;
+        let userSaldo = 9000;
         let userId = null; 
 
         // --- REFERENSI ELEMEN HTML ---
