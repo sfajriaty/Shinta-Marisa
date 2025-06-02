@@ -1,0 +1,1305 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>GameZone</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    /* --- Gaya Umum & Global --- */
+    * { box-sizing: border-box; }
+    body, html {
+      margin: 0; padding: 0; min-height: 100vh;
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(135deg, #1e3c72, #2a5298); /* Lebih menyatu dengan warna popup */
+      color: #fff;
+      display: flex;
+      flex-direction: column;
+    }
+    main {
+        flex-grow: 1; /* Pastikan main mengisi ruang kosong */
+    }
+
+    /* --- Header & Navigasi Baru --- */
+    header {
+      background-color: rgba(0,0,0,0.7); /* Lebih gelap, sedikit transparan */
+      padding: 15px 0;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+      position: sticky; /* Sticky header */
+      top: 0;
+      z-index: 1000;
+    }
+    header .container {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      max-width: 1200px; /* Lebarkan sedikit container header */
+      margin: 0 auto;
+      padding: 0 20px;
+    }
+    header h1 {
+      margin: 0;
+      font-size: 1.8em;
+      color: #ffb347; /* Warna cerah */
+      text-shadow: 0 0 8px rgba(255,179,71,0.5);
+    }
+    header nav ul {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      display: flex;
+    }
+    header nav ul li {
+      margin-left: 30px;
+    }
+    header nav ul li a {
+      color: #fff;
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 1.1em;
+      transition: color 0.3s ease, text-shadow 0.3s ease;
+    }
+    header nav ul li a:hover {
+      color: #ff9500;
+      text-shadow: 0 0 5px rgba(255,149,0,0.8);
+    }
+    /* Aktifkan untuk tombol logout */
+    header nav ul li button {
+        background: none;
+        border: none;
+        color: #fff;
+        font-weight: 600;
+        font-size: 1.1em;
+        cursor: pointer;
+        transition: color 0.3s ease, text-shadow 0.3s ease;
+    }
+    header nav ul li button:hover {
+        color: #e74c3c;
+        text-shadow: 0 0 5px rgba(231,76,60,0.8);
+    }
+
+
+    /* --- Bagian Utama (Hero & Auth Section) --- */
+    .section-container {
+        padding: 50px 20px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: calc(100vh - 100px); /* Kurangi tinggi header/footer */
+    }
+
+    /* Hero Section */
+    .hero-section {
+        text-align: center;
+        max-width: 800px;
+        background: rgba(0,0,0,0.5);
+        padding: 40px;
+        border-radius: 15px;
+        box-shadow: 0 0 25px 4px rgba(255,165,0,0.2);
+    }
+    .hero-section h2 {
+        font-size: 3em;
+        margin-bottom: 20px;
+        color: #ff9;
+        text-shadow: 0 0 15px #ffb347;
+        border-bottom: none; /* Override default h2 style */
+        padding-bottom: 0;
+    }
+    .hero-section p {
+        font-size: 1.2em;
+        margin-bottom: 30px;
+    }
+    .hero-section .btn { /* Tombol di hero section */
+        background: #ff9500;
+        color: #222; /* Kontras dengan background */
+        padding: 15px 35px;
+        border-radius: 30px;
+        font-size: 1.1em;
+        font-weight: 700;
+        transition: background 0.3s ease, transform 0.2s ease;
+    }
+    .hero-section .btn:hover {
+        background: #ffb347;
+        transform: translateY(-3px);
+    }
+
+    /* Auth Forms (Login & Register) */
+    .auth-forms {
+        background: rgba(0,0,0,0.7);
+        padding: 40px;
+        border-radius: 15px;
+        box-shadow: 0 0 25px 4px rgba(255,165,0,0.2);
+        width: 100%;
+        max-width: 450px;
+        text-align: center;
+    }
+    .auth-forms h2 {
+        color: #ff9;
+        text-shadow: 0 0 10px #ffb347;
+        margin-bottom: 30px;
+        font-size: 2.2em;
+        border-bottom: none;
+        padding-bottom: 0;
+    }
+    .form-group {
+        margin-bottom: 20px;
+        text-align: left;
+    }
+    .form-group label {
+        display: block;
+        margin-bottom: 8px;
+        font-weight: 600;
+        color: #eee;
+    }
+    .auth-forms input[type="text"],
+    .auth-forms input[type="email"],
+    .auth-forms input[type="password"] {
+        width: 100%;
+        padding: 12px 15px;
+        border: 1px solid rgba(255,255,255,0.3);
+        border-radius: 8px;
+        background-color: rgba(255,255,255,0.1);
+        color: #fff;
+        font-size: 1em;
+        transition: border-color 0.3s, background-color 0.3s;
+    }
+    .auth-forms input[type="text"]:focus,
+    .auth-forms input[type="email"]:focus,
+    .auth-forms input[type="password"]:focus {
+        outline: none;
+        border-color: #ff9500;
+        background-color: rgba(255,255,255,0.15);
+        box-shadow: 0 0 0 3px rgba(255,149,0,0.3);
+    }
+    .auth-forms input::placeholder {
+        color: rgba(255,255,255,0.6);
+    }
+    .auth-forms button[type="submit"] {
+        width: 100%;
+        background: #28a745; /* Warna hijau untuk submit */
+        color: #fff;
+        padding: 14px 25px;
+        border: none;
+        border-radius: 8px;
+        font-size: 1.1em;
+        font-weight: 700;
+        cursor: pointer;
+        transition: background 0.3s ease, transform 0.2s ease;
+    }
+    .auth-forms button[type="submit"]:hover {
+        background: #218838;
+        transform: translateY(-2px);
+    }
+    .auth-forms .message {
+        margin-top: 20px;
+        font-size: 0.95em;
+        color: #e0e0e0;
+    }
+    .auth-forms .message a {
+        color: #ff9500;
+        text-decoration: none;
+        font-weight: 600;
+        transition: color 0.3s;
+    }
+    .auth-forms .message a:hover {
+        color: #ffb347;
+        text-decoration: underline;
+    }
+    .error-message {
+        color: #ff4d4d;
+        margin-top: 10px;
+        font-size: 0.9em;
+    }
+
+    /* --- Kontainer Profil Utama (setelah login) --- */
+    .profile-container {
+      max-width: 800px; /* Lebih lebar dari sebelumnya */
+      margin: 40px auto;
+      background: rgba(0,0,0,0.6);
+      border-radius: 15px;
+      padding: 30px 40px;
+      box-shadow: 0 0 25px 4px rgba(255,165,0,0.5);
+    }
+    .profile-container h1 {
+      text-align: center;
+      color: #ff9;
+      text-shadow: 0 0 12px #ffb347;
+      margin-bottom: 30px;
+    }
+    .saldo {
+      font-size: 24px; /* Lebih besar */
+      font-weight: 700;
+      text-align: center;
+      margin-bottom: 25px;
+      color: #222; /* Teks gelap */
+      background: #ffdb58; /* Warna kuning terang */
+      padding: 12px 20px;
+      border-radius: 30px;
+      box-shadow: 0 0 15px rgba(255,165,0,0.4);
+    }
+    
+    /* --- Tombol Aksi Utama (Deposit, Withdraw) --- */
+    .main-actions-group {
+      display: flex;
+      justify-content: center;
+      gap: 20px; /* Jarak antar tombol */
+      margin-bottom: 30px;
+      padding: 15px 0;
+      border-bottom: 1px solid rgba(255,255,255,0.2);
+    }
+    .main-actions-group .btn {
+      background: #ff9500; /* Warna oranye */
+      border: none;
+      border-radius: 30px;
+      padding: 12px 25px;
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
+      color: #222; /* Kontras dengan oranye */
+      box-shadow: 0 0 12px rgba(255,165,0,0.5);
+      transition: background 0.3s ease, transform 0.2s ease;
+    }
+    .main-actions-group .btn:hover {
+      background: #ffb347;
+      transform: translateY(-3px);
+    }
+
+    /* --- Judul Sub-bagian (Riwayat, Detail Profil) --- */
+    h2 {
+      border-bottom: 2px solid #ff9500;
+      padding-bottom: 8px;
+      margin-bottom: 20px; /* Jarak lebih besar */
+      color: #ff9;
+      text-shadow: 0 0 8px rgba(255,179,71,0.3);
+      font-size: 1.8em;
+    }
+
+    /* --- Tabel (Riwayat Transaksi) --- */
+    table {
+      width: 100%; /* Lebar penuh */
+      border-collapse: separate; /* Untuk border-radius di tr */
+      border-spacing: 0;
+      margin-bottom: 30px;
+      border-radius: 10px; /* Sudut membulat tabel */
+      overflow: hidden; /* Penting agar border-radius berfungsi */
+      box-shadow: 0 0 15px rgba(0,0,0,0.3);
+    }
+    th, td {
+      padding: 12px 15px; /* Padding lebih nyaman */
+      text-align: left;
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+      color: #eee;
+    }
+    th {
+      background: #ff9500;
+      color: #222;
+      font-weight: 700;
+    }
+    tr:nth-child(even) { /* Warna selang-seling */
+        background-color: rgba(255,255,255,0.05);
+    }
+    tr:last-child td {
+        border-bottom: none; /* Hilangkan border bawah di baris terakhir */
+    }
+    .empty {
+      color: #bbb;
+      font-style: italic;
+      text-align: center;
+      padding: 15px 0;
+    }
+    .status-pending { color: #ffeb3b; font-weight: bold; } /* Kuning cerah */
+    .status-approved { color: #8bc34a; font-weight: bold; } /* Hijau terang */
+    .status-rejected { color: #f44336; font-weight: bold; } /* Merah terang */
+
+    /* --- Loading Button --- */
+    .btn.loading {
+      position: relative;
+      color: transparent;
+      pointer-events: none;
+      background: #ff9500;
+    }
+    .btn.loading::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 18px;
+      height: 18px;
+      margin-top: -9px;
+      margin-left: -9px;
+      border: 3px solid #fff;
+      border-top-color: transparent;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* --- Popup (Deposit, Withdraw, Riwayat) --- */
+    .popup-form {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(to bottom, rgba(0, 0, 0, 0.85) 0%, rgba(0, 0, 0, 0.7) 100%);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 9999;
+        opacity: 0;
+        visibility: hidden;
+        transition: opacity 0.3s ease-in-out, visibility 0.3s ease-in-out;
+    }
+    .popup-form.active { /* Ganti display:flex dengan class active */
+        opacity: 1;
+        visibility: visible;
+    }
+    .popup-inner {
+        background: linear-gradient(145deg, #2a5298, #1e3c72);
+        color: #e0e0e0;
+        padding: 30px; /* Padding lebih besar */
+        border-radius: 15px;
+        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.6), 0 0 25px 5px rgba(255, 165, 0, 0.4);
+        width: 90%;
+        max-width: 500px; /* Lebih lebar untuk form dan tabel */
+        transform: translateY(-20px) scale(0.95);
+        opacity: 0;
+        transition: transform 0.3s ease-in-out, opacity 0.3s ease-in-out;
+        position: relative;
+    }
+    .popup-form.active .popup-inner { /* Animasi masuk */
+        transform: translateY(0) scale(1);
+        opacity: 1;
+    }
+    .popup-inner h2 {
+        color: #ffb347;
+        text-align: center;
+        margin-bottom: 25px;
+        font-size: 2em; /* Ukuran font lebih besar */
+        text-shadow: 0 0 8px rgba(255,179,71,0.5);
+        border-bottom: none;
+        padding-bottom: 0;
+    }
+    .popup-inner input[type="text"],
+    .popup-inner input[type="email"],
+    .popup-inner input[type="number"],
+    .popup-inner select {
+        width: 100%; /* Lebar penuh */
+        padding: 12px 15px;
+        margin-bottom: 15px;
+        border-radius: 8px;
+        border: 1px solid #4a6fa5;
+        background-color: rgba(255, 255, 255, 0.1);
+        color: #e0e0e0;
+        font-size: 1em;
+        transition: border-color 0.3s ease, box-shadow 0.3s ease;
+    }
+    .popup-inner input:focus,
+    .popup-inner select:focus {
+        outline: none;
+        border-color: #ff9500;
+        box-shadow: 0 0 0 3px rgba(255, 149, 0, 0.3);
+        background-color: rgba(255, 255, 255, 0.15);
+    }
+    .popup-inner input::placeholder { color: #b0b0b0; }
+    .popup-inner input[readonly] {
+        background-color: rgba(255, 255, 255, 0.05);
+        border-color: #3a5b8e;
+        cursor: default;
+    }
+    .popup-inner button {
+        padding: 12px 20px;
+        border: none;
+        border-radius: 8px;
+        font-size: 1em;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background 0.3s ease, transform 0.1s ease;
+    }
+    .popup-inner button#dep-submit,
+    .popup-inner button#with-submit,
+    .popup-inner button#btn-qris {
+        background: #ff9500;
+        color: #222;
+        box-shadow: 0 4px 15px rgba(255, 149, 0, 0.4);
+    }
+    .popup-inner button#dep-submit:hover,
+    .popup-inner button#with-submit:hover,
+    .popup-inner button#btn-qris:hover {
+        background: #ffb347;
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(255, 179, 71, 0.5);
+    }
+    .popup-inner button.close-popup-btn, /* Tombol Batal/Tutup */
+    .popup-inner button#btn-kembali-ewallet {
+        background: #5a7ea8;
+        color: #fff;
+    }
+    .popup-inner button.close-popup-btn:hover,
+    .popup-inner button#btn-kembali-ewallet:hover {
+        background: #6c90b8;
+        transform: translateY(-2px);
+    }
+    .btn-copy {
+        background: #007bff !important;
+        color: white !important;
+        border-radius: 6px !important;
+        padding: 8px 12px !important;
+        font-size: 0.9em !important;
+        margin-left: 8px;
+        box-shadow: none !important;
+    }
+    .btn-copy:hover { background: #0056b3 !important; transform: translateY(0px) !important; }
+    #form-qris img {
+        max-width: 100%;
+        height: auto;
+        margin: 10px auto 20px; /* Tengah dan jarak lebih */
+        display: block; /* Agar margin auto bekerja */
+        border-radius: 8px;
+        border: 2px solid #ff9500;
+        box-shadow: 0 0 15px rgba(255,165,0,0.3);
+    }
+
+    /* --- Pop-up Riwayat Transaksi Baru --- */
+    #history-popup .popup-inner {
+        max-width: 700px; /* Lebih lebar untuk tabel riwayat */
+    }
+    #history-popup .popup-inner table {
+        width: 100%;
+        margin-top: 20px;
+        border-collapse: separate;
+        border-spacing: 0;
+        border-radius: 8px;
+        overflow: hidden;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+    }
+    #history-popup .popup-inner th, #history-popup .popup-inner td {
+        border: 1px solid #3a5b8e;
+        padding: 12px;
+        text-align: left;
+    }
+    #history-popup .popup-inner th {
+        background-color: #3e6297;
+        color: #f0f0f0;
+        font-weight: 700;
+    }
+    #history-popup .popup-inner td {
+        background-color: #2e4d7e;
+    }
+
+    /* --- Game Display Grid (NEW) --- */
+    .game-display-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); /* Responsif */
+        gap: 25px; /* Jarak antar game */
+        margin-top: 30px;
+        padding-top: 20px;
+        border-top: 1px solid rgba(255,255,255,0.2);
+    }
+
+    .game-item {
+        background: rgba(255,255,255,0.08); /* Background item game */
+        border-radius: 10px;
+        overflow: hidden;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.4);
+        text-align: center;
+        cursor: pointer;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        text-decoration: none; /* Hapus underline dari link */
+        color: inherit; /* Warisi warna teks dari parent */
+        display: block; /* Agar seluruh div bisa diklik */
+    }
+
+    .game-item:hover {
+        transform: translateY(-8px) scale(1.02); /* Efek melayang */
+        box-shadow: 0 10px 25px rgba(255,149,0,0.5), 0 0 20px rgba(255,149,0,0.3); /* Glow oranye */
+    }
+
+    .game-item img {
+        width: 100%;
+        height: 150px; /* Tinggi gambar konsisten */
+        object-fit: cover; /* Pastikan gambar mengisi kotak */
+        border-bottom: 1px solid rgba(255,255,255,0.1);
+        transition: transform 0.3s ease;
+    }
+
+    .game-item:hover img {
+        transform: scale(1.05); /* Sedikit zoom pada gambar */
+    }
+
+    .game-item h3 {
+        font-size: 1.1em;
+        margin: 15px 10px;
+        color: #ffb347; /* Warna judul game */
+        text-shadow: 0 0 5px rgba(255,179,71,0.3);
+    }
+    /* --- END Game Display Grid --- */
+
+
+    /* --- Footer --- */
+    footer {
+        background-color: rgba(0,0,0,0.7);
+        color: #fff;
+        text-align: center;
+        padding: 15px 0;
+        margin-top: auto; /* Dorong ke bawah */
+        box-shadow: 0 -4px 15px rgba(0,0,0,0.3);
+    }
+    footer p {
+        margin: 0;
+        font-size: 0.9em;
+        color: #bbb;
+    }
+
+    /* --- Utility Classes --- */
+    .hidden { display: none !important; }
+
+    /* --- Media Queries --- */
+    @media (max-width: 768px) {
+        header .container { flex-direction: column; }
+        header nav ul { margin-top: 15px; }
+        header nav ul li { margin: 0 10px; }
+        .hero-section h2 { font-size: 2.2em; }
+        .auth-forms h2 { font-size: 1.8em; }
+        .profile-container { padding: 25px 30px; margin: 20px auto; }
+        .main-actions-group { flex-wrap: wrap; gap: 15px; }
+        .main-actions-group .btn { width: calc(50% - 10px); }
+        .game-display-grid {
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 20px;
+        }
+        .popup-inner { padding: 25px; }
+    }
+    @media (max-width: 480px) {
+        .container, .profile-container, .auth-forms, .hero-section, .popup-inner {
+            margin: 15px;
+            padding: 20px;
+        }
+        .main-actions-group { flex-direction: column; }
+        .main-actions-group .btn { width: 100%; }
+        .saldo { font-size: 20px; }
+        h2 { font-size: 1.5em; }
+        th, td { padding: 10px; font-size: 0.9em; }
+        .popup-inner h2 { font-size: 1.6em; }
+        .popup-inner input, .popup-inner select, .popup-inner button { font-size: 0.9em; padding: 10px; }
+        .btn-copy { font-size: 0.8em !important; padding: 6px 10px !important; }
+        .game-display-grid {
+            grid-template-columns: 1fr; /* Satu kolom di layar sangat kecil */
+            gap: 15px;
+        }
+        .game-item img { height: 120px; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="container">
+      <h1>GameZone</h1>
+      <nav>
+        <ul id="nav-menu">
+          <li><a href="#" id="nav-home">Beranda</a></li>
+          <li id="nav-login-link"><a href="#" id="nav-login">Login</a></li>
+          <li id="nav-register-link"><a href="#" id="nav-register">Daftar</a></li>
+          <li class="hidden" id="nav-welcome-user">Selamat datang, <span id="display-nav-username"></span>!</li>
+          <li class="hidden" id="nav-logout-link"><button id="nav-logout-btn">Logout</button></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <section class="section-container" id="hero-section">
+        <div class="hero-section">
+            <h2>Selamat Datang di GameZone!</h2>
+            <p>Platform terbaik untuk pengalaman bermain game Anda. Login atau daftar sekarang!</p>
+            <button class="btn" id="hero-login-btn">Mulai Sekarang</button>
+        </div>
+    </section>
+
+    <section class="section-container hidden" id="auth-section">
+        <div class="auth-forms" id="login-form-wrapper">
+            <h2 id="auth-title">Login</h2>
+            <form id="auth-form">
+                <div class="form-group">
+                    <label for="auth-email">Email:</label>
+                    <input type="email" id="auth-email" name="email" required autocomplete="email">
+                </div>
+                <div class="form-group">
+                    <label for="auth-password">Password:</label>
+                    <input type="password" id="auth-password" name="password" required autocomplete="current-password">
+                </div>
+                <button type="submit" id="auth-submit-btn">Login</button>
+                <p class="error-message" id="auth-error-message"></p>
+                <p class="message" id="auth-toggle-message">
+                    Belum punya akun? <a href="#" id="show-register-link">Daftar di sini</a>
+                </p>
+            </form>
+        </div>
+    </section>
+
+    <section class="profile-container hidden" id="profile-section">
+      <h1>Profil Pemain</h1>
+      <div class="saldo" id="saldo-display">Saldo: Rp0</div>
+      
+      <div class="main-actions-group">
+        <button class="btn" id="btn-deposit">Deposit</button>
+        <button class="btn" id="btn-withdraw">Penarikan</button>
+      </div>
+
+      <div class="btn-group" style="margin-bottom: 30px;">
+        <button class="btn" id="btn-show-deposit-history">Riwayat Deposit</button>
+        <button class="btn" id="btn-show-withdraw-history">Riwayat Penarikan</button>
+      </div>
+
+      <h2>Pilih Game Favoritmu!</h2>
+      <div class="game-display-grid">
+        <a href="slot.html" class="game-item">
+          <img src="https://via.placeholder.com/200x150/FFD700/000000?text=Slot+Game" alt="Slot Game">
+          <h3>Slot Game Zone One</h3>
+        </a>
+        <a href="poker1.html" class="game-item">
+          <img src="https://via.placeholder.com/200x150/8B0000/FFFFFF?text=Poker+Game" alt="Poker Game">
+          <h3>Poker Game Zone One</h3>
+        </a>
+        <a href="tebakdadu.html" class="game-item">
+          <img src="https://via.placeholder.com/200x150/008080/FFFFFF?text=Tebak+Dadu" alt="Tebak Dadu">
+          <h3>Tebak Dadu Game Zone One</h3>
+        </a>
+        <a href="samgong1.html" class="game-item">
+          <img src="https://via.placeholder.com/200x150/4682B4/FFFFFF?text=Samgong" alt="Samgong Game">
+          <h3>Samgong Game Zone One</h3>
+        </a>
+        <a href="susunbalok99.html" class="game-item">
+          <img src="https://via.placeholder.com/200x150/DA70D6/FFFFFF?text=Susun+Balok" alt="Susun Balok">
+          <h3>Susun Balok Game Zone One</h3>
+        </a>
+        </div>
+      </section>
+  </main>
+
+  <div id="popup-deposit" class="popup-form">
+    <div class="popup-inner">
+      <h2>Deposit via DANA</h2>
+      <input type="text" id="dep-nama" placeholder="Nama" readonly />
+      <input type="email" id="dep-email" placeholder="Email" readonly style="margin-bottom: 12px;" />
+      <div style="display: flex; align-items: center; margin-bottom: 12px;">
+        <input type="text" id="dep-nomor" placeholder="Nomor" readonly style="flex-grow: 1; margin-bottom: 0;" />
+        <button class="btn-copy" data-target="dep-nomor">Salin</button>
+      </div>
+
+      <div style="text-align:center; margin: 12px 0;">
+        <button id="btn-qris">QRIS</button>
+      </div>
+      
+      <div style="text-align:center; margin: 12px 0;">
+        <button id="btn-kembali-ewallet" class="hidden">Kembali ke eWallet</button>
+      </div>
+
+      <div id="form-qris" class="hidden">
+        <img src="" alt="QRIS" id="gambar-qris" />
+      </div>
+
+      <input type="number" id="dep-jumlah" placeholder="Jumlah (Rp)" />
+      <button id="dep-submit">Kirim</button>
+      <button class="close-popup-btn" data-popup-id="popup-deposit">Batal</button>
+    </div>
+  </div>
+
+  <div id="popup-withdraw" class="popup-form">
+    <div class="popup-inner">
+      <h2>Penarikan</h2>
+      <input type="text" id="with-nama" placeholder="Nama" />
+      <input type="email" id="with-email" placeholder="Email" readonly style="margin-bottom: 12px;" />
+      <div style="display: flex; align-items: center; margin-bottom: 12px;">
+        <input type="text" id="with-nomor" placeholder="Nomor" />
+      </div>
+
+      <select id="with-metode">
+        <option value="">Pilih e-Wallet</option>
+        <option value="DANA">DANA</option>
+        <option value="OVO">OVO</option>
+        <option value="GoPay">GoPay</option>
+      </select>
+      <input type="number" id="with-jumlah" placeholder="Jumlah (Rp)" />
+      <button id="with-submit">Kirim</button>
+      <button class="close-popup-btn" data-popup-id="popup-withdraw">Batal</button>
+    </div>
+  </div>
+
+  <div id="history-popup" class="popup-form">
+    <div class="popup-inner">
+      <span class="close-button" data-popup-id="history-popup">&times;</span>
+      <h2 id="history-popup-title">Riwayat Transaksi</h2>
+      <table id="history-table">
+        <thead>
+          <tr><th>Tanggal</th><th>Jumlah (Rp)</th><th>Status</th></tr>
+        </thead>
+        <tbody>
+          <tr><td colspan="3" class="empty">Memuat data...</td></tr>
+        </tbody>
+      </table>
+      <button class="close-popup-btn" data-popup-id="history-popup">Tutup</button>
+    </div>
+  </div>
+
+  <footer>
+    <div class="container">
+      <p>&copy; 2025 GameZone. Semua Hak Cipta Dilindungi.</p>
+    </div>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script>
+    const supabase = window.supabase.createClient(
+      'https://vqmfachxnjyxwuavpgds.supabase.co',
+      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZxbWZhY2h4bmp5eHd1YXZwZ2RzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDg0MDYxNDAsImV4cCI6MjA2Mzk4MjE0MH0.Bzr8mUiEl8MzRWpVQ3_59eFxKk0EWZ3ca-4IEcpGLkk'
+    );
+
+    let uid = localStorage.getItem('uid');
+    let userEmail = localStorage.getItem('userEmail');
+    let currentUsername = localStorage.getItem('username');
+
+    // --- Elemen DOM Utama ---
+    const heroSection = document.getElementById('hero-section');
+    const authSection = document.getElementById('auth-section');
+    const profileSection = document.getElementById('profile-section');
+    const authTitle = document.getElementById('auth-title');
+    const authForm = document.getElementById('auth-form');
+    const authEmailInput = document.getElementById('auth-email');
+    const authPasswordInput = document.getElementById('auth-password');
+    const authSubmitBtn = document.getElementById('auth-submit-btn');
+    const authErrorMessage = document.getElementById('auth-error-message');
+    const authToggleMessage = document.getElementById('auth-toggle-message');
+    const showRegisterLink = document.getElementById('show-register-link');
+    const showLoginLinkHtml = 'Sudah punya akun? <a href="#" id="show-login-link">Login di sini</a>';
+    const showRegisterLinkHtml = 'Belum punya akun? <a href="#" id="show-register-link">Daftar di sini</a>';
+
+    // --- Navigasi ---
+    const navHome = document.getElementById('nav-home');
+    const navLoginLink = document.getElementById('nav-login-link');
+    const navRegisterLink = document.getElementById('nav-register-link');
+    const navWelcomeUser = document.getElementById('nav-welcome-user');
+    const displayNavUsername = document.getElementById('display-nav-username');
+    const navLogoutLink = document.getElementById('nav-logout-link');
+    const navLogoutBtn = document.getElementById('nav-logout-btn');
+
+    // --- Tombol Aksi Utama ---
+    const heroLoginBtn = document.getElementById('hero-login-btn');
+    const btnDeposit = document.getElementById('btn-deposit');
+    const btnWithdraw = document.getElementById('btn-withdraw');
+    // const btnMainGame = document.getElementById('btn-main-game'); // Dihapus
+    const btnShowDepositHistory = document.getElementById('btn-show-deposit-history');
+    const btnShowWithdrawHistory = document.getElementById('btn-show-withdraw-history');
+    // --- Popups ---
+    const popupDeposit = document.getElementById('popup-deposit');
+    const popupWithdraw = document.getElementById('popup-withdraw');
+    // const gamePopup = document.getElementById('game-popup'); // Dihapus
+    const historyPopup = document.getElementById('history-popup');
+    const historyPopupTitle = document.getElementById('history-popup-title');
+    const historyTableBody = historyPopup.querySelector('#history-table tbody');
+
+    // --- Deposit Popup Elements ---
+    const depNama = document.getElementById('dep-nama');
+    const depEmail = document.getElementById('dep-email');
+    const depNomor = document.getElementById('dep-nomor');
+    const btnQris = document.getElementById('btn-qris');
+    const btnKembaliEwallet = document.getElementById('btn-kembali-ewallet');
+    const formQris = document.getElementById('form-qris');
+    const gambarQris = document.getElementById('gambar-qris');
+    const depJumlah = document.getElementById('dep-jumlah');
+    const depSubmit = document.getElementById('dep-submit');
+
+    // --- Withdraw Popup Elements ---
+    const withNama = document.getElementById('with-nama');
+    const withEmail = document.getElementById('with-email');
+    const withMetode = document.getElementById('with-metode');
+    const withNomor = document.getElementById('with-nomor');
+    const withJumlah = document.getElementById('with-jumlah');
+    const withSubmit = document.getElementById('with-submit');
+
+    // --- General Utility Functions ---
+    function showPopup(popupId) {
+        document.getElementById(popupId).classList.add('active');
+    }
+
+    function closePopup(popupId) {
+        document.getElementById(popupId).classList.remove('active');
+        if (popupId === 'popup-deposit') {
+            formQris.classList.add('hidden');
+            btnKembaliEwallet.classList.add('hidden');
+            depJumlah.value = '';
+        } else if (popupId === 'popup-withdraw') {
+            withNama.value = '';
+            withMetode.value = '';
+            withNomor.value = '';
+            withJumlah.value = '';
+        }
+    }
+
+    document.querySelectorAll('.close-popup-btn').forEach(button => {
+        button.addEventListener('click', (e) => {
+            closePopup(e.target.dataset.popupId);
+        });
+    });
+    document.querySelectorAll('.popup-form').forEach(popup => {
+        popup.addEventListener('click', (e) => {
+            if (e.target === popup) {
+                closePopup(popup.id);
+            }
+        });
+    });
+
+    // --- AUTH LOGIC ---
+    let isRegisterMode = false;
+
+    function showAuthForm(mode) {
+        isRegisterMode = (mode === 'register');
+        heroSection.classList.add('hidden');
+        profileSection.classList.add('hidden');
+        authSection.classList.remove('hidden');
+
+        authTitle.textContent = isRegisterMode ? 'Daftar' : 'Login';
+        authSubmitBtn.textContent = isRegisterMode ? 'Daftar Akun' : 'Login';
+        authEmailInput.placeholder = isRegisterMode ? 'Email Anda' : 'Email atau Username';
+        authPasswordInput.placeholder = 'Password';
+
+        if (isRegisterMode) {
+            authToggleMessage.innerHTML = showLoginLinkHtml;
+            document.getElementById('auth-form').action = 'register';
+        } else {
+            authToggleMessage.innerHTML = showRegisterLinkHtml;
+            document.getElementById('auth-form').action = 'login';
+        }
+        setTimeout(() => {
+            const link = document.getElementById(isRegisterMode ? 'show-login-link' : 'show-register-link');
+            if (link) {
+                link.onclick = (e) => {
+                    e.preventDefault();
+                    showAuthForm(isRegisterMode ? 'login' : 'register');
+                    authErrorMessage.textContent = '';
+                    authForm.reset();
+                };
+            }
+        }, 0);
+        authErrorMessage.textContent = '';
+        authForm.reset();
+    }
+
+    async function handleAuthSubmit(e) {
+        e.preventDefault();
+        const email = authEmailInput.value;
+        const password = authPasswordInput.value;
+        authErrorMessage.textContent = '';
+
+        if (isRegisterMode) {
+            const { data, error } = await supabase.auth.signUp({
+                email: email,
+                password: password,
+                options: {
+                    data: {
+                        username: email.split('@')[0]
+                    }
+                }
+            });
+
+            if (error) {
+                authErrorMessage.textContent = 'Daftar Gagal: ' + error.message;
+            } else if (data.user) {
+                authErrorMessage.textContent = 'Pendaftaran berhasil! Silakan cek email Anda untuk verifikasi.';
+                authErrorMessage.style.color = '#8bc34a';
+                await loginUser(email, password);
+            }
+        } else {
+            await loginUser(email, password);
+        }
+    }
+
+    async function loginUser(email, password) {
+        const { data, error } = await supabase.auth.signInWithPassword({
+            email: email,
+            password: password,
+        });
+
+        if (error) {
+            authErrorMessage.textContent = 'Login Gagal: ' + error.message;
+            authErrorMessage.style.color = '#ff4d4d';
+        } else if (data.user) {
+            uid = data.user.id;
+            userEmail = data.user.email;
+            currentUsername = data.user.user_metadata?.username || email.split('@')[0];
+            localStorage.setItem('uid', uid);
+            localStorage.setItem('userEmail', userEmail);
+            localStorage.setItem('username', currentUsername);
+            authErrorMessage.textContent = '';
+            await loadProfile();
+            showSection('profile');
+            updateNavMenu(true);
+        }
+    }
+
+    async function logoutUser() {
+        const { error } = await supabase.auth.signOut();
+        if (error) {
+            console.error('Logout Gagal:', error.message);
+            alert('Gagal logout. Coba lagi.');
+        } else {
+            uid = null;
+            userEmail = null;
+            currentUsername = null;
+            localStorage.removeItem('uid');
+            localStorage.removeItem('userEmail');
+            localStorage.removeItem('username');
+            showSection('hero');
+            updateNavMenu(false);
+            authForm.reset();
+            authErrorMessage.textContent = '';
+        }
+    }
+
+    // --- Navigation & Section Display Logic ---
+    function showSection(sectionId) {
+        heroSection.classList.add('hidden');
+        authSection.classList.add('hidden');
+        profileSection.classList.add('hidden');
+
+        if (sectionId === 'hero') {
+            heroSection.classList.remove('hidden');
+        } else if (sectionId === 'auth') {
+            authSection.classList.remove('hidden');
+        } else if (sectionId === 'profile') {
+            profileSection.classList.remove('hidden');
+        }
+    }
+
+    function updateNavMenu(loggedIn) {
+        if (loggedIn) {
+            navLoginLink.classList.add('hidden');
+            navRegisterLink.classList.add('hidden');
+            navWelcomeUser.classList.remove('hidden');
+            displayNavUsername.textContent = currentUsername;
+            navLogoutLink.classList.remove('hidden');
+        } else {
+            navLoginLink.classList.remove('hidden');
+            navRegisterLink.classList.remove('hidden');
+            navWelcomeUser.classList.add('hidden');
+            navLogoutLink.classList.add('hidden');
+        }
+    }
+
+    // --- Initial Load & Event Listeners ---
+    document.addEventListener('DOMContentLoaded', async () => {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (user) {
+            uid = user.id;
+            userEmail = user.email;
+            currentUsername = user.user_metadata?.username || user.email.split('@')[0];
+            localStorage.setItem('uid', uid);
+            localStorage.setItem('userEmail', userEmail);
+            localStorage.setItem('username', currentUsername);
+            await loadProfile();
+            showSection('profile');
+            updateNavMenu(true);
+        } else {
+            showSection('hero');
+            updateNavMenu(false);
+        }
+
+        // --- Event Listeners for Nav & Hero Buttons ---
+        navHome.addEventListener('click', (e) => {
+            e.preventDefault();
+            if (uid) {
+                showSection('profile');
+            } else {
+                showSection('hero');
+            }
+        });
+        document.getElementById('nav-login').addEventListener('click', (e) => {
+            e.preventDefault();
+            showAuthForm('login');
+        });
+        document.getElementById('nav-register').addEventListener('click', (e) => {
+            e.preventDefault();
+            showAuthForm('register');
+        });
+        navLogoutBtn.addEventListener('click', logoutUser);
+        heroLoginBtn.addEventListener('click', () => showAuthForm('login'));
+        authForm.addEventListener('submit', handleAuthSubmit);
+
+        // --- Tombol Copy ---
+        document.querySelectorAll('.btn-copy').forEach(button => {
+            button.addEventListener('click', (event) => {
+                const targetId = event.currentTarget.dataset.target;
+                const inputElement = document.getElementById(targetId);
+                if (inputElement) {
+                    inputElement.select();
+                    inputElement.setSelectionRange(0, 99999);
+                    navigator.clipboard.writeText(inputElement.value)
+                        .then(() => alert('Nomor berhasil disalin: ' + inputElement.value))
+                        .catch(err => {
+                            console.error('Gagal menyalin teks:', err);
+                            alert('Gagal menyalin nomor. Silakan salin manual.');
+                        });
+                }
+            });
+        });
+
+        // NEW: Event listener untuk setiap item game di grid
+        document.querySelectorAll('.game-item').forEach(item => {
+            item.addEventListener('click', (e) => {
+                // Verifikasi apakah pengguna sudah login sebelum mengizinkan navigasi
+                if (!uid) {
+                    e.preventDefault(); // Hentikan navigasi default dari link
+                    alert("Anda harus login untuk bermain game ini.");
+                    showAuthForm('login'); // Arahkan ke form login
+                }
+                // Jika sudah login, biarkan link href bekerja secara normal
+            });
+        });
+
+        // --- History Popup Logic ---
+        btnShowDepositHistory.addEventListener('click', async () => {
+            if (!uid) { alert("Anda harus login untuk melihat riwayat deposit."); return; }
+            historyPopupTitle.textContent = 'Riwayat Deposit';
+            await loadHistoryTable('deposit_requests');
+            showPopup('history-popup');
+        });
+
+        btnShowWithdrawHistory.addEventListener('click', async () => {
+            if (!uid) { alert("Anda harus login untuk melihat riwayat penarikan."); return; }
+            historyPopupTitle.textContent = 'Riwayat Penarikan';
+            await loadHistoryTable('withdraw_requests');
+            showPopup('history-popup');
+        });
+
+        historyPopup.querySelector('.close-button').addEventListener('click', () => closePopup('history-popup'));
+    });
+
+    // --- Profil Data Loading ---
+    async function loadProfile() {
+      if (!uid) {
+          document.getElementById('saldo-display').textContent = 'Saldo: Rp0 (Harap Login)';
+          return;
+      }
+
+      const { data: userData, error: userError } = await supabase
+        .from('users_data')
+        .select('saldo')
+        .eq('user_id', uid)
+        .single();
+
+      if (userError && userError.code !== 'PGRST116') {
+        console.error('Error memuat data saldo:', userError.message);
+        document.getElementById('saldo-display').textContent = `Saldo: Rp0 (Error)`;
+      } else if (userError && userError.code === 'PGRST116') {
+          console.warn('Pengguna baru, membuat entri saldo awal...');
+          const { error: insertError } = await supabase
+              .from('users_data')
+              .insert([{ user_id: uid, saldo: 0 }]);
+
+          if (insertError) {
+              console.error('Error saat membuat entri saldo awal:', insertError.message);
+              alert('Gagal membuat entri saldo awal. Cek log.');
+          }
+          document.getElementById('saldo-display').textContent = `Saldo: Rp0`;
+      } else {
+          document.getElementById('saldo-display').textContent = `Saldo: Rp${(userData.saldo ?? 0).toLocaleString('id-ID')}`;
+      }
+    }
+
+    // --- Load History Table ---
+    async function loadHistoryTable(tableName) {
+        historyTableBody.innerHTML = '<tr><td colspan="3" class="empty">Memuat data...</td></tr>';
+
+        const { data, error } = await supabase
+            .from(tableName)
+            .select('created_at, amount, status')
+            .eq('user_id', uid)
+            .order('created_at', { ascending: false });
+
+        historyTableBody.innerHTML = '';
+        if (error) {
+            console.error(`Error fetching ${tableName} history:`, error.message);
+            historyTableBody.innerHTML = `<tr><td colspan="3" class="empty">Gagal memuat riwayat ${tableName.replace('_', ' ')}.</td></tr>`;
+        } else if (!data || data.length === 0) {
+            historyTableBody.innerHTML = `<tr><td colspan="3" class="empty">Belum ada riwayat ${tableName.replace('_', ' ')}.</td></tr>`;
+        } else {
+            data.forEach(row => {
+                const date = new Date(row.created_at).toLocaleString('id-ID');
+                const statusClass = `status-${row.status}`;
+                historyTableBody.innerHTML += `<tr><td>${date}</td><td>Rp${row.amount.toLocaleString('id-ID')}</td><td class="${statusClass}">${row.status.charAt(0).toUpperCase() + row.status.slice(1)}</td></tr>`;
+            });
+        }
+    }
+
+    // --- Deposit & Withdraw Logic ---
+    btnDeposit.onclick = async () => {
+        if (!uid) { alert("Anda harus login untuk melakukan deposit."); return; }
+        depEmail.value = userEmail || '';
+        depNama.value = currentUsername || '';
+
+        const { data, error } = await supabase
+            .from('deposit_config')
+            .select('*')
+            .eq('metode', 'eWallet')
+            .single();
+
+        if (error || !data) {
+            alert('Gagal ambil data eWallet.');
+            return;
+        }
+        depNama.value = data.nama;
+        depNomor.value = data.nomor;
+        depSubmit.dataset.metode = 'eWallet';
+        showPopup('popup-deposit');
+    };
+
+    btnQris.onclick = async () => {
+        const { data, error } = await supabase
+            .from('deposit_config')
+            .select('*')
+            .eq('metode', 'QRIS')
+            .single();
+
+        if (error || !data) {
+            alert('Gagal ambil data QRIS.');
+            return;
+        }
+        formQris.classList.remove('hidden');
+        gambarQris.src = data.qris_url;
+        depSubmit.dataset.metode = 'QRIS';
+        btnKembaliEwallet.classList.remove('hidden');
+    };
+
+    btnKembaliEwallet.onclick = async () => {
+        const { data, error } = await supabase
+            .from('deposit_config')
+            .select('*')
+            .eq('metode', 'eWallet')
+            .single();
+
+        if (error || !data) {
+            alert('Gagal ambil data eWallet.');
+            return;
+        }
+        formQris.classList.add('hidden');
+        depNama.value = data.nama;
+        depNomor.value = data.nomor;
+        depSubmit.dataset.metode = 'eWallet';
+        btnKembaliEwallet.classList.add('hidden');
+    };
+
+    depSubmit.onclick = async () => {
+        if (!uid) { alert("Anda harus login untuk melakukan deposit."); return; }
+        const nama = depNama.value;
+        const email = depEmail.value;
+        const nomor = depNomor.value;
+        const jumlah = parseInt(depJumlah.value);
+        const metode = depSubmit.dataset.metode;
+
+        if (!nama || !nomor || !jumlah || !email || isNaN(jumlah) || jumlah <= 0) {
+            alert("Lengkapi semua kolom dengan benar. Jumlah harus angka positif.");
+            return;
+        }
+
+        const { error } = await supabase.from('deposit_requests').insert([
+            { user_id: uid, nama, metode, amount: jumlah, status: 'pending', email: email }
+        ]);
+
+        if (error) {
+            console.error('Error kirim deposit:', error);
+            alert("Gagal kirim deposit. Silakan coba lagi.");
+        } else {
+            alert("Permintaan deposit berhasil dikirim.");
+            closePopup('popup-deposit');
+            loadProfile();
+        }
+    };
+
+    btnWithdraw.onclick = async () => {
+        if (!uid) { alert("Anda harus login untuk melakukan penarikan."); return; }
+        withEmail.value = userEmail || '';
+        withNama.value = currentUsername || '';
+        showPopup('popup-withdraw');
+    };
+
+    withSubmit.onclick = async () => {
+        if (!uid) { alert("Anda harus login untuk melakukan penarikan."); return; }
+
+        const nama = withNama.value;
+        const email = withEmail.value;
+        const metode = withMetode.value;
+        const nomor = withNomor.value;
+        const jumlah = parseInt(withJumlah.value);
+
+        if (!nama || !metode || !nomor || !jumlah || !email || isNaN(jumlah) || jumlah <= 0) {
+            alert("Lengkapi semua kolom dengan benar. Jumlah harus angka positif.");
+            return;
+        }
+
+        const { data: userData, error: saldoError } = await supabase
+            .from('users_data')
+            .select('saldo')
+            .eq('user_id', uid)
+            .single();
+
+        if (saldoError && saldoError.code !== 'PGRST116') {
+            console.error('Error fetching user saldo for withdraw:', saldoError);
+            alert('Gagal mengambil saldo user untuk penarikan. Silakan coba lagi.');
+            return;
+        } else if (saldoError && saldoError.code === 'PGRST116' || (userData && userData.saldo === null)) {
+            alert('Saldo Anda 0. Tidak bisa melakukan penarikan.');
+            return;
+        }
+
+        const currentSaldo = userData.saldo;
+
+        if (jumlah > currentSaldo) {
+            alert(`Saldo tidak mencukupi. Saldo Anda saat ini adalah Rp${currentSaldo.toLocaleString('id-ID')}.`);
+            return;
+        }
+
+        const saldoBaru = currentSaldo - jumlah;
+
+        const { error: updateSaldoError } = await supabase
+            .from('users_data')
+            .update({ saldo: saldoBaru })
+            .eq('user_id', uid);
+
+        if (updateSaldoError) {
+            console.error('Error updating saldo during withdraw request:', updateSaldoError);
+            alert('Gagal mengurangi saldo. Saldo Anda tidak berkurang.');
+            return;
+        }
+
+        document.getElementById('saldo-display').textContent = `Saldo: Rp${saldoBaru.toLocaleString('id-ID')}`;
+
+        const { error: insertRequestError } = await supabase
+            .from('withdraw_requests')
+            .insert([
+                { user_id: uid, nama, metode, amount: jumlah, email: email, status: 'pending' }
+            ]);
+
+        if (insertRequestError) {
+            console.error('Error inserting withdraw request:', insertRequestError);
+            alert('Gagal mencatat permintaan penarikan. Saldo Anda akan dikembalikan. Silakan coba lagi.');
+
+            const { error: refundError } = await supabase
+                .from('users_data')
+                .update({ saldo: currentSaldo })
+                .eq('user_id', uid);
+
+            if (refundError) {
+                console.error('CRITICAL ERROR: Gagal mengembalikan saldo setelah permintaan penarikan gagal dicatat:', refundError);
+                alert('KRITIS: Saldo gagal dikembalikan setelah permintaan penarikan gagal dicatat. MOHON SEGERA HUBUNGI ADMIN!');
+} else {
+                document.getElementById('saldo-display').textContent = `Saldo: Rp${currentSaldo.toLocaleString('id-ID')}`;
+            }
+        } else {
+            alert('Permintaan penarikan dikirim dan saldo berhasil dikurangi. Menunggu proses admin.');
+            closePopup('popup-withdraw');
+            loadProfile();
+        }
+    };
+  </script>
+</body>
+</html>
